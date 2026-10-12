@@ -80,7 +80,7 @@ const getRenderIdVisitor =
 
           // Ensure PolymorphicComponent import exists at top‑level
           const program = path.findParent((p) => p.isProgram());
-          if (!program) {
+          if (!program?.isProgram()) {
             console.warn(
               `No program found for ${filename} so unable to add CreatePolymorphicComponent import`
             );

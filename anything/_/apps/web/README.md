@@ -26,3 +26,6 @@ services, replace the backend, or bypass authentication. Keep `.env` private.
 TypeScript remains strict for TypeScript modules. `allowJs` is enabled because
 the route modules are JavaScript/JSX; `checkJs` is false for the existing untyped
 JavaScript source. React Router's generated route types can now resolve them.
+Standard TypeScript include patterns cover all application, server and plugin
+modules, with build output and caches excluded. Vitest discovers only the app's
+`src/` and `test/` tests, avoiding third-party tests stored in Bun's local cache.

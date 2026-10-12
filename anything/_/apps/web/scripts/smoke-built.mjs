@@ -19,7 +19,7 @@ try {
   const base = `http://127.0.0.1:${port}`;
   let ready = false;
   for (let attempt = 0; attempt < 75; attempt++) {
-    if (child.exitCode !== null) throw new Error(`Server exited: ${diagnostics}`);
+    if (child.exitCode !== null || child.signalCode !== null) throw new Error(`Server exited: ${diagnostics}`);
     try {
       const response = await fetch(base, { signal: AbortSignal.timeout(1000) });
       if (response.status === 200) { ready = true; break; }
@@ -43,9 +43,9 @@ try {
   assert.ok(!diagnostics.includes('Error finding route files'), diagnostics);
   console.log('Built server smoke passed: homepage, signed-out session, bundled parameter routes, configuration errors, and API 404.');
 } finally {
-  if (child.exitCode === null) {
+  if (child.exitCode === null && child.signalCode === null) {
     child.kill();
     await Promise.race([new Promise((resolve) => child.once('exit', resolve)), delay(5000)]);
-    if (child.exitCode === null) child.kill('SIGKILL');
+    if (child.exitCode === null && child.signalCode === null) child.kill('SIGKILL');
   }
 }

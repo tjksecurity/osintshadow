@@ -10,7 +10,7 @@ import { contextStorage, getContext } from 'hono/context-storage';
 import { cors } from 'hono/cors';
 import { proxy } from 'hono/proxy';
 import { bodyLimit } from 'hono/body-limit';
-import { requestId } from 'hono/request-id';
+import { requestId, type RequestIdVariables } from 'hono/request-id';
 import { createHonoServer } from 'react-router-hono-server/node';
 import { serializeError } from 'serialize-error';
 import ws from 'ws';
@@ -40,7 +40,7 @@ const pool = new Pool({
 });
 const adapter = NeonAdapter(pool);
 
-const app = new Hono();
+const app = new Hono<{ Variables: RequestIdVariables }>();
 
 app.use('*', requestId());
 

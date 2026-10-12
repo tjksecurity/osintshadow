@@ -1,11 +1,15 @@
 {
 	"include": [
-		"**/*.{ts,tsx,js,jsx}",
+		"**/*.ts",
+		"**/*.tsx",
+		"**/*.js",
+		"**/*.jsx",
 		"**/.server/**/*",
 		"**/.client/**/*",
 		".react-router/types/**/*",
 		"./src/global.d.ts"
 	],
+	"exclude": ["node_modules", "build", ".bun-cache", ".vitest"],
 	"compilerOptions": {
 		"lib": ["DOM", "DOM.Iterable", "ES2022"],
 		"types": ["node", "vite/client"],
