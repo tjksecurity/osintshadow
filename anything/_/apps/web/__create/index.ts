@@ -61,7 +61,7 @@ app.onError((err, c) => {
       500
     );
   }
-  return c.html(getHTMLForErrorPage(err), 200);
+  return c.html(getHTMLForErrorPage(err), 500);
 });
 
 if (process.env.CORS_ORIGINS) {
@@ -245,13 +245,24 @@ app.all('/integrations/:path{.+}', async (c, next) => {
 
 app.use('/api/auth/*', async (c, next) => {
   if (isAuthAction(c.req.path)) {
+    if (!process.env.AUTH_SECRET) {
+      // A signed-out session is valid without inventing an authenticated user.
+      if (c.req.path === '/api/auth/session' && c.req.method === 'GET') return c.json(null);
+      return c.json({ error: 'Authentication requires AUTH_SECRET and DATABASE_URL.' }, 503);
+    }
     return authHandler()(c, next);
   }
   return next();
 });
 app.route(API_BASENAME, api);
+app.all('/api/*', (c) => c.json({ error: 'API route not found.' }, 404));
+
+const port = Number(process.env.PORT ?? '43304');
+if (!Number.isInteger(port) || port < 1 || port > 65535) throw new Error('PORT must be an integer from 1 to 65535.');
 
 export default await createHonoServer({
   app,
   defaultLogger: false,
+  hostname: process.env.HOST ?? '127.0.0.1',
+  port,
 });

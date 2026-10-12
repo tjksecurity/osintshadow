@@ -4,3 +4,8 @@
 # React Router
 /.react-router/
 /build/
+/.vitest/
+/.bun-cache/
+.env
+.env.local
+*.log
