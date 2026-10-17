@@ -836,12 +836,7 @@ function getStripe({ projectGroupId, token }: GetStripeParams) {
   }
   return StripeClient;
 }
-const hasEnv =
-  env.CREATE_TEMP_API_KEY &&
-  env.NEXT_PUBLIC_PROJECT_GROUP_ID &&
-  env.NEXT_PUBLIC_CREATE_API_BASE_URL;
-
-const stripe = hasEnv
+const stripe = env.CREATE_TEMP_API_KEY && env.NEXT_PUBLIC_PROJECT_GROUP_ID && env.NEXT_PUBLIC_CREATE_API_BASE_URL
   ? getStripe({
       projectGroupId: env.NEXT_PUBLIC_PROJECT_GROUP_ID,
       token: env.CREATE_TEMP_API_KEY,

@@ -80,8 +80,9 @@ export default defineConfig({
   clearScreen: false,
   server: {
     allowedHosts: true,
-    host: '0.0.0.0',
-    port: 4000,
+    host: '127.0.0.1',
+    port: 43304,
+    strictPort: true,
     hmr: {
       overlay: false,
     },
