@@ -1,0 +1,1 @@
+{"framework":null,"installCommand":"cd anything/_/apps/web && npm install --ignore-scripts --legacy-peer-deps","buildCommand":"cd anything/_/apps/web && npx vite build --config vite.test-preview.config.ts","outputDirectory":"anything/_/apps/web/test-dist","rewrites":[{"source":"/(.*)","destination":"/index.html"}]}
