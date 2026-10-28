@@ -9,15 +9,11 @@ export default function ForgotPasswordPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
-  const [resetUrl, setResetUrl] = useState("");
-  const [emailSent, setEmailSent] = useState(null); // null = unknown, true/false from API
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setSuccess(false);
-    setResetUrl("");
-    setEmailSent(null);
 
     const normalized = email.trim().toLowerCase();
     if (!normalized) return;
@@ -35,13 +31,6 @@ export default function ForgotPasswordPage() {
           data?.error ||
             `When fetching /api/auth/password/forgot, the response was [${res.status}] ${res.statusText}`,
         );
-      }
-      const data = await res.json();
-      if (data?.resetUrl) {
-        setResetUrl(data.resetUrl);
-      }
-      if (typeof data?.emailSent === "boolean") {
-        setEmailSent(data.emailSent);
       }
       setSuccess(true);
     } catch (err) {
@@ -74,26 +63,9 @@ export default function ForgotPasswordPage() {
           {success ? (
             <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-lg p-3 mb-6">
               <p className="text-emerald-400 text-sm">
-                If an account exists for that email, you'll get a reset link.
-                Please check your inbox.
+                Check your inbox for password reset instructions. If you don't
+                receive an email, contact support.
               </p>
-              {emailSent === false && (
-                <p className="text-slate-300 text-xs mt-2">
-                  Email sending isn't configured yet, but you can use the link
-                  below right away.
-                </p>
-              )}
-              {resetUrl ? (
-                <p className="text-slate-300 text-xs mt-3">
-                  Reset link:{" "}
-                  <a
-                    href={resetUrl}
-                    className="text-[#00D1FF] hover:underline break-all"
-                  >
-                    {resetUrl}
-                  </a>
-                </p>
-              ) : null}
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-6">
@@ -140,3 +112,4 @@ export default function ForgotPasswordPage() {
     </div>
   );
 }
+

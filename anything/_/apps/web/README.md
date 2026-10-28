@@ -29,3 +29,24 @@ JavaScript source. React Router's generated route types can now resolve them.
 Standard TypeScript include patterns cover all application, server and plugin
 modules, with build output and caches excluded. Vitest discovers only the app's
 `src/` and `test/` tests, avoiding third-party tests stored in Bun's local cache.
+
+Password reset requires `RESEND_API_KEY`, `EMAIL_FROM`, and a trusted `APP_URL`
+(or `AUTH_URL`) set by the operator. The link origin must use HTTPS in
+production; local HTTP is allowed only for loopback development. Request Host
+and forwarded headers never choose reset-link destinations. The endpoint returns
+the same `{ ok: true }` body for known/unknown accounts and delivery outcomes,
+and never returns reset links or delivery-status flags. Missing delivery
+configuration is logged server-side and produces no reset token.
+
+The embedded Expo sign-in bridge permits same-origin parents by default, with
+both an exact `postMessage` target and a `frame-ancestors` policy. If a separate
+trusted parent is required, set `EXPO_AUTH_PARENT_ORIGIN` to its single HTTPS
+origin (no path, query, wildcard or credentials). Local HTTP origins are allowed
+only for loopback development. Invalid configuration fails closed. Token
+responses are not cached, and profile data cannot inject HTML into the script.
+
+`node --test test/auth-security.test.mjs` exercises both route handlers with
+isolated database, email and token-verification dependencies. It uses no
+credentials or external services and is included in `bun run test`.
+
+
