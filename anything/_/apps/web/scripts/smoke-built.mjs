@@ -30,18 +30,27 @@ try {
   const session = await fetch(`${base}/api/auth/session`, { signal: AbortSignal.timeout(5000) });
   assert.equal(session.status, 200);
   assert.equal(await session.json(), null);
-  for (const route of ['/api/investigations', '/api/investigations/synthetic/progress']) {
+  for (const route of ['/api/investigations', '/api/investigations/synthetic/progress', '/api/intelligence']) {
     const response = await fetch(base + route, { signal: AbortSignal.timeout(5000) });
     assert.equal(response.status, 503);
     const body = await response.json();
     assert.equal(body.code, 'CONFIGURATION_REQUIRED');
     assert.deepEqual(body.missing, ['DATABASE_URL', 'AUTH_SECRET']);
   }
+  const intelligencePage = await fetch(`${base}/intelligence`, { signal: AbortSignal.timeout(5000) });
+  assert.equal(intelligencePage.status, 200);
+  const intelligenceAction = await fetch(`${base}/api/intelligence`, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'ipinfo', input: { ip: '8.8.8.8' } }),
+    signal: AbortSignal.timeout(5000),
+  });
+  assert.equal(intelligenceAction.status, 503);
+  assert.equal((await intelligenceAction.json()).code, 'CONFIGURATION_REQUIRED');
   const missing = await fetch(`${base}/api/not-a-real-route`, { signal: AbortSignal.timeout(5000) });
   assert.equal(missing.status, 404);
   assert.equal((await missing.json()).error, 'API route not found.');
   assert.ok(!diagnostics.includes('Error finding route files'), diagnostics);
-  console.log('Built server smoke passed: homepage, signed-out session, bundled parameter routes, configuration errors, and API 404.');
+  console.log('Built server smoke passed: homepage, intelligence page, signed-out session, bundled parameter routes, intelligence GET/POST configuration guards, and API 404.');
 } finally {
   if (child.exitCode === null && child.signalCode === null) {
     child.kill();
