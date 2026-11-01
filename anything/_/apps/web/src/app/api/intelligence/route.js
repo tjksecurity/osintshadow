@@ -1,7 +1,7 @@
 import { auth } from "@/auth";
-import { dispatchAction } from "../../../../services/intelligence/service.mjs";
+import { dispatchIntelligenceAction } from "./remote.js";
 import { createIntelligenceHandlers } from "./handlers.js";
 
-const handlers = createIntelligenceHandlers({ authenticate: auth, dispatchAction });
+const handlers = createIntelligenceHandlers({ authenticate: auth, dispatchAction: dispatchIntelligenceAction });
 export const GET = handlers.GET;
 export const POST = handlers.POST;

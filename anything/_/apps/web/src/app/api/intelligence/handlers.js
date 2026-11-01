@@ -1,3 +1,6 @@
+import { IntelligenceError, toErrorResult } from "../../../../services/intelligence/service.mjs";
+import { getProviderReadiness } from "../../../../services/intelligence/provider-readiness.mjs";
+
 const ACTIONS = new Set(["ipinfo", "breach", "profile", "onion"]);
 const MAX_BODY_BYTES = 8192;
 
@@ -65,7 +68,8 @@ export function createIntelligenceHandlers({ authenticate, dispatchAction, getCo
         HIBP_API_KEY: Boolean(env.HIBP_API_KEY),
         PUPPETEER_EXECUTABLE_PATH: Boolean(env.PUPPETEER_EXECUTABLE_PATH),
         TOR_SOCKS_PROXY: Boolean(env.TOR_SOCKS_PROXY),
-      }, configurationOnly: true } });
+      }, remoteBrowser: { urlConfigured: Boolean(env.INTELLIGENCE_WORKER_URL), tokenConfigured: Boolean(env.INTELLIGENCE_WORKER_TOKEN) },
+      providers: getProviderReadiness(env), configurationOnly: true } });
     },
     async POST(request) {
       const denied = await authorize();
@@ -93,4 +97,3 @@ export function createIntelligenceHandlers({ authenticate, dispatchAction, getCo
     },
   };
 }
-import { IntelligenceError, toErrorResult } from "../../../../services/intelligence/service.mjs";

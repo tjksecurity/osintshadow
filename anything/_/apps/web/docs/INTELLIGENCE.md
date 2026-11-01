@@ -19,14 +19,45 @@ source, browser variables, screenshots, test fixtures, or this document.
 | --- | --- |
 | `DATABASE_URL`, `AUTH_SECRET` | Existing application authentication and API configuration guard |
 | `IPINFO_TOKEN` | Explicit-IP IPinfo lookup |
+| `IPINFO_API_MODE` | `legacy` by default; select `lite` or `lookup` only for the verified account endpoint |
 | `HIBP_API_KEY` | Have I Been Pwned email lookup |
+| `X_API_MODE` | `browser` by default; `api` selects the official X HTTP adapter |
+| `X_API_BEARER_TOKEN`, `X_INCLUDED_ACCESS_VERIFIED` | Official X API credentials and independently verified included allowance; the flag must be the literal string `true` |
 | `PUPPETEER_EXECUTABLE_PATH` | Optional override for an existing Chrome/Chromium executable; installed Chrome is otherwise detected when browser actions run |
 | `TOR_SOCKS_PROXY` | Tor SOCKS proxy used only for onion retrieval |
+| `INTELLIGENCE_WORKER_URL`, `INTELLIGENCE_WORKER_TOKEN` | Optional server-only remote browser-worker origin and token; configure both together |
 
-The app calls `services/intelligence/service.mjs` directly inside the authenticated
-Node server. It does not launch an additional bridge or alter the existing
-investigation pipeline. The browser receives provider results and configuration
-errors; it never receives provider credentials.
+The authenticated Node API always executes IPinfo, HIBP, and explicitly selected
+official X API operations locally with this app's server-side provider keys. It
+does not send those keys to the browser worker. Existing investigation collectors
+and accounting paths remain on their existing routes.
+
+Browser-mode X extraction and onion retrieval can use a hosted browser worker.
+Set `INTELLIGENCE_WORKER_URL` to its HTTPS origin, with no credentials, path,
+query, or fragment. A trailing `/` is allowed. Production rejects loopback names
+and addresses. Set `INTELLIGENCE_WORKER_TOKEN` to the matching server-only bearer
+token, at least 32 characters long and without whitespace. No worker settings
+belong in `NEXT_PUBLIC_*` or browser code.
+
+With both worker variables absent, local Node/Chrome/Tor behavior is preserved.
+Partial or invalid worker configuration fails closed for browser operations;
+HTTP-provider operations continue using their local adapters. Hosted serverless
+deployments need a configured and independently deployed worker for browser
+operations. Setting these variables does not publish a worker, approve billing,
+or establish live connectivity.
+
+`src/app/api/intelligence/remote.js` validates and normalizes the action before
+making one `POST /intelligence` request. It forwards only the action, its allowed
+input, and the worker bearer header. It never forwards browser cookies, user
+authorization, provider keys, or the app environment. Responses are limited to
+1.2 MB, checked against the requested profile/onion target, and reduced to the
+expected result fields. Unexpected upstream error text is not exposed.
+
+The remote deadline is 65 seconds, including response-body reading. There are no
+automatic retries. A Cloudflare HTTP 202 starting response becomes app HTTP 503
+with `WORKER_STARTING` and `Retry-After: 5`; the user decides when to try again.
+Worker authentication failures return a server-configuration error rather than
+changing the user's authenticated app session.
 
 For an onion operation, the browser uses a temporary local SOCKS gate before the
 configured Tor proxy. The gate allows only the requested onion host and blocks
@@ -48,7 +79,10 @@ continues to return HTTP 503 before route execution.
 presence booleans keyed by their environment-variable names. An absent browser
 override does not disable automatic Chrome detection. Those booleans do not
 establish provider connectivity, key validity, browser availability, or working
-Tor routing.
+Tor routing. `remoteBrowser` contains only worker URL/token presence booleans;
+it does not reveal their values. `providers` includes safe mode enums, credential
+presence, and configured allowance flags, explicitly marked as metadata without
+live checks.
 
 ## Browser operations
 
@@ -72,6 +106,10 @@ about persuasion or proof of useful performance on future data.
 injected authentication/provider boundaries, including failed authentication,
 cross-origin requests, malformed/oversized bodies, all four dispatch actions,
 configuration redaction, rate limits, and unexpected-error redaction.
+It also exercises the actual remote-dispatch helper: default local behavior,
+browser-only routing, provider-secret isolation, invalid-input rejection before
+network/compute, URL/token validation, cold-start responses, worker errors,
+bounded/stalled response bodies, target matching, and timeout cancellation.
 
 `src/app/intelligence/page.test.jsx` exercises sign-in gating, all seven visible
 tools, explicit fingerprint/cookie actions, provider-form request/result/error
