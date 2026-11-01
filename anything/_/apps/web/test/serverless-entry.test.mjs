@@ -8,6 +8,8 @@ test('Vercel publishes the client build and routes requests to the original serv
   assert.equal(config.outputDirectory, 'build/client');
   assert.equal(config.functions['api/index.mjs'].includeFiles, 'build/server/**');
   assert.deepEqual(config.rewrites, [{ source: '/(.*)', destination: '/api/index' }]);
+  const manifest = JSON.parse(await readFile(new URL('../package.json', import.meta.url), 'utf8'));
+  assert.match(manifest.scripts.build, /node scripts\/stage-runtime\.mjs/);
 });
 
 test('serverless entry preserves requests and responses while reusing the server', async () => {
@@ -25,9 +27,7 @@ test('serverless entry preserves requests and responses while reusing the server
     } } };
   };
   assert.ok(source.includes("import('../build/server/index.js')"));
-  assert.ok(source.includes("import('../build/server/assets/server-build.js')"), 'The function must directly trace the split SSR build and its dependencies.');
   source = source.replace("import('../build/server/index.js')", `globalThis[${JSON.stringify(fixtureKey)}]()`);
-  source = source.replace("import('../build/server/assets/server-build.js')", 'Promise.resolve({})');
   try {
     const { default: entry } = await import('data:text/javascript;base64,' + Buffer.from(source).toString('base64'));
     const request = new Request('https://example.invalid/api/synthetic?part=1', {

@@ -12,12 +12,6 @@ function getApplication() {
 
 export default {
   async fetch(request) {
-    const app = await getApplication();
-    if (!new URL(request.url).pathname.startsWith('/api/')) {
-      // A direct dependency edge lets Vercel trace the split SSR build's
-      // external packages. Wait until the app initializes to avoid its cycle.
-      await import('../build/server/assets/server-build.js');
-    }
-    return app.fetch(request);
+    return (await getApplication()).fetch(request);
   },
 };

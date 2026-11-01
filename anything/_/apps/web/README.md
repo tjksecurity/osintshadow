@@ -18,8 +18,11 @@ It uses no credentials or provider calls and stops only its own child process.
 
 Vercel uses `vercel.json` and `api/index.mjs` from this app root. The client build
 is served as static assets; other requests reach the same bundled Hono/React
-Router app in fetch mode without opening a standalone listener. The built smoke
-check also exercises this entry, including signed-out auth and bundled API
+Router app in fetch mode without opening a standalone listener. The build stages
+installed production dependencies beside the server so deployment does not
+depend on tracing generated SSR chunks. The smoke check copies only deployable
+server files to an isolated temporary directory and tests this entry with and
+without synthetic auth configuration. It checks signed-out auth and bundled API
 routes. Keep the project's Root Directory set to `anything/_/apps/web`.
 
 The local homepage and account screens work without external credentials.
