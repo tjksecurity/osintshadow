@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { spawn } from 'node:child_process';
+import { spawn, spawnSync } from 'node:child_process';
 import { createServer } from 'node:net';
 import { setTimeout as delay } from 'node:timers/promises';
 
@@ -50,4 +50,13 @@ try {
   }
 }
 
-await import('./smoke-fetch.mjs');
+for (const configuredAuth of ['0', '1']) {
+  const result = spawnSync(process.execPath, ['scripts/smoke-fetch.mjs'], {
+    cwd: process.cwd(),
+    env: { ...process.env, SHADOWTRACE_SMOKE_WITH_AUTH: configuredAuth },
+    encoding: 'utf8',
+    timeout: 30000,
+  });
+  assert.equal(result.status, 0, `${result.error ?? ''}\n${result.stdout}\n${result.stderr}`);
+  process.stdout.write(result.stdout);
+}

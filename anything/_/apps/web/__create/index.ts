@@ -88,8 +88,8 @@ for (const method of ['post', 'put', 'patch'] as const) {
 if (process.env.AUTH_SECRET) {
   app.use(
     '*',
-    initAuthConfig((c) => ({
-      secret: c.env.AUTH_SECRET,
+    initAuthConfig(() => ({
+      secret: process.env.AUTH_SECRET,
       pages: {
         signIn: '/account/signin',
         signOut: '/account/logout',
@@ -262,9 +262,12 @@ async function initializeServer() {
   // Vercel owns the HTTP listener. Keep the same auth/API middleware and SSR
   // app, but expose its fetch handler instead of opening a second socket.
   if (process.env.SHADOWTRACE_SERVER_MODE === 'fetch') {
-    // The Hono Vite plugin resolves this virtual build module.
-    const build = await import('virtual:react-router/server-build');
-    const handler = createRequestHandler(build, 'production');
+    // Defer the virtual build until request time, as the standalone adapter
+    // does, so shared Rollup chunks can finish initializing before SSR loads.
+    const handler = createRequestHandler(
+      () => import('virtual:react-router/server-build'),
+      'production',
+    );
     app.all('*', (c) => handler(c.req.raw));
     return app;
   }
