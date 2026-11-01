@@ -1,3 +1,5 @@
+import { safeReportUrl } from '../../utils/reportSafety.js';
+
 export function ReportTab({ investigation, user }) {
   const isAdminEmail =
     (user?.email || "").toLowerCase() === "glossontravis@gmail.com";
@@ -5,16 +7,17 @@ export function ReportTab({ investigation, user }) {
   const isTrial =
     !isAdmin &&
     (!user?.subscription_plan || user?.subscription_plan === "trial");
+  const pdfUrl = safeReportUrl(investigation.pdf_url, { allowRelative: true });
 
   return (
     <section className="space-y-4">
       <div className="bg-[#2D384E] rounded-lg p-4">
         <div className="flex items-center justify-between">
           <h3 className="font-semibold">HTML Report</h3>
-          {investigation.pdf_url && !isTrial && (
+          {pdfUrl && !isTrial && (
             <a
               className="text-[#00D1FF] hover:underline"
-              href={investigation.pdf_url}
+              href={pdfUrl}
               target="_blank"
               rel="noreferrer"
             >
@@ -32,6 +35,8 @@ export function ReportTab({ investigation, user }) {
           <iframe
             title="report"
             className="w-full h-[600px] mt-3 bg-white rounded"
+            sandbox="allow-popups allow-popups-to-escape-sandbox"
+            referrerPolicy="no-referrer"
             srcDoc={investigation.html_content}
           />
         ) : (

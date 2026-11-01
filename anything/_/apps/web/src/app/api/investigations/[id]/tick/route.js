@@ -1,5 +1,6 @@
 import { auth } from "@/auth";
 import sql from "@/app/api/utils/sql";
+import { readStoredProcessingFlags } from '../../utils/processingFlags.js';
 import {
   insertProgressEvent,
   logEvent,
@@ -155,6 +156,14 @@ export async function POST(request, { params }) {
       );
     }
 
+    const flags = readStoredProcessingFlags(inv.processing_flags);
+    if (!flags) {
+      return Response.json({
+        error: 'Investigation processing configuration must be reconciled before collection.',
+        code: 'PROCESSING_FLAGS_REQUIRED', debugId,
+      }, { status: 409, headers: cacheHeaders });
+    }
+
     // Attempt to claim a short-lived lock so multiple ticks don't run at the same time.
     const token = createToken();
     const claimed = await sql`
@@ -233,8 +242,6 @@ export async function POST(request, { params }) {
         { headers: cacheHeaders },
       );
     }
-
-    const flags = inv.processing_flags || {};
 
     // Helper to ensure we always release the lock
     const releaseLock = async () => {

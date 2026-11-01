@@ -17,6 +17,7 @@ interface NeonUser extends AdapterUser {
 
 interface NeonAdapter extends Adapter {
 	createUser(data: AdapterUser): Promise<AdapterUser>;
+	createCredentialsUser(data: Omit<AdapterUser, 'id'>, passwordHash: string): Promise<AdapterUser>;
 	getUser(userId: string): Promise<AdapterUser | null>;
 	getUserByEmail(email: string): Promise<NeonUser | null>;
 	getUserByAccount(data: {
@@ -41,6 +42,25 @@ interface NeonAdapter extends Adapter {
 
 export default function NeonAdapter(client: Pool): NeonAdapter {
 	return {
+		async createCredentialsUser(user, passwordHash) {
+			const query = `
+        WITH created_user AS (
+          INSERT INTO auth_users (name, email, "emailVerified", image)
+          VALUES ($1, $2, $3, $4)
+          RETURNING id, name, email, "emailVerified", image
+        ), created_account AS (
+          INSERT INTO auth_accounts ("userId", provider, type, "providerAccountId", password)
+          SELECT id, 'credentials', 'credentials', id::text, $5 FROM created_user
+          RETURNING "userId"
+        )
+        SELECT users.* FROM created_user AS users
+        JOIN created_account AS accounts ON accounts."userId" = users.id
+      `;
+			// PostgreSQL commits both inserts as one statement, or neither on error.
+			const result = await client.query(query, [user.name, user.email, user.emailVerified, user.image, passwordHash]);
+			if (!result.rows[0]?.id) throw new Error('Credential account creation returned no user.');
+			return result.rows[0];
+		},
 		async createVerificationToken(
 			verificationToken: VerificationToken
 		): Promise<VerificationToken> {

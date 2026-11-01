@@ -3,7 +3,6 @@ import sql from "@/app/api/utils/sql";
 import {
   checkAuthentication,
   checkUserCredits,
-  deductUserCredit,
 } from "./utils/auth.js";
 import {
   createInvestigation,
@@ -11,6 +10,7 @@ import {
   insertProgressEvent,
 } from "./utils/database.js";
 import { normalizePhoneCandidate } from "./osint/phoneValidation.js";
+import { readStoredProcessingFlags } from './utils/processingFlags.js';
 
 export async function GET(request) {
   try {
@@ -173,10 +173,10 @@ export async function POST(request) {
 
     const adminEmail = "glossontravis@gmail.com";
     const isAdminByEmail = (email || "").toLowerCase() === adminEmail;
-    const admin = isAdmin || isAdminByEmail;
+    let admin = isAdmin || isAdminByEmail;
 
     // Trial restrictions check
-    const isTrial =
+    let isTrial =
       !admin && (!user.subscription_plan || user.subscription_plan === "trial");
 
     if (isTrial) {
@@ -217,8 +217,19 @@ export async function POST(request) {
         userId,
         target_type,
         target_value,
+        body,
       );
     } catch (createError) {
+      if (['USER_NOT_FOUND', 'TRIAL_EXCEEDED', 'INSUFFICIENT_CREDITS'].includes(createError.code)) {
+        const messages = {
+          USER_NOT_FOUND: 'User not found',
+          TRIAL_EXCEEDED: 'Trial limit reached. Please upgrade to continue.',
+          INSUFFICIENT_CREDITS: 'No credits remaining',
+        };
+        return Response.json({ error: messages[createError.code], code: createError.code }, {
+          status: createError.code === 'USER_NOT_FOUND' ? 404 : 402,
+        });
+      }
       console.error("Investigation creation failed");
 
       await logEvent(sql, "investigation_create_failed", "Create failed", {
@@ -293,57 +304,18 @@ export async function POST(request) {
     }
 
     investigationId = investigation.id;
+    // Normalize capabilities using the account state that authorized the row.
+    if (investigation.__creditAuthorization) {
+      admin = investigation.__creditAuthorization.isAdmin;
+      isTrial = investigation.__creditAuthorization.isTrial;
+    }
     console.log("✅ INVESTIGATION CREATED SUCCESSFULLY");
     console.log("Investigation ID:", investigationId);
     console.log("Investigation ID type:", typeof investigationId);
 
-    // Processing flags normalization
-    const processingFlags = isTrial
-      ? {
-          includeWebScraping: false,
-          includeNSFW: false,
-          includeDeepImageScan: false,
-          includeDeepScan: false,
-          includeCriminal: false,
-          includeCourt: false,
-          includeProperty: false,
-          includeLicensePlate: false,
-          licensePlateRegion: null,
-          // Social media disabled for trial users
-          includeSocialMedia: false,
-          socialPlatforms: [],
-          enableRealTimeMonitoring: false,
-        }
-      : {
-          includeWebScraping: include_web_scraping !== false,
-          includeNSFW: include_nsfw !== false,
-          includeDeepImageScan: !!include_deep_image_scan,
-          includeDeepScan: !!include_deep_scan,
-          includeCriminal: include_criminal !== false,
-          includeCourt: include_court !== false,
-          includeProperty: include_property !== false,
-          includeLicensePlate: include_license_plate !== false,
-          licensePlateRegion: plate_region || null,
-          // Social media options for paid users
-          includeSocialMedia: include_social_media !== false,
-          socialPlatforms: Array.isArray(social_platforms)
-            ? social_platforms
-            : ["twitter", "instagram", "linkedin", "facebook"],
-          enableRealTimeMonitoring: !!enable_real_time_monitoring,
-        };
-
-    console.log("✓ Processing flags:", processingFlags);
-
-    // NEW: persist flags on the investigation row so production can reliably start processing later
-    try {
-      await sql`
-        UPDATE investigations
-        SET processing_flags = ${JSON.stringify(processingFlags)}
-        WHERE id = ${investigationId}
-      `;
-    } catch (e) {
-      console.warn("Failed to persist processing_flags (non-fatal)", e);
-    }
+    // Collection policy was persisted with the row and debit in one transaction.
+    const processingFlags = readStoredProcessingFlags(investigation.processing_flags);
+    if (!processingFlags) throw new Error('Investigation processing configuration was not persisted.');
 
     // NEW: write an immediate progress event so the UI shows *something* even if processing starts later
     try {
@@ -359,29 +331,7 @@ export async function POST(request) {
       console.warn("Failed to insert initial progress event", e);
     }
 
-    // Credit deduction for non-admin, non-trial
-    if (!admin && !isTrial) {
-      console.log("=== CREDIT DEDUCTION ===");
-      try {
-        await deductUserCredit(sql, userId);
-        console.log("✓ Credit deducted for user:", userId);
-      } catch (creditError) {
-        console.error("Deduct credit failed:", creditError);
-        console.error("Credit deduction stack:", creditError.stack);
-        await logEvent(
-          sql,
-          "credit_deduction_failed",
-          "Credit deduction failed",
-          {
-            user_id: userId,
-            investigation_id: investigation.id,
-            error_message: creditError.message,
-            error_stack: creditError.stack,
-          },
-        );
-        // Don't fail the entire request for credit deduction errors
-      }
-    }
+    // The required credit debit committed atomically with row creation.
 
     // Event logging
     try {

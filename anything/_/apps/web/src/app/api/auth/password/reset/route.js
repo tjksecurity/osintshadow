@@ -22,52 +22,68 @@ export async function POST(request) {
       );
     }
 
-    // Verify token is valid and not expired
-    const tokens = await sql(
-      "SELECT token, identifier, expires FROM auth_verification_token WHERE identifier = $1 AND token = $2 AND expires > NOW() LIMIT 1",
+    // Preserve the inexpensive rejection path for invalid tokens. This read is
+    // only a preflight: the mutation rechecks expiry and atomically claims it.
+    const [preflight] = await sql(
+      `SELECT EXISTS (
+         SELECT 1 FROM auth_verification_token
+         WHERE identifier = $1 AND token = $2 AND expires > NOW()
+       ) AS token_exists,
+       EXISTS (SELECT 1 FROM auth_users WHERE LOWER(email) = LOWER($1)) AS user_exists`,
       [email, token],
     );
-
-    if (tokens.length === 0) {
-      return Response.json(
-        { error: "Invalid or expired token" },
-        { status: 400 },
-      );
+    if (!preflight?.token_exists) {
+      return Response.json({ error: "Invalid or expired token" }, { status: 400 });
     }
-
-    // Ensure user exists
-    const users = await sql(
-      "SELECT id, email FROM auth_users WHERE LOWER(email) = LOWER($1) LIMIT 1",
-      [email],
-    );
-    if (users.length === 0) {
+    if (!preflight.user_exists) {
       return Response.json({ error: "Invalid user" }, { status: 400 });
     }
 
-    const user = users[0];
-
-    // Hash the new password
+    // Hash before the atomic database mutation. A hash failure cannot consume
+    // a token, and validity/expiry are checked again at mutation time.
     const hashed = await argon2.hash(password);
-
-    // Try to update any existing credentials rows
-    const updated = await sql(
-      "UPDATE auth_accounts SET password = $1 WHERE \"userId\" = $2 AND provider IN ('credentials', 'credentials-signin') RETURNING id",
-      [hashed, user.id],
+    const [result] = await sql(
+      `WITH candidate AS MATERIALIZED (
+         SELECT token FROM auth_verification_token
+         WHERE identifier = $1 AND token = $2 AND expires > NOW()
+       ), owner AS MATERIALIZED (
+         SELECT id FROM auth_users WHERE LOWER(email) = LOWER($1) LIMIT 1
+       ), claimed AS (
+         DELETE FROM auth_verification_token
+         WHERE identifier = $1 AND token = $2 AND expires > NOW()
+           AND EXISTS (SELECT 1 FROM owner)
+         RETURNING token
+       ), updated AS (
+         UPDATE auth_accounts AS accounts SET password = $3
+         FROM owner
+         WHERE accounts."userId" = owner.id
+           AND accounts.provider IN ('credentials', 'credentials-signin')
+           AND EXISTS (SELECT 1 FROM claimed)
+         RETURNING accounts.id
+       ), inserted AS (
+         INSERT INTO auth_accounts ("userId", type, provider, "providerAccountId", password)
+         SELECT owner.id, 'credentials', 'credentials', owner.id::text, $3
+         FROM owner
+         WHERE EXISTS (SELECT 1 FROM claimed)
+           AND NOT EXISTS (SELECT 1 FROM updated)
+         RETURNING id
+       )
+       SELECT EXISTS (SELECT 1 FROM candidate) AS token_exists,
+              EXISTS (SELECT 1 FROM owner) AS user_exists,
+              EXISTS (SELECT 1 FROM claimed) AS token_claimed,
+              (EXISTS (SELECT 1 FROM updated) OR EXISTS (SELECT 1 FROM inserted)) AS password_updated`,
+      [email, token, hashed],
     );
 
-    if (updated.length === 0) {
-      // If none existed, create a credentials row that matches the adapter's lookup
-      await sql(
-        'INSERT INTO auth_accounts ("userId", type, provider, "providerAccountId", password) VALUES ($1, $2, $3, $4, $5)',
-        [user.id, "credentials", "credentials", String(user.id), hashed],
-      );
+    // DELETE is the token claim. Concurrent retries cannot both claim the same
+    // row, and any password-write failure rolls the entire statement back.
+    if (!result?.token_exists || !result?.token_claimed) {
+      if (result?.token_exists && !result?.user_exists) {
+        return Response.json({ error: "Invalid user" }, { status: 400 });
+      }
+      return Response.json({ error: "Invalid or expired token" }, { status: 400 });
     }
-
-    // Invalidate the token
-    await sql(
-      "DELETE FROM auth_verification_token WHERE identifier = $1 AND token = $2",
-      [email, token],
-    );
+    if (!result.password_updated) throw new Error("Password reset did not update credentials.");
 
     return Response.json({ ok: true });
   } catch (err) {

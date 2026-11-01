@@ -199,22 +199,15 @@ if (process.env.AUTH_SECRET) {
             // logic to verify if user exists
             const user = await adapter.getUserByEmail(email);
             if (!user) {
-              const newUser = await adapter.createUser({
-                id: crypto.randomUUID(),
+              // Hash before opening the atomic persistence operation: hashing
+              // or credential insertion failure must not leave an orphan user.
+              const passwordHash = await hash(password);
+              const newUser = await adapter.createCredentialsUser({
                 emailVerified: null,
                 email,
                 name: typeof name === 'string' && name.length > 0 ? name : undefined,
                 image: typeof image === 'string' && image.length > 0 ? image : undefined,
-              });
-              await adapter.linkAccount({
-                extraData: {
-                  password: await hash(password),
-                },
-                type: 'credentials',
-                userId: newUser.id,
-                providerAccountId: newUser.id,
-                provider: 'credentials',
-              });
+              }, passwordHash);
               return newUser;
             }
             return null;

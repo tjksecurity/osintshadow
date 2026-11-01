@@ -1,3 +1,15 @@
+import { escapeReportText as text, safeReportUrl } from '../../../../utils/reportSafety.js';
+
+function sourceLink(url, label = url) {
+  const href = safeReportUrl(url);
+  const content = text(label);
+  return href
+    ? `<a href="${text(href)}" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer">${content}</a>`
+    : content;
+}
+
+const rawData = (value) => text(JSON.stringify(value, null, 2));
+
 export function generateReportHTML(osintData, aiAnalysis) {
   const phoneCandidates = (osintData.phone_seeds || []).filter(
     (candidate) => candidate?.verification_status === "unverified_candidate",
@@ -8,6 +20,8 @@ export function generateReportHTML(osintData, aiAnalysis) {
     <html>
     <head>
       <title>ShadowTrace Investigation Report</title>
+      <meta name="referrer" content="no-referrer" />
+      <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src https: http:; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'; frame-src 'none'" />
       <style>
         body { font-family: Arial, sans-serif; margin: 40px; }
         .header { border-bottom: 2px solid #00D1FF; padding-bottom: 20px; margin-bottom: 30px; }
@@ -36,16 +50,16 @@ export function generateReportHTML(osintData, aiAnalysis) {
     <body>
       <div class="header">
         <h1>ShadowTrace OSINT Investigation Report</h1>
-        <p><strong>Target:</strong> ${osintData.target_value} (${osintData.target_type})</p>
+        <p><strong>Target:</strong> ${text(osintData.target_value)} (${text(osintData.target_type)})</p>
         <p><strong>Generated:</strong> ${new Date().toLocaleString()}</p>
       </div>
 
       <div class="section">
         <h2>Executive Summary</h2>
-        <p>${aiAnalysis.summary}</p>
-        <p><strong>Risk Score:</strong> <span class="risk-score">${aiAnalysis.risk_score}/100</span> (${aiAnalysis.risk_level})</p>
-        <p><strong>Anomalies:</strong> ${aiAnalysis.anomalies || "None detected"}</p>
-        ${aiAnalysis.presentation?.headline ? `<p><em>${aiAnalysis.presentation.headline}</em></p>` : ""}
+        <p>${text(aiAnalysis.summary)}</p>
+        <p><strong>Risk Score:</strong> <span class="risk-score">${text(aiAnalysis.risk_score)}/100</span> (${text(aiAnalysis.risk_level)})</p>
+        <p><strong>Anomalies:</strong> ${text(aiAnalysis.anomalies || "None detected")}</p>
+        ${aiAnalysis.presentation?.headline ? `<p><em>${text(aiAnalysis.presentation.headline)}</em></p>` : ""}
         ${
           Array.isArray(aiAnalysis.presentation?.highlights) &&
           aiAnalysis.presentation.highlights.length
@@ -53,7 +67,7 @@ export function generateReportHTML(osintData, aiAnalysis) {
           <div>
             <h3>Key Findings</h3>
             <ul>
-              ${aiAnalysis.presentation.highlights.map((h) => `<li>${h}</li>`).join("")}
+              ${aiAnalysis.presentation.highlights.map((h) => `<li>${text(h)}</li>`).join("")}
             </ul>
           </div>
         `
@@ -63,10 +77,10 @@ export function generateReportHTML(osintData, aiAnalysis) {
 
       <div class="section">
         <h2>Cross-Platform Identity Graph</h2>
-        <p><strong>Emails:</strong> ${(aiAnalysis.identity_graph?.emails || []).join(", ") || "—"}</p>
-        <p><strong>Domains:</strong> ${(aiAnalysis.identity_graph?.domains || []).join(", ") || "—"}</p>
-        <p><strong>IPs:</strong> ${(aiAnalysis.identity_graph?.ips || []).join(", ") || "—"}</p>
-        <p><strong>Phone search targets (user-supplied; ownership is not verified):</strong> ${(aiAnalysis.presentation?.phone_numbers || aiAnalysis.identity_graph?.phones || []).join(", ") || "-"}</p>
+        <p><strong>Emails:</strong> ${text((aiAnalysis.identity_graph?.emails || []).join(", ") || "-")}</p>
+        <p><strong>Domains:</strong> ${text((aiAnalysis.identity_graph?.domains || []).join(", ") || "-")}</p>
+        <p><strong>IPs:</strong> ${text((aiAnalysis.identity_graph?.ips || []).join(", ") || "-")}</p>
+        <p><strong>Phone search targets (user-supplied; ownership is not verified):</strong> ${text((aiAnalysis.presentation?.phone_numbers || aiAnalysis.identity_graph?.phones || []).join(", ") || "-")}</p>
         <table>
           <thead><tr><th>Handle</th><th>Confidence</th><th>Platforms</th></tr></thead>
           <tbody>
@@ -74,7 +88,7 @@ export function generateReportHTML(osintData, aiAnalysis) {
               .map(
                 (h) => `
               <tr>
-                <td>${h.handle}</td>
+                <td>${text(h.handle)}</td>
                 <td>${Math.round((h.confidence || 0) * 100)}%</td>
                 <td>${(h.platforms || [])
                   .map((p) => {
@@ -87,7 +101,7 @@ export function generateReportHTML(osintData, aiAnalysis) {
                     const badge = hasEvidence
                       ? ' <span class="pill pill-evidence">Evidence-backed</span>'
                       : "";
-                    return `<a href="${p.profile_url}" target="_blank" rel="noopener">${p.platform}</a>${badge}`;
+                    return `${sourceLink(p.profile_url, p.platform)}${badge}`;
                   })
                   .join(", ")}</td>
               </tr>
@@ -108,7 +122,7 @@ export function generateReportHTML(osintData, aiAnalysis) {
           ${aiAnalysis.presentation.evidence_profiles
             .map(
               (p) =>
-                `<li><a href="${p.url}" target="_blank" rel="noopener">${p.platform}</a> ${typeof p.confidence === "number" ? `— ${Math.round(p.confidence * 100)}%` : ""}</li>`,
+                `<li>${sourceLink(p.url, p.platform)} ${typeof p.confidence === "number" ? `- ${Math.round(p.confidence * 100)}%` : ""}</li>`,
             )
             .join("")}
         </ul>
@@ -129,7 +143,7 @@ export function generateReportHTML(osintData, aiAnalysis) {
             ${phoneCandidates
               .map(
                 (p) =>
-                  `<tr><td>${p.display}</td><td>${p.extraction_method || "public page"}</td><td><a href="${p.source_url}" target="_blank" rel="noopener">${p.source_url}</a></td></tr>`,
+                  `<tr><td>${text(p.display)}</td><td>${text(p.extraction_method || "public page")}</td><td>${sourceLink(p.source_url)}</td></tr>`,
               )
               .join("")}
           </tbody>
@@ -150,7 +164,7 @@ export function generateReportHTML(osintData, aiAnalysis) {
             ${osintData.email_seeds
               .map(
                 (e) =>
-                  `<tr><td>${e.email}</td><td><a href="${e.source_url}" target="_blank" rel="noopener">${e.source_url}</a></td></tr>`,
+                  `<tr><td>${text(e.email)}</td><td>${sourceLink(e.source_url)}</td></tr>`,
               )
               .join("")}
           </tbody>
@@ -179,9 +193,9 @@ export function generateReportHTML(osintData, aiAnalysis) {
                   .filter(Boolean)
                   .join(" · ");
                 const source = d.source?.url
-                  ? `<a href="${d.source.url}" target="_blank" rel="noopener">${d.source.name || "Source"}</a>`
-                  : d.source?.name || "—";
-                return `<tr><td>${d.address || "—"}</td><td>${owners || "—"}</td><td>${sale || "—"}</td><td>${d.assessed_value ? `$${d.assessed_value}` : "—"}</td><td>${d.parcel_number || "—"}</td><td>${source}</td></tr>`;
+                  ? sourceLink(d.source.url, d.source.name || "Source")
+                  : text(d.source?.name || "-");
+                return `<tr><td>${text(d.address || "-")}</td><td>${text(owners || "-")}</td><td>${text(sale || "-")}</td><td>${text(d.assessed_value ? `$${d.assessed_value}` : "-")}</td><td>${text(d.parcel_number || "-")}</td><td>${source}</td></tr>`;
               })
               .join("")}
           </tbody>
@@ -203,7 +217,7 @@ export function generateReportHTML(osintData, aiAnalysis) {
             ${osintData.records.court_filings.items
               .map(
                 (f) =>
-                  `<tr><td>${f.case_name || "—"}</td><td>${f.court || "—"}</td><td>${f.date_filed || "—"}</td><td>${f.docket_number || "—"}</td><td>${f.url ? `<a href="${f.url}" target="_blank" rel="noopener">Open</a>` : "—"}</td></tr>`,
+                  `<tr><td>${text(f.case_name || "-")}</td><td>${text(f.court || "-")}</td><td>${text(f.date_filed || "-")}</td><td>${text(f.docket_number || "-")}</td><td>${f.url ? sourceLink(f.url, "Open") : "-"}</td></tr>`,
               )
               .join("")}
           </tbody>
@@ -225,7 +239,7 @@ export function generateReportHTML(osintData, aiAnalysis) {
             ${osintData.records.criminal.items
               .map(
                 (c) =>
-                  `<tr><td>${c.case_name || "—"}</td><td>${c.court || "—"}</td><td>${c.date_filed || "—"}</td><td>${c.docket_number || "—"}</td><td>${c.url ? `<a href="${c.url}" target="_blank" rel="noopener">Open</a>` : "—"}</td></tr>`,
+                  `<tr><td>${text(c.case_name || "-")}</td><td>${text(c.court || "-")}</td><td>${text(c.date_filed || "-")}</td><td>${text(c.docket_number || "-")}</td><td>${c.url ? sourceLink(c.url, "Open") : "-"}</td></tr>`,
               )
               .join("")}
           </tbody>
@@ -252,9 +266,9 @@ export function generateReportHTML(osintData, aiAnalysis) {
                     ? `${reg?.issued_on || ""}${reg?.expires_on ? ` → ${reg.expires_on}` : ""}`
                     : "—";
                 const source = p.source?.url
-                  ? `<a href="${p.source.url}" target="_blank" rel="noopener">${p.source.name || "Source"}</a>`
-                  : p.source?.name || "—";
-                return `<tr><td>${p.plate || "—"}</td><td>${p.state || "—"}</td><td>${p.vin || "—"}</td><td>${p?.vehicle?.year || "—"}</td><td>${p?.vehicle?.make || "—"}</td><td>${p?.vehicle?.model || "—"}</td><td>${p?.vehicle?.color || "—"}</td><td>${regStr}</td><td>${source}</td></tr>`;
+                  ? sourceLink(p.source.url, p.source.name || "Source")
+                  : text(p.source?.name || "-");
+                return `<tr><td>${text(p.plate || "-")}</td><td>${text(p.state || "-")}</td><td>${text(p.vin || "-")}</td><td>${text(p?.vehicle?.year || "-")}</td><td>${text(p?.vehicle?.make || "-")}</td><td>${text(p?.vehicle?.model || "-")}</td><td>${text(p?.vehicle?.color || "-")}</td><td>${text(regStr)}</td><td>${source}</td></tr>`;
               })
               .join("")}
           </tbody>
@@ -273,22 +287,21 @@ export function generateReportHTML(osintData, aiAnalysis) {
           ${osintData.images.items
             .map((it) => {
               const url = it.url;
+              const imageUrl = safeReportUrl(url);
               const hasExif = it?.exif?.has_exif ? "EXIF" : "No EXIF";
               const g = it?.reverse_search?.google;
               const b = it?.reverse_search?.bing;
               const y = it?.reverse_search?.yandex;
               return `
               <div class="img-card">
-                <a href="${url}" target="_blank" rel="noopener">
-                  <img src="${url}" alt="Recovered" />
-                </a>
+                ${imageUrl ? `<a href="${text(imageUrl)}" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer"><img src="${text(imageUrl)}" alt="Recovered" referrerpolicy="no-referrer" /></a>` : '<div>Image URL unavailable</div>'}
                 <div class="img-meta">
-                  <div><a href="${url}" target="_blank" rel="noopener">${url}</a></div>
+                  <div>${sourceLink(url)}</div>
                   <div>${hasExif}</div>
                   <div>
-                    ${g ? `<a href="${g}" target="_blank" rel="noopener">Google</a>` : ""}
-                    ${b ? ` · <a href="${b}" target="_blank" rel="noopener">Bing</a>` : ""}
-                    ${y ? ` · <a href="${y}" target="_blank" rel="noopener">Yandex</a>` : ""}
+                    ${g ? sourceLink(g, "Google") : ""}
+                    ${b ? ` · ${sourceLink(b, "Bing")}` : ""}
+                    ${y ? ` · ${sourceLink(y, "Yandex")}` : ""}
                   </div>
                 </div>
               </div>`;
@@ -303,34 +316,34 @@ export function generateReportHTML(osintData, aiAnalysis) {
       <div class="section">
         <h2>Raw Data (expand to view)</h2>
         <details><summary>Email Intelligence</summary>
-          <code>${JSON.stringify(osintData.email, null, 2)}</code>
+          <code>${rawData(osintData.email)}</code>
         </details>
         <details><summary>Username Intelligence</summary>
-          <code>${JSON.stringify(osintData.username, null, 2)}</code>
+          <code>${rawData(osintData.username)}</code>
         </details>
         <details><summary>Phone Intelligence</summary>
-          <code>${JSON.stringify(osintData.phone, null, 2)}</code>
+          <code>${rawData(osintData.phone)}</code>
         </details>
         <details><summary>Domain & Web Intelligence</summary>
-          <code>${JSON.stringify(osintData.domain, null, 2)}</code>
+          <code>${rawData(osintData.domain)}</code>
         </details>
         <details><summary>IP & Network Intelligence</summary>
-          <code>${JSON.stringify(osintData.ip_network, null, 2)}</code>
+          <code>${rawData(osintData.ip_network)}</code>
         </details>
         <details><summary>Social Enrichment</summary>
-          <code>${JSON.stringify(osintData.social, null, 2)}</code>
+          <code>${rawData(osintData.social)}</code>
         </details>
         <details><summary>Images</summary>
-          <code>${JSON.stringify(osintData.images, null, 2)}</code>
+          <code>${rawData(osintData.images)}</code>
         </details>
         <details><summary>Documents</summary>
-          <code>${JSON.stringify(osintData.documents, null, 2)}</code>
+          <code>${rawData(osintData.documents)}</code>
         </details>
         <details><summary>Crypto</summary>
-          <code>${JSON.stringify(osintData.crypto, null, 2)}</code>
+          <code>${rawData(osintData.crypto)}</code>
         </details>
         <details><summary>Records</summary>
-          <code>${JSON.stringify(osintData.records, null, 2)}</code>
+          <code>${rawData(osintData.records)}</code>
         </details>
       </div>
     </body>

@@ -36,9 +36,15 @@ export async function checkUserCredits(sql, userId) {
 }
 
 export async function deductUserCredit(sql, userId) {
-  await sql`
+  const rows = await sql`
     UPDATE auth_users 
     SET monthly_remaining = monthly_remaining - 1 
-    WHERE id = ${userId}
+    WHERE id = ${userId} AND monthly_remaining > 0
+    RETURNING id
   `;
+  if (!rows?.length) {
+    const error = new Error('No credits remaining');
+    error.code = 'INSUFFICIENT_CREDITS';
+    throw error;
+  }
 }

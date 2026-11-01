@@ -1,6 +1,7 @@
 import sql from "@/app/api/utils/sql";
 import crypto from "crypto";
 import { fulfillCheckout, validateCheckout } from "../fulfillment.js";
+import { fulfillRenewal, validateRenewalInvoice } from "../renewal.js";
 
 // Verify Stripe webhook signature without Stripe SDK
 const SIGNATURE_TOLERANCE_SECONDS = 300;
@@ -67,7 +68,7 @@ export async function POST(request) {
         await handleCheckoutCompleted(event.data.object, event.id);
         break;
       case "invoice.payment_succeeded":
-        await handlePaymentSucceeded(event.data.object);
+        await handlePaymentSucceeded(event.data.object, event.id);
         break;
       case "customer.subscription.created":
         await handleSubscriptionCreated(event.data.object);
@@ -107,60 +108,37 @@ async function handleCheckoutCompleted(session, eventId) {
   await fulfillCheckout(sql, validated, { type: "webhook", event_id: eventId });
 }
 
-async function handlePaymentSucceeded(invoice) {
-  if (!invoice.subscription) return;
+async function handlePaymentSucceeded(invoice, eventId) {
+  const renewal = validateRenewalInvoice(invoice, eventId);
+  if (!renewal.supported) {
+    await sql`
+      INSERT INTO logs (log_type, message, metadata_json)
+      VALUES ('stripe_renewal_skipped', 'Invoice did not authorize a monthly reset', ${JSON.stringify({
+        invoice_id: invoice?.id || null, reason: renewal.reason,
+      })})
+    `;
+    return;
+  }
   const subscription = await stripeGet(
-    `/v1/subscriptions/${invoice.subscription}`,
+    `/v1/subscriptions/${renewal.subscriptionId}`,
   );
   // A delayed payment event can arrive after cancellation. Do not restore
   // credits unless Stripe still reports the subscription as active.
-  if (subscription?.status !== "active") return;
+  if (subscription?.id !== renewal.subscriptionId) throw new Error("Stripe returned a different subscription.");
+  if (subscription.status !== "active") return;
 
   const customerId =
     typeof subscription.customer === "string"
       ? subscription.customer
       : subscription.customer?.id;
-  if (!customerId) return;
+  if (customerId !== renewal.customerId) throw new Error("Invoice and subscription customers do not match.");
 
   const customer = await stripeGet(`/v1/customers/${customerId}`);
 
-  const plan = { starter: 10, pro: 50, agency: 200 };
-  // The checkout route does not currently propagate plan metadata to Stripe's
-  // subscription object. Keep the existing local-plan entitlement source.
-  // Never bind a legacy null identity from an invoice: an older active
-  // subscription on the same customer could otherwise claim the account.
-  const user = await sql`
-    SELECT id, subscription_plan FROM auth_users
-    WHERE stripe_customer_id = ${customer.id}
-      AND stripe_subscription_id = ${subscription.id}
-    FOR UPDATE
-  `;
-  if (!user.length) return;
-  const userId = user[0].id;
-  const currentPlan = user[0].subscription_plan;
-
-  const credits = plan[currentPlan] || 0;
-  if (!credits) return;
-
-  await sql`
-    UPDATE auth_users
-    SET monthly_remaining = ${credits}, stripe_subscription_id = ${subscription.id}
-    WHERE id = ${userId}
-      AND stripe_customer_id = ${customer.id}
-      AND stripe_subscription_id = ${subscription.id}
-  `;
-
-  await sql`
-    INSERT INTO logs (log_type, message, metadata_json)
-    VALUES ('payment_succeeded', 'Monthly payment succeeded, credits added', ${JSON.stringify(
-      {
-        user_id: userId,
-        plan: currentPlan,
-        credits_added: credits,
-        invoice_id: invoice.id,
-      },
-    )})
-  `;
+  if (customer?.id !== renewal.customerId || customer.deleted) throw new Error("Stripe returned an invalid customer.");
+  // Local plan semantics remain authoritative. Legacy null identities cannot
+  // bind from an invoice, and claim/update/audit now commit together.
+  await fulfillRenewal(sql, renewal);
 }
 
 async function handleSubscriptionCreated(subscription) {

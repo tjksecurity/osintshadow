@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
-import { createHmac, randomUUID } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
+import { loadWebhook, renewalHarness, renewalEvent, deliverWebhook } from "./stripe-renewal-fixture.mjs";
 
 test("nested Stripe routes resolve the shared fulfillment module from their parent", async () => {
   for (const route of ["confirm", "webhook"]) {
@@ -22,25 +22,6 @@ async function loadFulfillment() {
   return import(
     `data:text/javascript;base64,${Buffer.from(source).toString("base64")}`,
   );
-}
-
-async function loadWebhook(sql, fulfillment) {
-  let source = await readFile(
-    new URL("../src/app/api/stripe/webhook/route.js", import.meta.url),
-    "utf8",
-  );
-  const key = `__shadowTraceWebhook_${randomUUID()}`;
-  globalThis[key] = { sql, fulfillment };
-  source = source
-    .replace('import sql from "@/app/api/utils/sql";', `const sql = globalThis[${JSON.stringify(key)}].sql;`)
-    .replace('import { fulfillCheckout, validateCheckout } from "../fulfillment.js";', `const { fulfillCheckout, validateCheckout } = globalThis[${JSON.stringify(key)}].fulfillment;`);
-  try {
-    return await import(
-      `data:text/javascript;base64,${Buffer.from(source).toString("base64")}`,
-    );
-  } finally {
-    delete globalThis[key];
-  }
 }
 
 async function harness() {
@@ -64,44 +45,7 @@ async function harness() {
 }
 
 async function invoiceHarness() {
-  const state = {
-    customerId: "cus_owner",
-    subscriptionId: null,
-    plan: "pro",
-    credits: 3,
-    updates: 0,
-    queries: [],
-  };
-  const sql = async (strings, ...values) => {
-    const query = strings.join("?");
-    state.queries.push({ query, values });
-    if (query.includes("SELECT id, subscription_plan")) {
-      const [customerId, subscriptionId] = values;
-      const eligible =
-        customerId === state.customerId &&
-        state.subscriptionId === subscriptionId;
-      return eligible ? [{ id: "user-1", subscription_plan: state.plan }] : [];
-    }
-    if (query.includes("SET monthly_remaining")) {
-      state.credits = values[0];
-      state.subscriptionId = values[1];
-      state.updates += 1;
-      return [];
-    }
-    if (query.includes("SET subscription_plan = NULL")) {
-      const [customerId, subscriptionId] = values;
-      if (customerId === state.customerId && subscriptionId === state.subscriptionId) {
-        state.plan = null;
-        state.credits = 0;
-        state.subscriptionId = null;
-        state.updates += 1;
-      }
-      return [];
-    }
-    if (query.includes("INSERT INTO logs")) return [];
-    throw new Error(`Unexpected query: ${query}`);
-  };
-  return { state, route: await loadWebhook(sql, await loadFulfillment()) };
+  return renewalHarness({ subscriptionId: null });
 }
 
 function event() {
@@ -130,25 +74,7 @@ async function deliver(
   timestamp = Math.floor(Date.now() / 1000).toString(),
   extraV1 = "",
 ) {
-  const secret = "webhook-test-secret";
-  const raw = JSON.stringify(payload);
-  const digest = createHmac("sha256", secret).update(`${timestamp}.${raw}`).digest("hex");
-  const previous = process.env.STRIPE_WEBHOOK_SECRET;
-  const previousFetch = globalThis.fetch;
-  process.env.STRIPE_WEBHOOK_SECRET = secret;
-  if (fetchMock) globalThis.fetch = fetchMock;
-  try {
-    const response = await route.POST(new Request("https://shadowtrace.test/api/stripe/webhook", {
-      method: "POST",
-      headers: { "stripe-signature": valid ? `t=${timestamp},v1=${digest}${extraV1}` : "t=0,v1=invalid" },
-      body: raw,
-    }));
-    return { status: response.status, body: await response.json() };
-  } finally {
-    if (previous === undefined) delete process.env.STRIPE_WEBHOOK_SECRET;
-    else process.env.STRIPE_WEBHOOK_SECRET = previous;
-    globalThis.fetch = previousFetch;
-  }
+  return deliverWebhook(route, payload, { valid, fetchMock, timestamp, extraV1 });
 }
 
 test("a signed duplicate checkout webhook can fulfill one shared session only once", async () => {
@@ -172,11 +98,7 @@ test("invalid signatures and unpaid Checkout events cannot grant an entitlement"
 
 test("renewals require a stored subscription identity and duplicate delivery does not accumulate credits", async () => {
   const h = await invoiceHarness();
-  const invoice = {
-    id: "in_renewal",
-    type: "invoice.payment_succeeded",
-    data: { object: { id: "in_renewal", subscription: "sub_1" } },
-  };
+  const invoice = renewalEvent({ id: "in_renewal", subscription: "sub_1" });
   const canceledSubscription = async () => Response.json({
     id: "sub_1", status: "canceled", customer: "cus_owner",
   });
@@ -199,7 +121,7 @@ test("renewals require a stored subscription identity and duplicate delivery doe
   assert.equal((await deliver(h.route, invoice, true, activeSubscription)).status, 200);
   assert.equal(h.state.credits, 50);
   assert.equal(h.state.subscriptionId, "sub_1");
-  assert.equal(h.state.updates, 2);
+  assert.equal(h.state.updates, 1);
 });
 
 test("old or cross-customer cancellation cannot clear a replacement subscription", async () => {
