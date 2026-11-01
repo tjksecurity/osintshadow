@@ -70,6 +70,15 @@ export function Sidebar({ sidebarOpen, setSidebarOpen, isAdmin }) {
         </li>
         <li>
           <a
+            href="/intelligence"
+            className="flex items-center gap-3 py-2 px-6 hover:bg-[#303B52] text-slate-400 hover:text-white transition-colors"
+          >
+            <Activity size={18} />
+            <span>Intelligence tools</span>
+          </a>
+        </li>
+        <li>
+          <a
             href="/settings"
             className="flex items-center gap-3 py-2 px-6 hover:bg-[#303B52] text-slate-400 hover:text-white transition-colors"
           >

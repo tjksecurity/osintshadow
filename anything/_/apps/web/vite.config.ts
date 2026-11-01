@@ -29,6 +29,11 @@ export default defineConfig({
       '@auth/core/errors',
       'fsevents',
       'lightningcss',
+      // Browser automation runs only in the authenticated Node API. Its Node
+      // dependencies cannot be prebundled against client browser targets.
+      'puppeteer-core',
+      'puppeteer-extra',
+      'puppeteer-extra-plugin-stealth',
     ],
   },
   logLevel: 'info',
