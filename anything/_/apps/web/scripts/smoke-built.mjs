@@ -49,3 +49,5 @@ try {
     if (child.exitCode === null && child.signalCode === null) child.kill('SIGKILL');
   }
 }
+
+await import('./smoke-fetch.mjs');

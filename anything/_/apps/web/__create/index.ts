@@ -12,6 +12,7 @@ import { proxy } from 'hono/proxy';
 import { bodyLimit } from 'hono/body-limit';
 import { requestId, type RequestIdVariables } from 'hono/request-id';
 import { createHonoServer } from 'react-router-hono-server/node';
+import { createRequestHandler } from 'react-router';
 import { serializeError } from 'serialize-error';
 import ws from 'ws';
 import NeonAdapter from './adapter';
@@ -257,12 +258,25 @@ app.use('/api/auth/*', async (c, next) => {
 app.route(API_BASENAME, api);
 app.all('/api/*', (c) => c.json({ error: 'API route not found.' }, 404));
 
-const port = Number(process.env.PORT ?? '43304');
-if (!Number.isInteger(port) || port < 1 || port > 65535) throw new Error('PORT must be an integer from 1 to 65535.');
+async function initializeServer() {
+  // Vercel owns the HTTP listener. Keep the same auth/API middleware and SSR
+  // app, but expose its fetch handler instead of opening a second socket.
+  if (process.env.SHADOWTRACE_SERVER_MODE === 'fetch') {
+    // @ts-expect-error - the Hono Vite plugin resolves this virtual build module.
+    const build = await import('virtual:react-router/server-build');
+    const handler = createRequestHandler(build, 'production');
+    app.all('*', (c) => handler(c.req.raw));
+    return app;
+  }
 
-export default await createHonoServer({
-  app,
-  defaultLogger: false,
-  hostname: process.env.HOST ?? '127.0.0.1',
-  port,
-});
+  const port = Number(process.env.PORT ?? '43304');
+  if (!Number.isInteger(port) || port < 1 || port > 65535) throw new Error('PORT must be an integer from 1 to 65535.');
+  return createHonoServer({
+    app,
+    defaultLogger: false,
+    hostname: process.env.HOST ?? '127.0.0.1',
+    port,
+  });
+}
+
+export default await initializeServer();

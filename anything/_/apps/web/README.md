@@ -16,6 +16,12 @@ loopback port and verifies homepage serving, signed-out session, bundled API
 parameter routes, explicit missing-configuration responses, and API 404s.
 It uses no credentials or provider calls and stops only its own child process.
 
+Vercel uses `vercel.json` and `api/index.mjs` from this app root. The client build
+is served as static assets; other requests reach the same bundled Hono/React
+Router app in fetch mode without opening a standalone listener. The built smoke
+check also exercises this entry, including signed-out auth and bundled API
+routes. Keep the project's Root Directory set to `anything/_/apps/web`.
+
 The local homepage and account screens work without external credentials.
 Authentication and stored/API investigations require `DATABASE_URL` and
 `AUTH_SECRET`; registered API routes report missing configuration as HTTP 503.
