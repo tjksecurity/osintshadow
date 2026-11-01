@@ -60,6 +60,8 @@ function ProviderTool({ title, description, action, field, label, placeholder, t
     }
   }
   return <ToolCard title={title} description={description}>
+    {action === "breach" && <p className="mb-3 text-sm text-slate-300">Breach data supplied by <a href="https://haveibeenpwned.com/" target="_blank" rel="noreferrer" className="underline">Have I Been Pwned</a>.</p>}
+    {action === "ipinfo" && <p className="mb-3 text-sm text-slate-300">IP address data supplied by <a href="https://ipinfo.io/" target="_blank" rel="noreferrer" className="underline">IPinfo</a>.</p>}
     <form onSubmit={run} className="space-y-3">
       <label className="block text-sm text-slate-200">{label}<input required maxLength={1024} type={type} value={input} onChange={(event) => setInput(event.target.value)} placeholder={placeholder} className={`${inputClass} mt-1`} /></label>
       <button disabled={busy} className={buttonClass} type="submit">{busy ? "Working…" : `Run ${title}`}</button>
