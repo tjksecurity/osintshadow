@@ -1,25 +1,42 @@
 import sql from "@/app/api/utils/sql";
 import crypto from "crypto";
+import { fulfillCheckout, validateCheckout } from "./fulfillment.js";
 
 // Verify Stripe webhook signature without Stripe SDK
+const SIGNATURE_TOLERANCE_SECONDS = 300;
+
 function verifyStripeSignature(rawBody, sigHeader, secret) {
   if (!sigHeader || !secret) return false;
   // Header format: t=timestamp,v1=signature[,v0=old]
-  const parts = Object.fromEntries(
-    sigHeader.split(",").map((p) => p.split("=")),
-  );
-  const t = parts.t;
-  const v1 = parts.v1;
-  if (!t || !v1) return false;
-  const payload = `${t}.${rawBody}`;
+  const parts = sigHeader.split(",").map((part) => {
+    const index = part.indexOf("=");
+    return index < 1 ? [] : [part.slice(0, index), part.slice(index + 1)];
+  });
+  const timestamp = parts.find(([key]) => key === "t")?.[1];
+  const signatures = parts
+    .filter(([key, value]) => key === "v1" && /^[0-9a-f]{64}$/i.test(value))
+    .map(([, value]) => value);
+  const timestampSeconds = Number(timestamp);
+  if (
+    !Number.isSafeInteger(timestampSeconds) ||
+    !signatures.length ||
+    Math.abs(Math.floor(Date.now() / 1000) - timestampSeconds) >
+      SIGNATURE_TOLERANCE_SECONDS
+  ) {
+    return false;
+  }
+  const payload = `${timestamp}.${rawBody}`;
   const hmac = crypto.createHmac("sha256", secret);
   hmac.update(payload, "utf8");
   const digest = hmac.digest("hex");
-  // Constant-time compare
-  const a = Buffer.from(digest, "hex");
-  const b = Buffer.from(v1, "hex");
-  if (a.length !== b.length) return false;
-  return crypto.timingSafeEqual(a, b);
+  const expected = Buffer.from(digest, "hex");
+  return signatures.some((signature) => {
+    const received = Buffer.from(signature, "hex");
+    return (
+      received.length === expected.length &&
+      crypto.timingSafeEqual(expected, received)
+    );
+  });
 }
 
 async function stripeGet(path) {
@@ -47,7 +64,7 @@ export async function POST(request) {
 
     switch (event.type) {
       case "checkout.session.completed":
-        await handleCheckoutCompleted(event.data.object);
+        await handleCheckoutCompleted(event.data.object, event.id);
         break;
       case "invoice.payment_succeeded":
         await handlePaymentSucceeded(event.data.object);
@@ -81,38 +98,13 @@ export async function POST(request) {
   }
 }
 
-async function handleCheckoutCompleted(session) {
-  const userId = session.metadata?.user_id;
-  const plan = session.metadata?.plan;
-  const credits = parseInt(session.metadata?.credits || "0", 10);
+async function handleCheckoutCompleted(session, eventId) {
+  const validated = validateCheckout(session);
+  if (!validated.ok || !validated.paid) return;
 
-  if (!userId) return;
-
-  if (session.mode === "payment") {
-    // Lifetime plan
-    await sql`
-      UPDATE auth_users 
-      SET subscription_plan = ${plan}, monthly_remaining = ${credits}
-      WHERE id = ${userId}
-    `;
-  } else if (session.mode === "subscription") {
-    await sql`
-      UPDATE auth_users 
-      SET subscription_plan = ${plan}
-      WHERE id = ${userId}
-    `;
-  }
-
-  await sql`
-    INSERT INTO logs (log_type, message, metadata_json)
-    VALUES ('checkout_completed', 'Checkout session completed', ${JSON.stringify(
-      {
-        user_id: userId,
-        plan,
-        session_id: session.id,
-      },
-    )})
-  `;
+  // This uses the same session-id claim as the browser confirm endpoint.
+  // Whichever signed delivery arrives first may fulfill the session once.
+  await fulfillCheckout(sql, validated, { type: "webhook", event_id: eventId });
 }
 
 async function handlePaymentSucceeded(invoice) {
@@ -120,20 +112,42 @@ async function handlePaymentSucceeded(invoice) {
   const subscription = await stripeGet(
     `/v1/subscriptions/${invoice.subscription}`,
   );
-  const customer = await stripeGet(`/v1/customers/${subscription.customer}`);
+  // A delayed payment event can arrive after cancellation. Do not restore
+  // credits unless Stripe still reports the subscription as active.
+  if (subscription?.status !== "active") return;
 
+  const customerId =
+    typeof subscription.customer === "string"
+      ? subscription.customer
+      : subscription.customer?.id;
+  if (!customerId) return;
+
+  const customer = await stripeGet(`/v1/customers/${customerId}`);
+
+  const plan = { starter: 10, pro: 50, agency: 200 };
+  // The checkout route does not currently propagate plan metadata to Stripe's
+  // subscription object. Keep the existing local-plan entitlement source.
+  // Never bind a legacy null identity from an invoice: an older active
+  // subscription on the same customer could otherwise claim the account.
   const user = await sql`
-    SELECT id, subscription_plan FROM auth_users WHERE stripe_customer_id = ${customer.id}
+    SELECT id, subscription_plan FROM auth_users
+    WHERE stripe_customer_id = ${customer.id}
+      AND stripe_subscription_id = ${subscription.id}
+    FOR UPDATE
   `;
   if (!user.length) return;
   const userId = user[0].id;
-  const plan = user[0].subscription_plan;
+  const currentPlan = user[0].subscription_plan;
 
-  const planCredits = { starter: 10, pro: 50, agency: 200 };
-  const credits = planCredits[plan] || 0;
+  const credits = plan[currentPlan] || 0;
+  if (!credits) return;
 
   await sql`
-    UPDATE auth_users SET monthly_remaining = ${credits} WHERE id = ${userId}
+    UPDATE auth_users
+    SET monthly_remaining = ${credits}, stripe_subscription_id = ${subscription.id}
+    WHERE id = ${userId}
+      AND stripe_customer_id = ${customer.id}
+      AND stripe_subscription_id = ${subscription.id}
   `;
 
   await sql`
@@ -141,7 +155,7 @@ async function handlePaymentSucceeded(invoice) {
     VALUES ('payment_succeeded', 'Monthly payment succeeded, credits added', ${JSON.stringify(
       {
         user_id: userId,
-        plan,
+        plan: currentPlan,
         credits_added: credits,
         invoice_id: invoice.id,
       },
@@ -173,21 +187,28 @@ async function handleSubscriptionUpdated(subscription) {
 }
 
 async function handleSubscriptionDeleted(subscription) {
-  const customer = await stripeGet(`/v1/customers/${subscription.customer}`);
-  const user =
-    await sql`SELECT id FROM auth_users WHERE stripe_customer_id = ${customer.id}`;
-  if (!user.length) return;
+  const customerId =
+    typeof subscription.customer === "string"
+      ? subscription.customer
+      : subscription.customer?.id;
+  if (!subscription?.id || !customerId) return;
 
+  // Do not let an old cancellation clear a newer subscription on the same
+  // customer. Legacy null identities are intentionally not guessed here.
   await sql`
-    UPDATE auth_users SET subscription_plan = NULL, monthly_remaining = 0 WHERE id = ${user[0].id}
+    UPDATE auth_users
+    SET subscription_plan = NULL,
+        monthly_remaining = 0,
+        stripe_subscription_id = NULL
+    WHERE stripe_customer_id = ${customerId}
+      AND stripe_subscription_id = ${subscription.id}
   `;
 
   await sql`
     INSERT INTO logs (log_type, message, metadata_json)
     VALUES ('subscription_cancelled', 'Subscription cancelled', ${JSON.stringify(
       {
-        user_id: user[0].id,
-        customer_id: customer.id,
+        customer_id: customerId,
         subscription_id: subscription.id,
       },
     )})

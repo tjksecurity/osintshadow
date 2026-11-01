@@ -22,8 +22,6 @@ export async function GET(request) {
       );
     }
 
-    console.log("Looking up session token:", sessionToken);
-
     // Look up the session token in logs
     const results = await sql`
       SELECT metadata_json
@@ -37,7 +35,6 @@ export async function GET(request) {
     `;
 
     if (results.length === 0) {
-      console.log("Session token not found or expired:", sessionToken);
       return Response.json(
         {
           error: "Session token not found or expired",
@@ -50,8 +47,6 @@ export async function GET(request) {
     const tokenData = results[0].metadata_json;
     const investigationId = tokenData.investigation_id;
 
-    console.log("Found investigation ID for session token:", investigationId);
-
     // Verify the investigation belongs to this user
     const investigations = await sql`
       SELECT id, target_type, target_value, created_at
@@ -60,7 +55,6 @@ export async function GET(request) {
     `;
 
     if (investigations.length === 0) {
-      console.log("Investigation not found or unauthorized:", investigationId);
       return Response.json(
         { error: "Investigation not found", code: "INVESTIGATION_NOT_FOUND" },
         { status: 404 },

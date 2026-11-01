@@ -1,4 +1,5 @@
 import { safeFetch } from "./helpers.js";
+import { extractPhoneCandidatesFromHtml } from "./phoneValidation.js";
 
 function extractEmails(html) {
   if (!html) return [];
@@ -16,16 +17,7 @@ function extractEmails(html) {
 }
 
 function extractPhones(html) {
-  if (!html) return [];
-  const candidates = new Set();
-  // crude: match 10-15 digit groups and common formats
-  const re = /(\+?\d[\d\s().-]{7,})/g;
-  let m;
-  while ((m = re.exec(html))) {
-    const digits = m[1].replace(/\D/g, "");
-    if (digits.length >= 10 && digits.length <= 15) candidates.add(digits);
-  }
-  return Array.from(candidates).slice(0, 200);
+  return extractPhoneCandidatesFromHtml(html).slice(0, 200);
 }
 
 function extractLinks(html, baseUrl) {
@@ -116,7 +108,11 @@ export async function deepWebDiscovery(seedUrls = [], opts = {}) {
   const uniqLinks = new Set();
   for (const r of results) {
     (r.emails || []).forEach((e) => uniqEmails.add(e));
-    (r.phones || []).forEach((p) => uniqPhones.add(p));
+    (r.phones || []).forEach((p) => {
+      if (p?.digits && !uniqPhones.has(p.digits)) {
+        uniqPhones.set(p.digits, { ...p, source_url: r.url });
+      }
+    });
     (r.links || []).forEach((l) => uniqLinks.add(l));
   }
 
@@ -124,7 +120,7 @@ export async function deepWebDiscovery(seedUrls = [], opts = {}) {
     pages: results,
     aggregate: {
       emails: Array.from(uniqEmails).slice(0, deep ? 500 : 150),
-      phones: Array.from(uniqPhones).slice(0, deep ? 500 : 150),
+      phones: Array.from(uniqPhones.values()).slice(0, deep ? 500 : 150),
       links: Array.from(uniqLinks).slice(0, deep ? 800 : 250),
     },
     meta: {

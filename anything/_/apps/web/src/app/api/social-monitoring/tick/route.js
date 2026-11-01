@@ -101,8 +101,8 @@ export async function POST() {
 
         const profile = profRows[0];
 
-        // Collect a small set of recent posts. (These are currently mocked for most platforms,
-        // but the monitoring plumbing is real and will work when you swap to real APIs.)
+        // Collect only from the supported public collectors. Unsupported
+        // platforms return no posts; this route does not create stand-in data.
         const posts = await collectPostsForProfile(profile, {
           maxPostsPerProfile: 10,
         });

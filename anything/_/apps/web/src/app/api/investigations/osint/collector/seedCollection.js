@@ -21,9 +21,9 @@ export async function collectPhoneSeeds(data, crossRefs, targetType) {
         deepScan: data.flags.include_deep_scan,
       });
       data.phone_seeds = seed.seedPhones || [];
-      crossRefs.phones.push(
-        ...data.phone_seeds.map((p) => `+${p.digits}`.replace(/^\+\+/, "+")),
-      );
+      // Public-page candidates are intentionally not promoted into cross-source
+      // correlation. A page mention is not evidence that this phone belongs to
+      // the target, and using it as a search key can manufacture associations.
     }
   } catch {}
 }
@@ -64,9 +64,6 @@ export async function collectHubDiscovery(data, crossRefs, targetType) {
       data.email_seeds = discovery.seedEmails || [];
       data.discovered_urls = discovery.discoveredUrls || [];
 
-      crossRefs.phones.push(
-        ...data.phone_seeds.map((p) => `+${p.digits}`.replace(/^\+\+/, "+")),
-      );
       crossRefs.emails.push(...(data.email_seeds || []).map((e) => e.email));
     }
   } catch {}

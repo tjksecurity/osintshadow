@@ -33,7 +33,7 @@ export function buildPresentation(
       ? `${evidenceProfiles.length} profile(s) with on-page evidence`
       : null,
     identityGraph.phones.length
-      ? `${identityGraph.phones.length} phone number(s) linked or discovered`
+      ? `${identityGraph.phones.length} phone search target(s) supplied for this investigation`
       : null,
     breachCount ? `${breachCount} known breach(es)` : null,
     criminalCount ? `${criminalCount} criminal record(s)` : null,
@@ -48,5 +48,6 @@ export function buildPresentation(
       confidence: p.confidence,
     })),
     phone_numbers: identityGraph.phones,
+    phone_candidates: identityGraph.phone_candidates || [],
   };
 }

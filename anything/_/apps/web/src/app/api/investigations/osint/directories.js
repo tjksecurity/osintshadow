@@ -1,4 +1,5 @@
 import { safeFetch } from "./helpers.js";
+import { extractPhoneCandidatesFromHtml } from "./phoneValidation.js";
 
 // Simple in-memory cache with TTL for fetched pages
 const __CACHE__ = new Map(); // key: url, value: { ts: number, html: string }
@@ -27,35 +28,6 @@ function delay(ms) {
 // Tighter timeout wrapper for scraping-heavy calls (now uses safeFetch timeoutMs)
 async function fetchWithTighterTimeout(url, opts = {}) {
   return safeFetch(url, { ...opts, timeoutMs: opts.timeoutMs ?? 8000 }); // default 8s timeout
-}
-
-// Simple phone extractor from HTML/text
-function extractPhonesFromHtml(html) {
-  if (!html) return [];
-  const body = html.replace(/\s+/g, " ");
-  // Matches common phone formats: +1 555-555-5555, (555) 555 5555, 555.555.5555, 15555555555, etc.
-  const re =
-    /(?:(?:\+?\d{1,3}[\s.-]?)?(?:\(\d{2,4}\)|\d{2,4})[\s.-]?\d{2,4}[\s.-]?\d{3,4}(?:[\s.-]?\d{2,4})?)/g;
-  const matches = body.match(re) || [];
-  const cleaned = matches
-    .map((m) => m.trim())
-    // Filter out obvious false positives (short, long, or pure date-like)
-    .filter(
-      (m) =>
-        m.replace(/\D/g, "").length >= 10 && m.replace(/\D/g, "").length <= 15,
-    )
-    .slice(0, 20);
-  // De-dupe by digits-only normalization
-  const seen = new Set();
-  const out = [];
-  for (const m of cleaned) {
-    const digits = m.replace(/\D/g, "");
-    if (!seen.has(digits)) {
-      seen.add(digits);
-      out.push({ display: m, digits });
-    }
-  }
-  return out;
 }
 
 // NEW: Simple email extractor
@@ -165,12 +137,11 @@ export async function phoneDirectoriesSeed(
         setCache(url, html);
         await delay(RATE_DELAY_MS);
       }
-      const found = extractPhonesFromHtml(html);
+      const found = extractPhoneCandidatesFromHtml(html);
       for (const f of found) {
         seedPhones.push({
           source_url: url,
-          digits: f.digits,
-          display: f.display,
+          ...f,
         });
       }
       if (seedPhones.length >= (deep ? 50 : 25)) break; // keep it light-ish
@@ -337,14 +308,13 @@ export async function hubDiscoverySeed({ email, username, domain }, opts = {}) {
         await delay(RATE_DELAY_MS);
       }
 
-      const phones = extractPhonesFromHtml(html);
+      const phones = extractPhoneCandidatesFromHtml(html);
       const emails = extractEmailsFromHtml(html);
 
       phones.forEach((p) =>
         seedPhones.push({
           source_url: url,
-          digits: p.digits,
-          display: p.display,
+          ...p,
         }),
       );
       emails.forEach((e) =>

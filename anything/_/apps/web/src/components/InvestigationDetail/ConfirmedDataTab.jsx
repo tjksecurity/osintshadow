@@ -168,7 +168,7 @@ export function ConfirmedDataTab({ confirmed, hasConfirmed, osintRaw }) {
 
             {/* Phones */}
             <div className="border border-[#37425B] rounded-lg p-3">
-              <div className="font-semibold mb-2">Phone Numbers</div>
+              <div className="font-semibold mb-2">Phone References</div>
               {confirmedPhones.length === 0 ? (
                 <div className="text-slate-400 text-sm">None</div>
               ) : (
@@ -180,6 +180,9 @@ export function ConfirmedDataTab({ confirmed, hasConfirmed, osintRaw }) {
                     return (
                       <li key={idx} className="text-sm">
                         <span className="text-slate-200">{ph.phone}</span>
+                        <div className="text-xs text-slate-400">
+                          Public reference only; ownership is not verified.
+                        </div>
                         {reasons && (
                           <div className="text-xs text-slate-400">
                             Reasons: {reasons}

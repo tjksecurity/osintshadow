@@ -10,6 +10,7 @@ import {
   logEvent,
   insertProgressEvent,
 } from "./utils/database.js";
+import { normalizePhoneCandidate } from "./osint/phoneValidation.js";
 
 export async function GET(request) {
   try {
@@ -70,22 +71,11 @@ export async function POST(request) {
   let investigationId = null; // Track for cleanup on errors
 
   try {
-    console.log("=== INVESTIGATION API START ===");
-    console.log("Request method:", request.method);
-    console.log("Request URL:", request.url);
-    console.log(
-      "Request headers:",
-      Object.fromEntries(request.headers.entries()),
-    );
-
-    // Authentication check with detailed logging
-    console.log("=== AUTHENTICATION CHECK ===");
     let authResult;
     try {
       authResult = await checkAuthentication(auth);
-      console.log("Authentication result:", authResult);
     } catch (authError) {
-      console.error("Authentication check failed:", authError);
+      console.error("Authentication check failed");
       return Response.json(
         { error: "Authentication failed", code: "AUTH_FAILED" },
         { status: 500 },
@@ -94,25 +84,17 @@ export async function POST(request) {
 
     const { authenticated, userId, email } = authResult;
     if (!authenticated) {
-      console.log("Authentication failed - no valid session");
       return Response.json(
         { error: "Unauthorized", code: "UNAUTHORIZED" },
         { status: 401 },
       );
     }
 
-    console.log("✓ Authentication successful - User:", userId, email);
-
-    // Request body parsing with detailed error handling
-    console.log("=== REQUEST BODY PARSING ===");
     let body;
     try {
       const rawBody = await request.text();
-      console.log("Raw request body:", rawBody);
-      console.log("Raw body length:", rawBody.length);
 
       if (!rawBody) {
-        console.error("Request body is empty");
         return Response.json(
           { error: "Request body is required", code: "EMPTY_BODY" },
           { status: 400 },
@@ -120,10 +102,8 @@ export async function POST(request) {
       }
 
       body = JSON.parse(rawBody);
-      console.log("✓ Request body parsed successfully:", body);
     } catch (parseError) {
-      console.error("Failed to parse request body:", parseError);
-      console.error("Parse error message:", parseError.message);
+      console.error("Invalid investigation request body");
       return Response.json(
         { error: "Invalid JSON in request body", code: "INVALID_JSON" },
         { status: 400 },
@@ -147,29 +127,32 @@ export async function POST(request) {
       enable_real_time_monitoring,
     } = body || {};
 
-    console.log("✓ Investigation request params extracted:", {
-      target_type,
-      target_value,
-    });
-
     // Validation
     if (!target_type || !target_value) {
-      console.log("Missing required fields:", { target_type, target_value });
       return Response.json(
         { error: "Missing required fields", code: "MISSING_FIELDS" },
         { status: 400 },
       );
     }
 
-    // User credits check with detailed logging
-    console.log("=== USER CREDITS CHECK ===");
+    if (
+      String(target_type).toLowerCase() === "phone" &&
+      !normalizePhoneCandidate(target_value, { allow_bare_input: true })
+    ) {
+      return Response.json(
+        {
+          error: "Phone target is invalid or ambiguous",
+          code: "INVALID_PHONE_TARGET",
+        },
+        { status: 400 },
+      );
+    }
+
     let userCheckResult;
     try {
       userCheckResult = await checkUserCredits(sql, userId);
-      console.log("✓ User credits check completed:", userCheckResult);
     } catch (creditsError) {
-      console.error("checkUserCredits failed:", creditsError);
-      console.error("Credits error stack:", creditsError.stack);
+      console.error("User credit check failed");
       return Response.json(
         {
           error: "Failed to check user credentials",
@@ -182,7 +165,6 @@ export async function POST(request) {
     const { found, hasCredits, user, isAdmin } = userCheckResult;
 
     if (!found) {
-      console.log("User not found in database:", userId);
       return Response.json(
         { error: "User not found", code: "USER_NOT_FOUND" },
         { status: 404 },
@@ -193,35 +175,16 @@ export async function POST(request) {
     const isAdminByEmail = (email || "").toLowerCase() === adminEmail;
     const admin = isAdmin || isAdminByEmail;
 
-    console.log("✓ User permissions determined:", {
-      isAdmin,
-      admin,
-      hasCredits,
-      subscription_plan: user.subscription_plan,
-    });
-
     // Trial restrictions check
     const isTrial =
       !admin && (!user.subscription_plan || user.subscription_plan === "trial");
 
-    console.log("=== TRIAL RESTRICTIONS CHECK ===");
-    console.log("Is trial user:", isTrial);
-
     if (isTrial) {
       try {
-        const trialCheckQuery = `SELECT COUNT(*)::int as cnt FROM investigations WHERE user_id = ${userId}`;
-        console.log("Executing trial check query:", trialCheckQuery);
-
         const [{ cnt }] = await sql`
           SELECT COUNT(*)::int as cnt FROM investigations WHERE user_id = ${userId}
         `;
-        console.log("✓ Trial investigation count:", cnt);
-
         if (cnt >= 1) {
-          console.log("Trial user exceeded limit:", {
-            userId,
-            currentCount: cnt,
-          });
           return Response.json(
             {
               error: "Trial limit reached. Please upgrade to continue.",
@@ -231,8 +194,7 @@ export async function POST(request) {
           );
         }
       } catch (trialError) {
-        console.error("Trial check query failed:", trialError);
-        console.error("Trial error stack:", trialError.stack);
+        console.error("Trial eligibility check failed");
         return Response.json(
           { error: "Failed to check trial status", code: "TRIAL_CHECK_FAILED" },
           { status: 500 },
@@ -242,23 +204,11 @@ export async function POST(request) {
 
     // Credits check for non-admin, non-trial users
     if (!admin && !isTrial && !hasCredits) {
-      console.log("User has no credits:", {
-        userId,
-        monthly_remaining: user.monthly_remaining,
-      });
       return Response.json(
         { error: "No credits remaining", code: "INSUFFICIENT_CREDITS" },
         { status: 402 },
       );
     }
-
-    // Investigation creation with detailed logging
-    console.log("=== DATABASE INVESTIGATION CREATION ===");
-    console.log("Calling createInvestigation with:", {
-      userId,
-      target_type,
-      target_value,
-    });
 
     let investigation;
     try {
@@ -268,25 +218,13 @@ export async function POST(request) {
         target_type,
         target_value,
       );
-      console.log("✓ createInvestigation returned:", investigation);
-      console.log("Investigation type:", typeof investigation);
-
-      if (investigation) {
-        console.log("Investigation keys:", Object.keys(investigation));
-        console.log("Investigation values:", Object.values(investigation));
-      }
     } catch (createError) {
-      console.error("=== DATABASE CREATE FAILED ===");
-      console.error("createInvestigation error:", createError);
-      console.error("Create error message:", createError.message);
-      console.error("Create error stack:", createError.stack);
+      console.error("Investigation creation failed");
 
       await logEvent(sql, "investigation_create_failed", "Create failed", {
         user_id: userId,
         target_type,
-        target_value,
-        error_message: createError.message,
-        error_stack: createError.stack,
+        error_code: "CREATE_FAILED",
       });
 
       return Response.json(
@@ -312,8 +250,7 @@ export async function POST(request) {
         {
           user_id: userId,
           target_type,
-          target_value,
-          investigation,
+          error_code: "NO_DATA_RETURNED",
         },
       );
       return Response.json(
@@ -341,9 +278,7 @@ export async function POST(request) {
         {
           user_id: userId,
           target_type,
-          target_value,
-          investigation_object: investigation,
-          investigation_keys: Object.keys(investigation),
+          error_code: "NO_ID_RETURNED",
         },
       );
 
@@ -424,33 +359,6 @@ export async function POST(request) {
       console.warn("Failed to insert initial progress event", e);
     }
 
-    // Session token creation with detailed logging
-    console.log("=== SESSION TOKEN CREATION ===");
-    const sessionToken = `inv_${Date.now()}_${Math.random().toString(36).substring(2)}`;
-    console.log("Generated session token:", sessionToken);
-
-    try {
-      await sql`
-        INSERT INTO logs (log_type, message, metadata_json)
-        VALUES ('investigation_session_token', 'Session token created', ${JSON.stringify(
-          {
-            session_token: sessionToken,
-            investigation_id: investigation.id,
-            user_id: userId,
-            target_type,
-            target_value,
-            created_at: new Date().toISOString(),
-            expires_at: new Date(Date.now() + 10 * 60 * 1000).toISOString(),
-          },
-        )})
-      `;
-      console.log("✓ Session token stored successfully");
-    } catch (tokenError) {
-      console.warn("Failed to create session token:", tokenError);
-      console.warn("Token error stack:", tokenError.stack);
-      // Non-fatal, continue without it
-    }
-
     // Credit deduction for non-admin, non-trial
     if (!admin && !isTrial) {
       console.log("=== CREDIT DEDUCTION ===");
@@ -485,7 +393,6 @@ export async function POST(request) {
           investigation_id: investigation.id,
           user_id: userId,
           target_type,
-          target_value,
           flags: processingFlags,
         },
       );

@@ -78,14 +78,9 @@ export function extractConfirmedData(
 
         const seedUrl = seed?.source_url || null;
         const hasGoodSeed = !!seedUrl && !isWeakHubSource(seedUrl);
-        if (hasGoodSeed) {
-          reasons.push("found on public hub/contact page");
-        }
-
-        // Only treat it as strongly confirmed if there is on-page evidence
-        // or a non-weak hub/source backing it. This avoids noisy sources
-        // like generic tap.bio pages showing up as confirmed.
-        const strong = links.length > 0 || hasGoodSeed;
+        // A public-page candidate can corroborate a page mention, but it does
+        // not establish who owns the number. Do not confirm identity from it.
+        const strong = links.length > 0;
 
         return strong
           ? {
@@ -95,6 +90,7 @@ export function extractConfirmedData(
                 seed_source_url: hasGoodSeed ? seedUrl : null,
               },
               reasons,
+              identity_verification: "not_verified",
             }
           : null;
       })

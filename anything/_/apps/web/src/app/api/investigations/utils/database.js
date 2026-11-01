@@ -4,8 +4,6 @@ export async function createInvestigation(
   targetType,
   targetValue,
 ) {
-  console.log("Creating investigation:", { userId, targetType, targetValue });
-
   const investigation = await sql`
     INSERT INTO investigations (user_id, target_type, target_value, status)
     VALUES (${userId}, ${targetType}, ${targetValue}, 'queued')
@@ -20,7 +18,6 @@ export async function createInvestigation(
     throw new Error("Database INSERT failed - no ID returned");
   }
 
-  console.log("Investigation created:", investigation[0].id);
   return investigation[0];
 }
 

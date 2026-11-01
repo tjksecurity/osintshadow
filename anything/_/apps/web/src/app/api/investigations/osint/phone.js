@@ -1,4 +1,5 @@
 import { safeFetch } from "./helpers.js";
+import { normalizePhoneCandidate } from "./phoneValidation.js";
 
 // Generate common display variants for a phone number to improve web matching
 function phoneDisplayVariants(normalized) {
@@ -41,15 +42,19 @@ function phoneDisplayVariants(normalized) {
 }
 
 function normalizePhone(input) {
+  const candidate = normalizePhoneCandidate(input, { allow_bare_input: true });
   const cleaned = String(input || "").replace(/\D/g, "");
+  if (!candidate) return { cleaned, normalized: null };
   let normalized = null;
-  // Basic heuristics
-  if (cleaned.length === 10)
-    normalized = `+1${cleaned}`; // default to NANP if 10 digits
-  else if (cleaned.length >= 11 && cleaned.length <= 15) {
-    normalized = cleaned.startsWith("+") ? cleaned : `+${cleaned}`;
+  // Do not invent an international country code for an arbitrary digit string.
+  if (candidate.digits.length === 10)
+    normalized = `+1${candidate.digits}`; // valid NANP local input
+  else if (candidate.digits.length === 11 && candidate.digits.startsWith("1")) {
+    normalized = `+${candidate.digits}`;
+  } else if (String(input || "").trim().startsWith("+")) {
+    normalized = `+${candidate.digits}`;
   }
-  return { cleaned, normalized };
+  return { cleaned: candidate.digits, normalized };
 }
 
 function inferRegion(digits) {
@@ -153,6 +158,15 @@ async function searchDuckDuckGo(query, opts = {}) {
 export async function reversePhoneWebScan(input, opts = {}) {
   const { normalized } = normalizePhone(input);
   const digits = (normalized || "").replace(/\D/g, "");
+  if (!normalized) {
+    return {
+      query_variants: [],
+      items: [],
+      emails: [],
+      discovered_urls: [],
+      validation_error: "Phone input did not pass local syntax validation.",
+    };
+  }
   const variants = phoneDisplayVariants(normalized);
   const deep = !!opts.deepScan;
 
@@ -223,7 +237,10 @@ export async function phoneIntel(input) {
   out.normalized = normalized;
 
   out.length = cleaned.length;
-  out.format_valid = cleaned.length >= 10 && cleaned.length <= 15;
+  out.format_valid = !!normalized;
+  out.validation_status = normalized
+    ? "syntax_valid_unverified_target"
+    : "invalid_or_ambiguous_input";
 
   const digits = (normalized || "").replace(/\D/g, "");
   out.region = inferRegion(digits);

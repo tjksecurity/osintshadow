@@ -51,7 +51,7 @@ export async function performAIAnalysis(osintData, options = {}) {
   progress("Extracting core identifiers", 67);
 
   // Extract base identifiers
-  const { baseEmail, emailLocal, emailDomain, phoneSeeds } =
+  const { baseEmail, emailLocal, emailDomain, phoneCandidates } =
     extractBaseIdentifiers(osintData, emailInfo, phoneInfo);
 
   progress("Normalizing profiles", 68);
@@ -67,7 +67,7 @@ export async function performAIAnalysis(osintData, options = {}) {
     baseEmail,
     emailLocal,
     emailDomain,
-    phoneSeeds,
+    phoneCandidates,
     emailInfo,
     usernameInfo,
     domainInfo,

@@ -137,10 +137,9 @@ export function OSINTTab({ osint }) {
     0,
     30,
   );
-  const deepPhones = (safeOsint?.deep_discovery?.aggregate?.phones || []).slice(
-    0,
-    30,
-  );
+  const deepPhones = (safeOsint?.deep_discovery?.aggregate?.phones || [])
+    .filter((phone) => phone?.verification_status === "unverified_candidate")
+    .slice(0, 30);
 
   return (
     <section className="bg-[#2D384E] rounded-lg p-4 overflow-auto">
@@ -343,15 +342,31 @@ export function OSINTTab({ osint }) {
                 </div>
                 <div>
                   <div className="text-xs uppercase text-slate-400 mb-1">
-                    Phones
+                    Unverified phone candidates
                   </div>
                   <ul className="space-y-1 max-h-40 overflow-auto pr-1">
                     {deepPhones.map((ph) => (
-                      <li key={`dph-${ph}`} className="text-sm break-all">
-                        {ph}
+                      <li
+                        key={`dph-${ph?.digits || ph}`}
+                        className="text-sm break-all"
+                      >
+                        {typeof ph === "string" ? ph : ph?.display || ph?.digits}
+                        {typeof ph !== "string" && ph?.source_url ? (
+                          <a
+                            href={ph.source_url}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="block text-xs text-[#00D1FF] hover:underline"
+                          >
+                            Public-page source
+                          </a>
+                        ) : null}
                       </li>
                     ))}
                   </ul>
+                  <div className="text-xs text-slate-400 mt-2">
+                    Observations only; they do not verify ownership or identity.
+                  </div>
                 </div>
               </div>
             )}

@@ -25,14 +25,13 @@ export function extractBaseIdentifiers(osintData, emailInfo, phoneInfo) {
   const emailLocal = baseEmail ? String(baseEmail).split("@")[0] : null;
   const emailDomain = baseEmail ? String(baseEmail).split("@")[1] : null;
 
-  const phoneSeeds = asArray(osintData?.phone_seeds)
-    .map((p) => p?.digits || p)
-    .filter(Boolean);
+  const phoneCandidates = asArray(osintData?.phone_seeds)
+    .filter((p) => p?.digits && p?.verification_status === "unverified_candidate");
 
   return {
     baseEmail,
     emailLocal,
     emailDomain,
-    phoneSeeds,
+    phoneCandidates,
   };
 }

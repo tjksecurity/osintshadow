@@ -1,5 +1,6 @@
 import { auth } from "@/auth";
 import sql from "@/app/api/utils/sql";
+import { fulfillCheckout, validateCheckout } from "./fulfillment.js";
 
 async function stripeGet(path) {
   const res = await fetch(`https://api.stripe.com${path}`, {
@@ -36,73 +37,45 @@ export async function POST(request) {
       `/v1/checkout/sessions/${encodeURIComponent(sessionId)}`,
     );
 
-    const customerId = checkout?.customer;
-    const plan = checkout?.metadata?.plan || null;
-    const credits = Number(checkout?.metadata?.credits || 0);
-
-    // In most cases Stripe will redirect only after success, but we still sanity check.
-    const paymentStatus = checkout?.payment_status || null; // "paid" for payments
-    const status = checkout?.status || null; // "complete"
-
-    if (!plan) {
+    const validated = validateCheckout(checkout, {
+      expectedSessionId: sessionId,
+      expectedUserId: session.user.id,
+    });
+    if (!validated.ok && validated.code === "ownership") {
       return Response.json(
-        { error: "Checkout session is missing plan metadata" },
+        { error: "Checkout session does not belong to this user" },
+        { status: 403 },
+      );
+    }
+    if (!validated.ok) {
+      return Response.json(
+        { error: "Invalid Checkout entitlement metadata" },
         { status: 400 },
       );
     }
+    if (!validated.paid) {
+      return Response.json({
+        ok: true,
+        applied: false,
+        status: validated.status,
+        payment_status: validated.paymentStatus,
+        message: "Checkout payment not complete yet",
+      });
+    }
 
-    // If payment/subscription isn't complete, don't upgrade.
-    const looksPaid = paymentStatus === "paid" || status === "complete";
-    if (!looksPaid) {
+    const fulfillment = await fulfillCheckout(sql, validated, "confirmation");
+    if (!fulfillment.ownerMatches) {
       return Response.json(
-        {
-          ok: true,
-          applied: false,
-          status,
-          payment_status: paymentStatus,
-          message: "Checkout not complete yet",
-        },
-        { status: 200 },
+        { error: "Checkout session does not belong to this user" },
+        { status: 403 },
       );
     }
-
-    // Only allow confirming a session for the signed-in user.
-    const userRows = await sql`
-      SELECT id, stripe_customer_id
-      FROM auth_users
-      WHERE id = ${session.user.id}
-      LIMIT 1
-    `;
-
-    if (!userRows.length) {
-      return Response.json({ error: "User not found" }, { status: 404 });
-    }
-
-    // Apply plan + credits.
-    await sql`
-      UPDATE auth_users
-      SET subscription_plan = ${plan},
-          monthly_remaining = ${credits},
-          stripe_customer_id = COALESCE(stripe_customer_id, ${customerId})
-      WHERE id = ${session.user.id}
-    `;
-
-    await sql`
-      INSERT INTO logs (log_type, message, metadata_json)
-      VALUES (
-        'stripe_confirm',
-        'Applied subscription plan via confirm endpoint',
-        ${JSON.stringify({
-          user_id: session.user.id,
-          plan,
-          credits,
-          session_id: sessionId,
-          customer_id: customerId,
-        })}
-      )
-    `;
-
-    return Response.json({ ok: true, applied: true, plan, credits });
+    return Response.json({
+      ok: true,
+      applied: fulfillment.applied,
+      plan: validated.plan,
+      credits: validated.credits,
+    });
   } catch (error) {
     console.error("Error confirming Stripe session:", error);
     return Response.json({ error: "Internal server error" }, { status: 500 });

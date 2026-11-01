@@ -42,7 +42,7 @@ export function buildActionLog(
 
   if (identityGraph.phones.length > 0) {
     actionLog.push(
-      `Uncovered ${identityGraph.phones.length} associated phone numbers.`,
+      `Recorded ${identityGraph.phones.length} phone search target(s); this does not verify ownership or identity.`,
     );
   }
 

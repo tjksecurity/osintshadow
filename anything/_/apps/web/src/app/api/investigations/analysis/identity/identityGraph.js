@@ -5,7 +5,7 @@ export function buildIdentityGraph(
   baseEmail,
   emailLocal,
   emailDomain,
-  phoneSeeds,
+  phoneCandidates,
   emailInfo,
   usernameInfo,
   domainInfo,
@@ -61,16 +61,28 @@ export function buildIdentityGraph(
         .map((r) => r?.data || r?.ip)
         .filter(Boolean),
     ]),
+    // A user-supplied phone is a search target, not ownership evidence. Public
+    // page candidates stay separate and never create identity graph links.
     phones: uniq([
       osintData?.target_type === "phone" ? osintData?.target_value : null,
       osintData?.phone?.normalized,
       osintData?.phone?.original,
-      ...phoneSeeds,
-      ...(deepInfo?.aggregate?.phones || []),
     ]).filter(Boolean),
+    phone_candidates: [],
     handles,
     links: [],
   };
+
+  const candidateByDigits = new Map();
+  for (const candidate of [
+    ...(phoneCandidates || []),
+    ...(deepInfo?.aggregate?.phones || []),
+  ]) {
+    if (candidate?.digits && !candidateByDigits.has(candidate.digits)) {
+      candidateByDigits.set(candidate.digits, candidate);
+    }
+  }
+  identityGraph.phone_candidates = Array.from(candidateByDigits.values());
 
   if (emailLocal) {
     for (const h of handles) {

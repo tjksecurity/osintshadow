@@ -6,7 +6,7 @@
 		"dev": "react-router dev",
 		"build": "react-router build",
 		"start": "node build/server/index.js",
-		"test": "vitest run && node --test test/auth-security.test.mjs",
+		"test": "vitest run && node --test test/auth-security.test.mjs test/stripe-confirm-security.test.mjs test/stripe-webhook-fulfillment.test.mjs test/investigation-privacy.test.mjs test/phone-validation.test.mjs",
 		"typecheck": "react-router typegen && tsc --noEmit"
 	},
 	"dependencies": {

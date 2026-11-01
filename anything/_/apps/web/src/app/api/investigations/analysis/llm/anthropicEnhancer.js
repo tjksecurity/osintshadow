@@ -42,6 +42,7 @@ export async function enhanceWithAI(
       "6. Legal/Criminal: Analyze any court filings, criminal records, or property deeds found.",
       "7. Verdict: Assess the overall threat/credibility.",
       "8. Risk Score: 0-100.",
+      "Phone candidates marked unverified_candidate or public-page observations are not identity, ownership, or contact verification. Do not describe them as associated with the target unless separate evidence establishes that link.",
       "Only return JSON matching the provided schema.",
     ].join("\n");
 

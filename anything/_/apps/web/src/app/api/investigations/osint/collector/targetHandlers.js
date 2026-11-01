@@ -45,11 +45,17 @@ export async function handleUsernameTarget(targetValue, data, crossRefs) {
 
 export async function handlePhoneTarget(targetValue, data, crossRefs) {
   data.phone = await phoneIntel(targetValue);
-  crossRefs.phones.push(targetValue);
+  if (!data.phone?.format_valid) {
+    data.phone.validation_error =
+      "Phone target did not pass local syntax validation; no phone enrichment was run.";
+    return;
+  }
+
+  crossRefs.phones.push(data.phone.normalized || targetValue);
 
   if (data.flags.include_web_scraping) {
     try {
-      const rev = await reversePhoneWebScan(targetValue, {
+      const rev = await reversePhoneWebScan(data.phone.normalized || targetValue, {
         deepScan: data.flags.include_deep_scan,
       });
       data.phone.web = rev;

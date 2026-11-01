@@ -1,4 +1,8 @@
 export function generateReportHTML(osintData, aiAnalysis) {
+  const phoneCandidates = (osintData.phone_seeds || []).filter(
+    (candidate) => candidate?.verification_status === "unverified_candidate",
+  );
+
   return `
     <!DOCTYPE html>
     <html>
@@ -62,7 +66,7 @@ export function generateReportHTML(osintData, aiAnalysis) {
         <p><strong>Emails:</strong> ${(aiAnalysis.identity_graph?.emails || []).join(", ") || "—"}</p>
         <p><strong>Domains:</strong> ${(aiAnalysis.identity_graph?.domains || []).join(", ") || "—"}</p>
         <p><strong>IPs:</strong> ${(aiAnalysis.identity_graph?.ips || []).join(", ") || "—"}</p>
-        <p><strong>Phones:</strong> ${(aiAnalysis.presentation?.phone_numbers || aiAnalysis.identity_graph?.phones || []).join(", ") || "—"}</p>
+        <p><strong>Phone search targets (user-supplied; ownership is not verified):</strong> ${(aiAnalysis.presentation?.phone_numbers || aiAnalysis.identity_graph?.phones || []).join(", ") || "-"}</p>
         <table>
           <thead><tr><th>Handle</th><th>Confidence</th><th>Platforms</th></tr></thead>
           <tbody>
@@ -114,17 +118,18 @@ export function generateReportHTML(osintData, aiAnalysis) {
       }
 
       ${
-        Array.isArray(osintData.phone_seeds) && osintData.phone_seeds.length
+        phoneCandidates.length
           ? `
       <div class="section">
-        <h2>Phone Numbers Discovered (Seeds)</h2>
+        <h2>Public-page Phone Candidates (Unverified)</h2>
+        <p>These are syntax-validated public-page observations, not verified ownership or identity findings.</p>
         <table>
-          <thead><tr><th>Number</th><th>Source</th></tr></thead>
+          <thead><tr><th>Number</th><th>How observed</th><th>Source</th></tr></thead>
           <tbody>
-            ${osintData.phone_seeds
+            ${phoneCandidates
               .map(
                 (p) =>
-                  `<tr><td>${p.display}</td><td><a href="${p.source_url}" target="_blank" rel="noopener">${p.source_url}</a></td></tr>`,
+                  `<tr><td>${p.display}</td><td>${p.extraction_method || "public page"}</td><td><a href="${p.source_url}" target="_blank" rel="noopener">${p.source_url}</a></td></tr>`,
               )
               .join("")}
           </tbody>
