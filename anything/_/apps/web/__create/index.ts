@@ -262,7 +262,7 @@ async function initializeServer() {
   // Vercel owns the HTTP listener. Keep the same auth/API middleware and SSR
   // app, but expose its fetch handler instead of opening a second socket.
   if (process.env.SHADOWTRACE_SERVER_MODE === 'fetch') {
-    // @ts-expect-error - the Hono Vite plugin resolves this virtual build module.
+    // The Hono Vite plugin resolves this virtual build module.
     const build = await import('virtual:react-router/server-build');
     const handler = createRequestHandler(build, 'production');
     app.all('*', (c) => handler(c.req.raw));
