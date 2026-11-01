@@ -1,6 +1,6 @@
 import { auth } from "@/auth";
 import sql from "@/app/api/utils/sql";
-import { fulfillCheckout, validateCheckout } from "./fulfillment.js";
+import { fulfillCheckout, validateCheckout } from "../fulfillment.js";
 
 async function stripeGet(path) {
   const res = await fetch(`https://api.stripe.com${path}`, {

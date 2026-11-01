@@ -1,6 +1,6 @@
 import sql from "@/app/api/utils/sql";
 import crypto from "crypto";
-import { fulfillCheckout, validateCheckout } from "./fulfillment.js";
+import { fulfillCheckout, validateCheckout } from "../fulfillment.js";
 
 // Verify Stripe webhook signature without Stripe SDK
 const SIGNATURE_TOLERANCE_SECONDS = 300;

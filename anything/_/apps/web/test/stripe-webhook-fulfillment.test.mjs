@@ -3,6 +3,17 @@ import { createHmac, randomUUID } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 
+test("nested Stripe routes resolve the shared fulfillment module from their parent", async () => {
+  for (const route of ["confirm", "webhook"]) {
+    const source = await readFile(
+      new URL(`../src/app/api/stripe/${route}/route.js`, import.meta.url),
+      "utf8",
+    );
+    assert.match(source, /from "\.\.\/fulfillment\.js"/);
+    assert.doesNotMatch(source, /from "\.\/fulfillment\.js"/);
+  }
+});
+
 async function loadFulfillment() {
   const source = await readFile(
     new URL("../src/app/api/stripe/fulfillment.js", import.meta.url),
@@ -22,7 +33,7 @@ async function loadWebhook(sql, fulfillment) {
   globalThis[key] = { sql, fulfillment };
   source = source
     .replace('import sql from "@/app/api/utils/sql";', `const sql = globalThis[${JSON.stringify(key)}].sql;`)
-    .replace('import { fulfillCheckout, validateCheckout } from "./fulfillment.js";', `const { fulfillCheckout, validateCheckout } = globalThis[${JSON.stringify(key)}].fulfillment;`);
+    .replace('import { fulfillCheckout, validateCheckout } from "../fulfillment.js";', `const { fulfillCheckout, validateCheckout } = globalThis[${JSON.stringify(key)}].fulfillment;`);
   try {
     return await import(
       `data:text/javascript;base64,${Buffer.from(source).toString("base64")}`,

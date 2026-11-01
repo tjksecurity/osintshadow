@@ -20,7 +20,7 @@ async function loadRoute(mocks) {
     `const sql = globalThis[${JSON.stringify(key)}].sql;`,
   );
   source = source.replace(
-    'import { fulfillCheckout, validateCheckout } from "./fulfillment.js";',
+    'import { fulfillCheckout, validateCheckout } from "../fulfillment.js";',
     `const { fulfillCheckout, validateCheckout } = globalThis[${JSON.stringify(key)}].fulfillment;`,
   );
   try {
