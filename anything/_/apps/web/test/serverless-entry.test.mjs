@@ -25,7 +25,9 @@ test('serverless entry preserves requests and responses while reusing the server
     } } };
   };
   assert.ok(source.includes("import('../build/server/index.js')"));
+  assert.ok(source.includes("import('../build/server/assets/server-build.js')"), 'The function must directly trace the split SSR build and its dependencies.');
   source = source.replace("import('../build/server/index.js')", `globalThis[${JSON.stringify(fixtureKey)}]()`);
+  source = source.replace("import('../build/server/assets/server-build.js')", 'Promise.resolve({})');
   try {
     const { default: entry } = await import('data:text/javascript;base64,' + Buffer.from(source).toString('base64'));
     const request = new Request('https://example.invalid/api/synthetic?part=1', {

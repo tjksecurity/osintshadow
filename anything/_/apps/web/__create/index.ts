@@ -90,6 +90,7 @@ if (process.env.AUTH_SECRET) {
     '*',
     initAuthConfig(() => ({
       secret: process.env.AUTH_SECRET,
+      basePath: '/api/auth',
       pages: {
         signIn: '/account/signin',
         signOut: '/account/logout',
