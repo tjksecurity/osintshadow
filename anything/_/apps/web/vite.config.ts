@@ -32,6 +32,11 @@ export default defineConfig({
     ],
   },
   logLevel: 'info',
+  ssr: {
+    // Bundle this CommonJS package so Node/Vercel never relies on detecting
+    // its named hook export from the deployed CommonJS wrapper.
+    noExternal: ['react-idle-timer'],
+  },
   plugins: [
     nextPublicProcessEnv(),
     restartEnvFileChange(),
