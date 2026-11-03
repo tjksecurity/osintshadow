@@ -22,4 +22,4 @@ const missing = await request('/api/not-a-real-route');
 assert.equal(missing.status, 404);
 assert.equal((await missing.json()).error, 'API route not found.');
 assert.ok(!process.getActiveResourcesInfo().includes('TCPServerWrap'), 'Fetch mode opened an HTTP listener.');
-console.log(`Built fetch smoke passed (configured auth: ${Boolean(process.env.AUTH_SECRET)}): homepage, signed-out session, API configuration errors, and no HTTP listener.`);
+console.log(`Hosting-only built fetch smoke passed (synthetic auth secret present: ${Boolean(process.env.AUTH_SECRET)}, database intentionally unconfigured): homepage, signed-out session, API configuration errors, and no HTTP listener. Authentication, persistence and operational readiness are NOT verified.`);

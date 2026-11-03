@@ -16,6 +16,34 @@ loopback port and verifies homepage serving, signed-out session, bundled API
 parameter routes, explicit missing-configuration responses, and API 404s.
 It uses no credentials or provider calls and stops only its own child process.
 
+These are **hosting-only** checks. They deliberately accept missing-configuration
+responses and cannot establish working login, database access or investigations.
+A rendered sign-in form or `200 null` signed-out session is not app readiness.
+
+Before handing out a deployed link, run the separate read-only preflight with
+the explicit HTTPS application origin:
+
+```text
+node scripts/check-deployment.mjs <https-app-origin>
+```
+
+This makes credential-free GET requests and checks homepage status/content type,
+Auth.js provider/CSRF responses, signed-out session and protected investigation
+boundary. It rejects redirects/access-login pages, missing runtime configuration,
+unexpected status/payloads and unsafe input URLs. It never copies credentials or
+prints tokens. It does not create accounts or investigations and does not bypass
+deployment protection. A protected preview can therefore be blocked for this
+anonymous check even when the user's existing browser can open it.
+
+Even a passing preflight explicitly leaves `operationalReady`,
+`authenticatedWorkflowVerified` and `databaseVerified` false. Before claiming
+a usable application, separately verify the intended deployed commit/project,
+original database binding/schema, an authorized existing-account sign-in and
+the core investigation/report workflow using a designated non-production test
+workflow. Do not replace those gates with fixtures or send an untested substitute
+URL. Missing `AUTH_SECRET`/`DATABASE_URL` is a deployment configuration blocker,
+not something a different homepage link can fix.
+
 Vercel uses `vercel.json` and `api/index.mjs` from this app root. The client build
 is served as static assets; other requests reach the same bundled Hono/React
 Router app in fetch mode without opening a standalone listener. The build stages

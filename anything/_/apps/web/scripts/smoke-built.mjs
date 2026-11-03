@@ -41,7 +41,7 @@ try {
   assert.equal(missing.status, 404);
   assert.equal((await missing.json()).error, 'API route not found.');
   assert.ok(!diagnostics.includes('Error finding route files'), diagnostics);
-  console.log('Built server smoke passed: homepage, signed-out session, bundled parameter routes, configuration errors, and API 404.');
+  console.log('Hosting-only built server smoke passed: homepage, signed-out session, bundled parameter routes, configuration errors, and API 404. Authentication, persistence and operational readiness are NOT verified.');
 } finally {
   if (child.exitCode === null && child.signalCode === null) {
     child.kill();
