@@ -403,8 +403,8 @@ export default function Billing() {
                     key={plan.id}
                     className={`relative bg-[var(--st-panel)] rounded-lg p-6 border transition-all ${
                       plan.popular
-                        ? "border-[var(--st-accent)] ring-1 ring-[var(--st-accent)]/20"
-                        : "border-[var(--st-line)] hover:border-[var(--st-line)]/80"
+                        ? "border-[var(--st-accent)] ring-1 ring-[rgb(var(--st-accent-rgb))]/20"
+                        : "border-[var(--st-line)] hover:border-[rgb(var(--st-line-rgb))]/80"
                     }`}
                   >
                     {plan.popular && (

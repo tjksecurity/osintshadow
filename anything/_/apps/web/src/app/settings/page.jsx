@@ -335,7 +335,7 @@ export default function SettingsPage() {
                   type="email"
                   value={email}
                   disabled
-                  className="w-full px-4 py-3 bg-[var(--st-elevated)]/50 border border-[var(--st-line)] rounded-lg text-[var(--st-muted)] cursor-not-allowed"
+                  className="w-full px-4 py-3 bg-[rgb(var(--st-elevated-rgb))]/50 border border-[var(--st-line)] rounded-lg text-[var(--st-muted)] cursor-not-allowed"
                 />
                 <p className="mt-1 text-xs text-[var(--st-muted)]">
                   Email cannot be changed

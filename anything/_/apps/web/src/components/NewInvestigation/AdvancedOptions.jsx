@@ -37,7 +37,7 @@ export function AdvancedOptions({
           <Shield size={14} /> Advanced / Deep Scan
         </h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <label className="flex items-center gap-3 p-3 rounded-md border border-[var(--st-line)] bg-[var(--st-elevated)]/40 border-l-4 border-l-[var(--st-accent)]">
+          <label className="flex items-center gap-3 p-3 rounded-md border border-[var(--st-line)] bg-[rgb(var(--st-elevated-rgb))]/40 border-l-4 border-l-[var(--st-accent)]">
             <input
               type="checkbox"
               checked={includeDeepScan}
@@ -54,7 +54,7 @@ export function AdvancedOptions({
             </div>
           </label>
 
-          <label className="flex items-center gap-3 p-3 rounded-md border border-[var(--st-line)] bg-[var(--st-elevated)]/40 border-l-4 border-l-[var(--st-accent)]">
+          <label className="flex items-center gap-3 p-3 rounded-md border border-[var(--st-line)] bg-[rgb(var(--st-elevated-rgb))]/40 border-l-4 border-l-[var(--st-accent)]">
             <input
               type="checkbox"
               checked={includeDeepImageScan}
@@ -79,7 +79,7 @@ export function AdvancedOptions({
         </h3>
 
         <div className="space-y-4">
-          <label className="flex items-center gap-3 p-3 rounded-md border border-[var(--st-line)] bg-[var(--st-elevated)]/40 border-l-4 border-l-[#9333EA]">
+          <label className="flex items-center gap-3 p-3 rounded-md border border-[var(--st-line)] bg-[rgb(var(--st-elevated-rgb))]/40 border-l-4 border-l-[#9333EA]">
             <input
               type="checkbox"
               checked={includeSocialMedia}
@@ -125,7 +125,7 @@ export function AdvancedOptions({
                 </div>
               </div>
 
-              <label className="flex items-center gap-3 p-3 rounded-md border border-[var(--st-line)] bg-[var(--st-elevated)]/40 border-l-4 border-l-[#F59E0B]">
+              <label className="flex items-center gap-3 p-3 rounded-md border border-[var(--st-line)] bg-[rgb(var(--st-elevated-rgb))]/40 border-l-4 border-l-[#F59E0B]">
                 <input
                   type="checkbox"
                   checked={enableRealTimeMonitoring}

@@ -24,7 +24,7 @@ export function SearchOptions({
         Search Options
       </h3>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <label className="flex items-center gap-3 p-3 rounded-md border border-[var(--st-line)] bg-[var(--st-elevated)]/40">
+        <label className="flex items-center gap-3 p-3 rounded-md border border-[var(--st-line)] bg-[rgb(var(--st-elevated-rgb))]/40">
           <input
             type="checkbox"
             checked={includeWebScraping}
@@ -38,7 +38,7 @@ export function SearchOptions({
             </div>
           </div>
         </label>
-        <label className="flex items-center gap-3 p-3 rounded-md border border-[var(--st-line)] bg-[var(--st-elevated)]/40">
+        <label className="flex items-center gap-3 p-3 rounded-md border border-[var(--st-line)] bg-[rgb(var(--st-elevated-rgb))]/40">
           <input
             type="checkbox"
             checked={includeNSFW}
@@ -54,7 +54,7 @@ export function SearchOptions({
         </label>
 
         {/* NEW: Social media post collection option */}
-        <label className="flex items-center gap-3 p-3 rounded-md border border-[var(--st-line)] bg-[var(--st-elevated)]/40">
+        <label className="flex items-center gap-3 p-3 rounded-md border border-[var(--st-line)] bg-[rgb(var(--st-elevated-rgb))]/40">
           <input
             type="checkbox"
             checked={includePostCollection}
@@ -71,7 +71,7 @@ export function SearchOptions({
           </div>
         </label>
 
-        <label className="flex items-center gap-3 p-3 rounded-md border border-[var(--st-line)] bg-[var(--st-elevated)]/40">
+        <label className="flex items-center gap-3 p-3 rounded-md border border-[var(--st-line)] bg-[rgb(var(--st-elevated-rgb))]/40">
           <input
             type="checkbox"
             checked={includeProperty}
@@ -87,7 +87,7 @@ export function SearchOptions({
             </div>
           </div>
         </label>
-        <label className="flex items-center gap-3 p-3 rounded-md border border-[var(--st-line)] bg-[var(--st-elevated)]/40">
+        <label className="flex items-center gap-3 p-3 rounded-md border border-[var(--st-line)] bg-[rgb(var(--st-elevated-rgb))]/40">
           <input
             type="checkbox"
             checked={includeCourt}
@@ -103,7 +103,7 @@ export function SearchOptions({
             </div>
           </div>
         </label>
-        <label className="flex items-center gap-3 p-3 rounded-md border border-[var(--st-line)] bg-[var(--st-elevated)]/40">
+        <label className="flex items-center gap-3 p-3 rounded-md border border-[var(--st-line)] bg-[rgb(var(--st-elevated-rgb))]/40">
           <input
             type="checkbox"
             checked={includeCriminal}
@@ -120,7 +120,7 @@ export function SearchOptions({
           </div>
         </label>
         {targetType === "license_plate" && (
-          <label className="flex items-center gap-3 p-3 rounded-md border border-[var(--st-line)] bg-[var(--st-elevated)]/40">
+          <label className="flex items-center gap-3 p-3 rounded-md border border-[var(--st-line)] bg-[rgb(var(--st-elevated-rgb))]/40">
             <input
               type="checkbox"
               checked={includeLicensePlate}

@@ -62,3 +62,16 @@ pages can automatically tick investigations. Fixture rendering is not login,
 collection, provider activation, billing or live report acceptance. Previously
 recorded browser-injected document hydration errors are separate and not claimed
 fixed by this presentation change.
+
+## Review follow-up
+
+Read-only independent review identified two visual defects before final handoff:
+plain CSS-variable colors with Tailwind 3 alpha modifiers were not emitted, and
+the solid-button substring selector also matched translucent selected controls.
+The follow-up uses RGB channel tokens for alpha utilities and an exact CSS class
+token selector. Actual installed Tailwind color parsing now has regression
+coverage, including selected-target contrast. No event/data handlers changed.
+
+Final local suite: 320 tests, 319 passed, 0 failed, same 1 environment-limited
+package-link skip. New theme suite now contains 14 tests. Full hosted checks and
+the final deployment identity remain in the task's delivery record.

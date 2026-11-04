@@ -244,7 +244,7 @@ function LogsTable() {
         </thead>
         <tbody className="divide-y divide-[var(--st-line)]">
           {logs.map((l) => (
-            <tr key={l.id} className="hover:bg-[var(--st-elevated)]/40">
+            <tr key={l.id} className="hover:bg-[rgb(var(--st-elevated-rgb))]/40">
               <td className="py-2 pr-4 whitespace-nowrap">
                 {new Date(l.created_at).toLocaleString()}
               </td>
@@ -310,7 +310,7 @@ function AIChatLogsTable() {
             const m = l.metadata_json || {};
             const action = m.action || "event";
             return (
-              <tr key={l.id} className="hover:bg-[var(--st-elevated)]/40">
+              <tr key={l.id} className="hover:bg-[rgb(var(--st-elevated-rgb))]/40">
                 <td className="py-2 pr-4 whitespace-nowrap">
                   {new Date(l.created_at).toLocaleString()}
                 </td>

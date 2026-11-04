@@ -5,6 +5,7 @@ import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import ts from 'typescript';
 import { safeReportUrl } from '../src/utils/reportSafety.js';
+import alphaUtilities from 'tailwindcss/lib/util/withAlphaVariable.js';
 
 // Actual presentation modules, isolated from auth, routing, maps and network.
 // These fixtures verify markup/controls, not browser layout or live acceptance.
@@ -128,4 +129,43 @@ test('not-found screen shares branding without forcing a desktop minimum width',
   assert.match(html,/st-product st-workspace/);
   assert.match(html,/aria-label="ShadowTrace"/);
   assert.doesNotMatch(html,/min-w-\[850px\]/);
+});
+
+test('translucent theme utilities are accepted by the installed Tailwind color parser',async()=>{
+  const css=await read('../src/components/Theme/product.css');
+  const directories=['../src/app/','../src/components/NewInvestigation/','../src/components/InvestigationDetail/'];
+  const files=[];
+  async function visit(directory){
+    for(const entry of await readdir(new URL(directory,import.meta.url),{withFileTypes:true})) {
+      if(entry.name==='api')continue;
+      const file=directory+entry.name;
+      if(entry.isDirectory())await visit(file+'/');
+      else if(/\.(jsx|tsx)$/.test(entry.name))files.push(file);
+    }
+  }
+  for(const directory of directories)await visit(directory);
+  let checked=0;
+  for(const file of files){
+    const source=await read(file);
+    assert.doesNotMatch(source,/\[var\(--st-[a-z-]+\)\]\/\d+/,file);
+    for(const [,token,percent] of source.matchAll(/\[rgb\(var\(--st-([a-z]+)-rgb\)\)\]\/(\d+)/g)) {
+      const channels=css.match(new RegExp(`--st-${token}-rgb:\\s*(\\d+) (\\d+) (\\d+)`));
+      assert.ok(channels,token);
+      const hex='#'+channels.slice(1).map(value=>Number(value).toString(16).padStart(2,'0')).join('');
+      assert.match(css,new RegExp(`--st-${token}:\\s*${hex}`));
+      assert.ok(alphaUtilities.withAlphaValue(`rgb(var(--st-${token}-rgb))`,String(Number(percent)/100)),file);
+      checked++;
+    }
+  }
+  assert.ok(checked>=15,'must test actual translucent classes, not an empty inventory');
+});
+
+test('solid primary text styling cannot match a translucent selected target control',async()=>{
+  const css=await read('../src/components/Theme/product.css');
+  assert.ok(css.includes('[class~="bg-[var(--st-accent)]"]'));
+  assert.ok(!css.includes('[class*="bg-[var(--st-accent)]"]'));
+  const {TargetTypeSelector}=await load('../src/components/NewInvestigation/TargetTypeSelector.jsx');
+  const html=render(TargetTypeSelector,{targetTypes:[{value:'domain',label:'Domain',icon:()=>null}],targetType:'domain',setTargetType:forbidden});
+  assert.match(html,/bg-\[rgb\(var\(--st-accent-rgb\)\)\]\/10/);
+  assert.doesNotMatch(html,/text-\[var\(--st-bg\)\]/);
 });

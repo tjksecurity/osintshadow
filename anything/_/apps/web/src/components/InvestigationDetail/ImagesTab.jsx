@@ -78,7 +78,7 @@ export function ImagesTab({ investigation, imagesItems, hasImages }) {
                           href={sourceUrl}
                           target="_blank"
                           rel="noreferrer"
-                          className="px-2 py-0.5 rounded-full bg-[var(--st-accent)]/10 text-[var(--st-accent)] whitespace-nowrap"
+                          className="px-2 py-0.5 rounded-full bg-[rgb(var(--st-accent-rgb))]/10 text-[var(--st-accent)] whitespace-nowrap"
                           title={sourceUrl}
                         >
                           {host}

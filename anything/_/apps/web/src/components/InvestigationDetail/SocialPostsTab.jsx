@@ -359,7 +359,7 @@ export default function SocialPostsTab({ investigation }) {
             return (
               <div
                 key={index}
-                className="border border-[var(--st-line)] rounded-lg p-4 bg-[var(--st-elevated)]/30"
+                className="border border-[var(--st-line)] rounded-lg p-4 bg-[rgb(var(--st-elevated-rgb))]/30"
               >
                 <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3 mb-3">
                   <div className="flex flex-wrap items-center gap-2">

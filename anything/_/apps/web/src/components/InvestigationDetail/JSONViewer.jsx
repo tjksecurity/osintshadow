@@ -38,7 +38,7 @@ function JSONNode({ label, value, level = 0 }) {
         <span
           className={`inline-block w-4 h-4 text-center leading-4 rounded-sm ${
             open
-              ? "bg-[var(--st-accent)]/20 text-[var(--st-accent)]"
+              ? "bg-[rgb(var(--st-accent-rgb))]/20 text-[var(--st-accent)]"
               : "bg-[var(--st-elevated)] text-slate-300"
           }`}
         >

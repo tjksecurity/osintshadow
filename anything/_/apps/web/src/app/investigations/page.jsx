@@ -329,7 +329,7 @@ export default function Investigations() {
                   className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                     filterStatus === "all"
                       ? "bg-[var(--st-accent)] text-[var(--st-bg)]"
-                      : "bg-[var(--st-elevated)] text-slate-300 hover:bg-[var(--st-hover)]/80"
+                      : "bg-[var(--st-elevated)] text-slate-300 hover:bg-[rgb(var(--st-hover-rgb))]/80"
                   }`}
                 >
                   All
@@ -339,7 +339,7 @@ export default function Investigations() {
                   className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                     filterStatus === "completed"
                       ? "bg-[var(--st-accent)] text-[var(--st-bg)]"
-                      : "bg-[var(--st-elevated)] text-slate-300 hover:bg-[var(--st-hover)]/80"
+                      : "bg-[var(--st-elevated)] text-slate-300 hover:bg-[rgb(var(--st-hover-rgb))]/80"
                   }`}
                 >
                   Completed
@@ -349,7 +349,7 @@ export default function Investigations() {
                   className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                     filterStatus === "processing"
                       ? "bg-[var(--st-accent)] text-[var(--st-bg)]"
-                      : "bg-[var(--st-elevated)] text-slate-300 hover:bg-[var(--st-hover)]/80"
+                      : "bg-[var(--st-elevated)] text-slate-300 hover:bg-[rgb(var(--st-hover-rgb))]/80"
                   }`}
                 >
                   Processing
@@ -359,7 +359,7 @@ export default function Investigations() {
                   className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                     filterStatus === "failed"
                       ? "bg-[var(--st-accent)] text-[var(--st-bg)]"
-                      : "bg-[var(--st-elevated)] text-slate-300 hover:bg-[var(--st-hover)]/80"
+                      : "bg-[var(--st-elevated)] text-slate-300 hover:bg-[rgb(var(--st-hover-rgb))]/80"
                   }`}
                 >
                   Failed
@@ -428,7 +428,7 @@ export default function Investigations() {
                     {filteredInvestigations.map((investigation) => (
                       <tr
                         key={investigation.id}
-                        className="hover:bg-[var(--st-elevated)]/40 cursor-pointer"
+                        className="hover:bg-[rgb(var(--st-elevated-rgb))]/40 cursor-pointer"
                         onClick={() => {
                           window.location.href = `/investigations/${investigation.id}`;
                         }}

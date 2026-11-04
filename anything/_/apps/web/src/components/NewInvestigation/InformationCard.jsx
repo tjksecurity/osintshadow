@@ -4,7 +4,7 @@ export function InformationCard() {
       <h3 className="font-semibold mb-4">What happens next?</h3>
       <div className="space-y-3 text-sm text-slate-300">
         <div className="flex items-start gap-3">
-          <div className="w-6 h-6 bg-[var(--st-accent)]/20 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+          <div className="w-6 h-6 bg-[rgb(var(--st-accent-rgb))]/20 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
             <span className="text-[var(--st-accent)] text-xs font-bold">1</span>
           </div>
           <div>
@@ -15,7 +15,7 @@ export function InformationCard() {
           </div>
         </div>
         <div className="flex items-start gap-3">
-          <div className="w-6 h-6 bg-[var(--st-accent)]/20 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+          <div className="w-6 h-6 bg-[rgb(var(--st-accent-rgb))]/20 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
             <span className="text-[var(--st-accent)] text-xs font-bold">2</span>
           </div>
           <div>
@@ -26,7 +26,7 @@ export function InformationCard() {
           </div>
         </div>
         <div className="flex items-start gap-3">
-          <div className="w-6 h-6 bg-[var(--st-accent)]/20 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+          <div className="w-6 h-6 bg-[rgb(var(--st-accent-rgb))]/20 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
             <span className="text-[var(--st-accent)] text-xs font-bold">3</span>
           </div>
           <div>

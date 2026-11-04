@@ -259,7 +259,7 @@ export default function AssociatesTab({ investigation }) {
             return (
               <div
                 key={index}
-                className="border border-[var(--st-line)] rounded-lg p-4 bg-[var(--st-elevated)]/30"
+                className="border border-[var(--st-line)] rounded-lg p-4 bg-[rgb(var(--st-elevated-rgb))]/30"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex-1">
