@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { PUBLIC_SOURCES, normalizePublicSources } from '../utils/publicSources.js';
 
 export function useNewInvestigation() {
   const [targetType, setTargetType] = useState("email");
@@ -8,6 +9,7 @@ export function useNewInvestigation() {
   const [includeDeepImageScan, setIncludeDeepImageScan] = useState(false);
   const [includeDeepScan, setIncludeDeepScan] = useState(false);
   const [includePeopleDataLabs, setIncludePeopleDataLabs] = useState(false);
+  const [publicSources, setPublicSources] = useState([]);
   const [includeCriminal, setIncludeCriminal] = useState(true);
   const [includeCourt, setIncludeCourt] = useState(true);
   const [includeProperty, setIncludeProperty] = useState(true);
@@ -55,6 +57,7 @@ export function useNewInvestigation() {
         include_deep_image_scan: includeDeepImageScan,
         include_deep_scan: includeDeepScan,
         include_people_data_labs: includePeopleDataLabs === true && ['email', 'domain'].includes(targetType),
+        public_sources: normalizePublicSources(publicSources).filter(id => PUBLIC_SOURCES.find(source => source.id === id)?.targets.includes(targetType)),
         include_criminal: includeCriminal,
         include_court: includeCourt,
         include_property: includeProperty,
@@ -294,6 +297,8 @@ export function useNewInvestigation() {
     setIncludeDeepScan,
     includePeopleDataLabs,
     setIncludePeopleDataLabs,
+    publicSources,
+    setPublicSources,
     includeCriminal,
     setIncludeCriminal,
     includeCourt,

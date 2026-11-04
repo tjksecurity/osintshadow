@@ -255,6 +255,7 @@ export async function POST(request, { params }) {
         });
 
         const { collectOSINT } = await import("../../osint/collector.js");
+        const { createPublicSourceStore } = await import('../../osint/publicSourceStore.js');
 
         // IMPORTANT: OSINT is best-effort. If any provider times out (AbortError)
         // we should NOT fail the entire investigation.
@@ -270,6 +271,9 @@ export async function POST(request, { params }) {
             includeDeepImageScan: !!flags.includeDeepImageScan,
             includeDeepScan: !!flags.includeDeepScan,
             includePeopleDataLabs: flags.includePeopleDataLabs === true,
+            publicSources: flags.publicSources,
+            investigationId: inv.id,
+            publicSourceStore: createPublicSourceStore(sql),
             includeLicensePlate:
               flags.includeLicensePlate === undefined
                 ? true

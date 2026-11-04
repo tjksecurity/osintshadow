@@ -1,0 +1,184 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Public source result v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "provider",
+    "status",
+    "message",
+    "evaluated_at",
+    "request_started",
+    "truncated",
+    "records",
+    "validation"
+  ],
+  "properties": {
+    "provider": {
+      "type": "string",
+      "enum": [
+        "github",
+        "bluesky",
+        "stackexchange",
+        "openalex",
+        "wikidata",
+        "tavily",
+        "exa",
+        "veriphone"
+      ]
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "candidates_found",
+        "validated",
+        "no_match",
+        "not_configured",
+        "unsupported_target",
+        "invalid_target",
+        "quota_exhausted",
+        "rate_limited",
+        "lookup_pending",
+        "budget_unavailable",
+        "persistence_error",
+        "authentication_error",
+        "provider_error",
+        "timeout",
+        "invalid_response"
+      ]
+    },
+    "message": {
+      "type": "string",
+      "maxLength": 400
+    },
+    "evaluated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "request_started": {
+      "type": "boolean"
+    },
+    "truncated": {
+      "type": "boolean"
+    },
+    "records": {
+      "type": "array",
+      "maxItems": 5,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "label",
+          "url"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 500
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "maxLength": 1000
+          },
+          "context": {
+            "type": "string",
+            "maxLength": 300
+          }
+        }
+      }
+    },
+    "validation": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "phone_valid"
+          ],
+          "properties": {
+            "phone_valid": {
+              "type": "boolean"
+            },
+            "phone_type": {
+              "type": "string",
+              "maxLength": 100
+            },
+            "country_code": {
+              "type": "string",
+              "maxLength": 100
+            },
+            "carrier": {
+              "type": "string",
+              "maxLength": 100
+            }
+          }
+        }
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "candidates_found"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "records": {
+            "minItems": 1
+          },
+          "validation": {
+            "type": "null"
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "records": {
+            "maxItems": 0
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "validated"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "provider": {
+            "const": "veriphone"
+          },
+          "validation": {
+            "type": "object"
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "validation": {
+            "type": "null"
+          }
+        }
+      }
+    }
+  ]
+}

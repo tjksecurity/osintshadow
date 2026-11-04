@@ -34,7 +34,7 @@ test('ordinary zero and low balances still display their warnings', async () => 
 test('an unlimited form is enabled at zero balance and never claims a debit', async () => {
   const empty = () => null;
   const { InvestigationForm } = await load('../src/components/NewInvestigation/InvestigationForm.jsx', {
-    TargetTypeSelector: empty, TargetValueInput: empty, SearchOptions: empty, AdvancedOptions: empty,
+    TargetTypeSelector: empty, TargetValueInput: empty, SearchOptions: empty, AdvancedOptions: empty, PublicSourceOptions: empty,
     targetTypes: [{ value: 'domain', label: 'Domain' }],
   }, true);
   const html = renderToStaticMarkup(React.createElement(InvestigationForm, {
@@ -101,7 +101,7 @@ test('trial accounts remain trial rather than being mislabeled unlimited', async
 test('ordinary zero-credit users cannot enable the form by passing isAdmin to the presentation component', async () => {
   const empty = () => null;
   const { InvestigationForm } = await load('../src/components/NewInvestigation/InvestigationForm.jsx', {
-    TargetTypeSelector: empty, TargetValueInput: empty, SearchOptions: empty, AdvancedOptions: empty,
+    TargetTypeSelector: empty, TargetValueInput: empty, SearchOptions: empty, AdvancedOptions: empty, PublicSourceOptions: empty,
     targetTypes: [{ value: 'domain', label: 'Domain' }],
   }, true);
   const html = renderToStaticMarkup(React.createElement(InvestigationForm, {
@@ -153,7 +153,7 @@ test('current-session mismatch masks even a retained unlimited query result befo
 test('pending or failed entitlement checks disable submission despite previously unlimited data', async () => {
   const empty = () => null;
   const { InvestigationForm } = await load('../src/components/NewInvestigation/InvestigationForm.jsx', {
-    TargetTypeSelector: empty, TargetValueInput: empty, SearchOptions: empty, AdvancedOptions: empty,
+    TargetTypeSelector: empty, TargetValueInput: empty, SearchOptions: empty, AdvancedOptions: empty, PublicSourceOptions: empty,
     targetTypes: [{ value: 'domain', label: 'Domain' }],
   }, true);
   for (const state of [{ creditsPending: true }, { creditError: new Error('Synthetic failure') }]) {

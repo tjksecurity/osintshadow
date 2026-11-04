@@ -178,7 +178,7 @@ test('real collector retains separate provider provenance and continues on no-ma
   const source = await readFile(new URL('../src/app/api/investigations/osint/collector.js', import.meta.url), 'utf8');
   const names = [...source.matchAll(/import\s*\{([^}]+)\}/g)].flatMap(match => match[1].split(',').map(v => v.trim()).filter(Boolean));
   const bindings = Object.fromEntries(names.map(name => [name, async () => {}]));
-  Object.assign(bindings, envelope, { enrichPeopleDataLabs: (...args) => enrichPeopleDataLabs(...args, { env, fetchImpl: async () => Response.json({}, { status: 404 }) }) });
+  Object.assign(bindings, envelope, { collectPublicSources: async () => [], enrichPeopleDataLabs: (...args) => enrichPeopleDataLabs(...args, { env, fetchImpl: async () => Response.json({}, { status: 404 }) }) });
   const { collectOSINT } = await load('../src/app/api/investigations/osint/collector.js', bindings);
   const result = await collectOSINT('email', 'synthetic@example.invalid', requested);
   assert.equal(result.people_data_labs.status, 'no_match'); assert.equal(result.error, undefined);
@@ -220,7 +220,7 @@ test('React and HTML reports escape provider data and keep uncertainty visible',
 test('form opt-in defaults off and explains separate provider credits; disabled for trial/unsupported targets', async () => {
   const empty = () => null;
   const { InvestigationForm } = await load('../src/components/NewInvestigation/InvestigationForm.jsx', {
-    TargetTypeSelector: empty, TargetValueInput: empty, SearchOptions: empty, AdvancedOptions: empty,
+    TargetTypeSelector: empty, TargetValueInput: empty, SearchOptions: empty, AdvancedOptions: empty, PublicSourceOptions: empty,
     targetTypes: [{ value: 'domain' }, { value: 'phone' }],
   }, true);
   const render = props => renderToStaticMarkup(React.createElement(InvestigationForm, { targetType: 'domain', targetValue: 'example.invalid', user: {}, hasUnlimitedCredits: true, ...props }));

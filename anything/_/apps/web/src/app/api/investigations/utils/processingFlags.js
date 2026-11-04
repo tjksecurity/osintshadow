@@ -1,3 +1,5 @@
+import { normalizePublicSources } from '../../../../utils/publicSources.js';
+
 const BOOLEAN_FLAGS = Object.freeze([
   'includeWebScraping', 'includeNSFW', 'includeDeepImageScan', 'includeDeepScan',
   'includeCriminal', 'includeCourt', 'includeProperty', 'includeLicensePlate',
@@ -6,7 +8,7 @@ const BOOLEAN_FLAGS = Object.freeze([
 
 export function normalizeProcessingFlags(options = {}, isTrial = false) {
   if (isTrial) {
-    return { ...Object.fromEntries(BOOLEAN_FLAGS.map(key => [key, false])), includePeopleDataLabs: false, licensePlateRegion: null, socialPlatforms: [] };
+    return { ...Object.fromEntries(BOOLEAN_FLAGS.map(key => [key, false])), includePeopleDataLabs: false, publicSources: [], licensePlateRegion: null, socialPlatforms: [] };
   }
   return {
     includeWebScraping: options.include_web_scraping !== false,
@@ -14,6 +16,7 @@ export function normalizeProcessingFlags(options = {}, isTrial = false) {
     includeDeepImageScan: !!options.include_deep_image_scan,
     includeDeepScan: !!options.include_deep_scan,
     includePeopleDataLabs: options.include_people_data_labs === true,
+    publicSources: normalizePublicSources(options.public_sources),
     includeCriminal: options.include_criminal !== false,
     includeCourt: options.include_court !== false,
     includeProperty: options.include_property !== false,
@@ -33,6 +36,8 @@ export function readStoredProcessingFlags(stored) {
     if (!flags || typeof flags !== 'object' || Array.isArray(flags)) return null;
     if (BOOLEAN_FLAGS.some(key => typeof flags[key] !== 'boolean')) return null;
     if (flags.includePeopleDataLabs !== undefined && typeof flags.includePeopleDataLabs !== 'boolean') return null;
+    if (flags.publicSources !== undefined && (!Array.isArray(flags.publicSources) ||
+      JSON.stringify(normalizePublicSources(flags.publicSources)) !== JSON.stringify(flags.publicSources))) return null;
     if (!Array.isArray(flags.socialPlatforms) || flags.socialPlatforms.some(platform => typeof platform !== 'string')) return null;
     if (flags.licensePlateRegion !== null && typeof flags.licensePlateRegion !== 'string') return null;
     return flags;

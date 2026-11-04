@@ -5,6 +5,8 @@ import useUser from "@/utils/useUser";
 import { useInvestigationCredits } from "@/hooks/useInvestigationCredits";
 import {
   Shield,
+  ArrowRight,
+  ArrowUpRight,
   Search,
   Bell,
   User,
@@ -25,12 +27,15 @@ import {
   Sparkles,
 } from "lucide-react";
 import BrandLogo from "@/components/BrandLogo";
+import "@/components/Landing/shadowtrace.css";
 
 export default function Dashboard() {
   const { data: user, loading } = useUser();
   const { data: credits, error: creditError } = useInvestigationCredits(user?.id);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [investigations, setInvestigations] = useState([]);
+  const [listLoading, setListLoading] = useState(true);
+  const [listError, setListError] = useState(false);
   const [stats, setStats] = useState({
     total: 0,
     completed: 0,
@@ -139,7 +144,9 @@ export default function Dashboard() {
 
       if (response.ok) {
         const data = await response.json();
-        const items = data?.investigations || [];
+        if (!Array.isArray(data?.investigations)) throw new Error('Invalid investigation response');
+        const items = data.investigations;
+        setListError(false);
         setInvestigations(items);
 
         // Calculate stats
@@ -151,385 +158,96 @@ export default function Dashboard() {
         const failed = items.filter((i) => i.status === "failed").length;
 
         setStats({ total, completed, processing, failed });
+      } else {
+        setListError(true);
       }
     } catch (error) {
-      console.error("Error fetching investigations:", error);
+      setListError(true);
+    } finally {
+      setListLoading(false);
     }
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-[#263043] flex items-center justify-center">
-        <div className="text-white">Loading...</div>
-      </div>
-    );
+
+  if (loading || !user) {
+    return <div className="st-dashboard"><main className="st-empty-state" style={{ width: '100%' }}><Shield size={30} aria-hidden="true" /><p role="status">Opening your workspace…</p></main></div>;
   }
 
-  // Remove direct window usage during render
-  // if (!user) {
-  //   window.location.href = "/account/signin";
-  //   return null;
-  // }
+  return <DashboardView user={user} credits={credits} creditError={creditError}
+    sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} isAdmin={isAdmin}
+    investigations={investigations} stats={stats} listLoading={listLoading}
+    listError={listError} retry={fetchInvestigations} />;
+}
 
-  const getStatusIcon = (status) => {
-    switch (status) {
-      case "completed":
-        return <CheckCircle className="text-green-400" size={16} />;
-      case "processing":
-        return <Clock className="text-yellow-400" size={16} />;
-      case "failed":
-        return <XCircle className="text-red-400" size={16} />;
-      default:
-        return <Clock className="text-slate-400" size={16} />;
-    }
-  };
+export function filterInvestigationRows(rows, query) {
+  const value = String(query || '').trim().toLowerCase();
+  return rows.filter(row => [row.target_value, row.target_type, row.status].some(field => String(field || '').toLowerCase().includes(value)));
+}
 
-  const getRiskColor = (riskScore) => {
-    if (riskScore >= 70) return "text-red-400";
-    if (riskScore >= 40) return "text-yellow-400";
-    return "text-green-400";
-  };
+export function DashboardView({ user, credits, creditError, sidebarOpen = false, setSidebarOpen = () => {}, isAdmin = false, investigations = [], stats = { total: 0, completed: 0, processing: 0, failed: 0 }, listLoading = false, listError = false, retry = () => {}, initialQuery = '' }) {
+  const [query, setQuery] = useState(initialQuery);
+  const menuToggle = useRef(null);
+  useEffect(() => {
+    if (!sidebarOpen) return;
+    const close = event => {
+      if (event.key === 'Escape') { setSidebarOpen(false); menuToggle.current?.focus(); }
+    };
+    window.addEventListener('keydown', close);
+    return () => window.removeEventListener('keydown', close);
+  }, [sidebarOpen, setSidebarOpen]);
+  const rows = filterInvestigationRows(investigations, query);
+  const navigation = [
+    ['/dashboard', LayoutDashboard, 'Overview'],
+    ['/investigations/new', Plus, 'New investigation'],
+    ['/investigations', FileBarChart, 'Investigations'],
+    ['/ai/chat', Sparkles, 'AI Chat'],
+    ['/map', Map, 'Global map'],
+    ['/billing', CreditCard, 'Billing'],
+    ['/settings', Settings, 'Settings'],
+  ];
+  const creditLabel = creditError ? 'Unavailable' : !credits ? 'Loading…' : credits.credits_unlimited ? 'Unlimited' : credits.monthly_remaining;
+  const creditNote = creditError ? 'Could not load your allowance' : credits?.credits_unlimited ? 'Your investigation allowance' : 'Current investigation allowance';
+  const statusIcon = status => status === 'completed' ? CheckCircle : status === 'failed' ? XCircle : Clock;
 
   return (
-    <div className="flex min-h-screen text-white font-inter bg-[#263043]">
-      {/* Sidebar Navigation */}
-      <aside
-        className={`fixed md:static inset-y-0 left-0 z-50 w-[220px] bg-[#232D41] border-r border-[#37425B] transform transition-transform duration-300 ${
-          sidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
-        }`}
-      >
-        <div className="flex items-center gap-2 py-4 px-6">
-          <BrandLogo className="h-5 w-auto" variant="onDark" />
-          <div className="flex-1"></div>
-          <X
-            className="md:hidden text-slate-300 cursor-pointer"
-            size={22}
-            onClick={() => setSidebarOpen(false)}
-          />
-        </div>
-
-        <ul className="space-y-1">
-          <li className="flex items-center gap-3 py-2 px-6 bg-[#303B52] border-l-2 border-[#00D1FF] text-white">
-            <LayoutDashboard size={18} />
-            <span>Dashboard</span>
-          </li>
-          <li>
-            <a
-              href="/investigations/new"
-              className="flex items-center gap-3 py-2 px-6 hover:bg-[#303B52] text-slate-400 hover:text-white transition-colors"
-            >
-              <Plus size={18} />
-              <span>New Investigation</span>
-            </a>
-          </li>
-          <li>
-            <a
-              href="/investigations"
-              className="flex items-center gap-3 py-2 px-6 hover:bg-[#303B52] text-slate-400 hover:text-white transition-colors"
-            >
-              <FileBarChart size={18} />
-              <span>Investigations</span>
-            </a>
-          </li>
-          <li>
-            <a
-              href="/ai/chat"
-              className="flex items-center gap-3 py-2 px-6 hover:bg-[#303B52] text-slate-400 hover:text-white transition-colors"
-            >
-              <Sparkles size={18} />
-              <span>AI Chat</span>
-            </a>
-          </li>
-          <li>
-            <a
-              href="/map"
-              className="flex items-center gap-3 py-2 px-6 hover:bg-[#303B52] text-slate-400 hover:text-white transition-colors"
-            >
-              <Map size={18} />
-              <span>Global Map</span>
-            </a>
-          </li>
-          <li>
-            <a
-              href="/billing"
-              className="flex items-center gap-3 py-2 px-6 hover:bg-[#303B52] text-slate-400 hover:text-white transition-colors"
-            >
-              <CreditCard size={18} />
-              <span>Billing</span>
-            </a>
-          </li>
-          <li>
-            <a
-              href="/settings"
-              className="flex items-center gap-3 py-2 px-6 hover:bg-[#303B52] text-slate-400 hover:text-white transition-colors"
-            >
-              <Settings size={18} />
-              <span>Settings</span>
-            </a>
-          </li>
-        </ul>
-
-        {isAdmin && (
-          <>
-            <hr className="border-t border-[#37425B] my-4" />
-            <div className="text-slate-400 text-xs uppercase px-6 mb-2">
-              Admin Portal
-            </div>
-            <ul className="space-y-1">
-              <li>
-                <a
-                  href="/administration"
-                  className="flex items-center gap-3 py-2 px-6 hover:bg-[#303B52] text-slate-400 hover:text-white transition-colors"
-                >
-                  <Activity size={18} />
-                  <span>Administration</span>
-                </a>
-              </li>
-            </ul>
-          </>
-        )}
+    <div className="st-dashboard">
+      <a className="st-skip" href="#workspace-main">Skip to workspace</a>
+      <aside className="st-app-sidebar" id="workspace-navigation" data-open={sidebarOpen}>
+        <div className="st-app-brand"><a href="/" aria-label="ShadowTrace home"><BrandLogo className="st-logo" /></a><button type="button" className="st-mobile-only" aria-label="Close navigation" onClick={() => { setSidebarOpen(false); menuToggle.current?.focus(); }}><X size={18} aria-hidden="true" /></button></div>
+        <p className="st-sidebar-label">WORKSPACE</p>
+        <nav className="st-app-nav" aria-label="Workspace navigation">{navigation.map(([href, Icon, label]) => <a key={href} href={href} aria-current={href === '/dashboard' ? 'page' : undefined}><Icon size={17} aria-hidden="true" /><span>{label}</span></a>)}</nav>
+        {isAdmin && <div className="st-admin-nav"><p className="st-sidebar-label">ADMINISTRATION</p><nav className="st-app-nav" aria-label="Administration"><a href="/administration"><Activity size={17} aria-hidden="true" />Admin portal</a></nav></div>}
+        <div className="st-sidebar-bottom"><Shield size={21} aria-hidden="true" /><p>SOURCE-LED INTELLIGENCE<br />HUMAN-REVIEWED CONCLUSIONS</p><a href="/account/logout">Sign out <ArrowRight size={13} aria-hidden="true" /></a></div>
       </aside>
 
-      {/* Main Content Wrapper */}
-      <div className="flex-1 flex flex-col min-w-0">
-        {/* Top Application Bar */}
-        <nav className="w-full h-14 px-6 flex items-center justify-between border-b border-[#37425B] bg-[#263043]">
-          <div className="flex items-center gap-4">
-            <Menu
-              className="md:hidden cursor-pointer"
-              size={24}
-              onClick={() => setSidebarOpen(!sidebarOpen)}
-            />
-            <div className="hidden sm:flex relative w-64">
-              <Search
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
-                size={16}
-              />
-              <input
-                className="w-full rounded-full bg-transparent text-sm placeholder-slate-500 pl-9 pr-3 py-1.5 border border-[#37425B] focus:ring-0 focus:border-[#00D1FF] focus:outline-none"
-                placeholder="Search investigations..."
-              />
-            </div>
+      <div className="st-app-main">
+        <header className="st-app-topbar"><div className="st-breadcrumb"><button ref={menuToggle} type="button" className="st-mobile-only" aria-label="Open navigation" aria-controls="workspace-navigation" aria-expanded={sidebarOpen} onClick={() => setSidebarOpen(!sidebarOpen)}><Menu size={19} aria-hidden="true" /></button><span>Workspace</span><span>/</span><strong>Overview</strong></div><a href="/settings" className="st-account-link" aria-label="Account settings"><span className="st-avatar"><User size={15} aria-hidden="true" /></span><span>{user?.name || user?.email || 'Your account'}</span></a></header>
+        <main id="workspace-main" className="st-app-content">
+          <div className="st-app-heading"><div><p className="st-eyebrow">YOUR INTELLIGENCE WORKSPACE</p><h1>A clearer view of your work.</h1><p>Pick up an investigation, examine the evidence, or follow a new lead.</p></div><div className="st-app-actions"><a href="/ai/chat" className="st-button st-button-outline"><Sparkles size={15} aria-hidden="true" />AI Chat</a><a href="/investigations/new" className="st-button"><Plus size={16} aria-hidden="true" />New investigation</a></div></div>
+
+          <div className="st-stats-grid" aria-label="Investigation overview">
+            <article className="st-stat"><div className="st-stat-top"><p>Credits remaining</p><CreditCard size={18} aria-hidden="true" /></div><strong>{creditLabel}</strong><small>{creditNote}</small></article>
+            <article className="st-stat"><div className="st-stat-top"><p>Recent investigations</p><FileBarChart size={18} aria-hidden="true" /></div><strong>{listLoading ? '—' : listError ? 'Unavailable' : stats.total}</strong><small>Latest 10 investigations</small></article>
+            <article className="st-stat"><div className="st-stat-top"><p>Completed</p><CheckCircle size={18} aria-hidden="true" /></div><strong>{listLoading ? '—' : listError ? 'Unavailable' : stats.completed}</strong><small>In your recent activity</small></article>
+            <article className="st-stat"><div className="st-stat-top"><p>In progress</p><Clock size={18} aria-hidden="true" /></div><strong>{listLoading ? '—' : listError ? 'Unavailable' : stats.processing}</strong><small>In your recent activity</small></article>
           </div>
 
-          <div className="flex items-center gap-6">
-            <Bell
-              className="text-slate-400 hover:text-white transition cursor-pointer"
-              strokeWidth={1.5}
-              size={20}
-            />
-            <a
-              href="/ai/chat"
-              className="hidden sm:inline-flex items-center gap-2 px-3 py-1.5 border border-[#37425B] rounded hover:bg-[#37425B] text-slate-200 text-sm transition-colors"
-            >
-              <Sparkles size={16} />
-              AI Chat
-            </a>
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-slate-600 flex items-center justify-center">
-                <User size={16} />
-              </div>
-              <span className="text-sm font-medium">
-                {user?.name || user?.email}
-              </span>
-            </div>
-          </div>
-        </nav>
-
-        {/* Main Content Area */}
-        <section className="flex-1 p-6 space-y-6 overflow-auto">
-          {/* Page Header */}
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <LayoutDashboard className="text-slate-400" size={24} />
-              <h1 className="text-lg font-semibold">Dashboard</h1>
-            </div>
-            <div className="flex items-center gap-3">
-              <a
-                href="/ai/chat"
-                className="flex items-center gap-2 px-4 py-2 border border-[#37425B] rounded-lg hover:bg-[#37425B] transition-colors font-medium"
-              >
-                <Sparkles size={16} />
-                <span>AI Chat</span>
-              </a>
-              <a
-                href="/investigations/new"
-                className="flex items-center gap-2 px-4 py-2 bg-[#00D1FF] text-[#263043] rounded-lg hover:bg-[#00B8E6] transition-colors font-medium"
-              >
-                <Plus size={16} />
-                <span>New Investigation</span>
-              </a>
-            </div>
-          </div>
-
-          {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="bg-[#2D384E] rounded-lg p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-slate-400 text-sm">Credits Remaining</p>
-                  <p className="text-2xl font-bold text-white">
-                    {creditError ? 'Unavailable' : !credits ? 'Loading...' : credits.credits_unlimited ? 'Unlimited' : credits.monthly_remaining}
-                  </p>
-                </div>
-                <div className="w-12 h-12 bg-[#00D1FF]/10 rounded-lg flex items-center justify-center">
-                  <CreditCard className="text-[#00D1FF]" size={24} />
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-[#2D384E] rounded-lg p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-slate-400 text-sm">Total Investigations</p>
-                  <p className="text-2xl font-bold text-white">{stats.total}</p>
-                </div>
-                <div className="w-12 h-12 bg-blue-500/10 rounded-lg flex items-center justify-center">
-                  <FileBarChart className="text-blue-400" size={24} />
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-[#2D384E] rounded-lg p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-slate-400 text-sm">Completed</p>
-                  <p className="text-2xl font-bold text-white">
-                    {stats.completed}
-                  </p>
-                </div>
-                <div className="w-12 h-12 bg-green-500/10 rounded-lg flex items-center justify-center">
-                  <CheckCircle className="text-green-400" size={24} />
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-[#2D384E] rounded-lg p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-slate-400 text-sm">Processing</p>
-                  <p className="text-2xl font-bold text-white">
-                    {stats.processing}
-                  </p>
-                </div>
-                <div className="w-12 h-12 bg-yellow-500/10 rounded-lg flex items-center justify-center">
-                  <Clock className="text-yellow-400" size={24} />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Recent Investigations */}
-          <div className="bg-[#2D384E] rounded-lg p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-lg font-semibold">Recent Investigations</h2>
-              <a
-                href="/investigations"
-                className="text-[#00D1FF] hover:underline text-sm"
-              >
-                View All
-              </a>
-            </div>
-
-            {investigations.length === 0 ? (
-              <div className="text-center py-12">
-                <FileBarChart
-                  className="mx-auto text-slate-400 mb-4"
-                  size={48}
-                />
-                <p className="text-slate-400 mb-4">No investigations yet</p>
-                <a
-                  href="/investigations/new"
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-[#00D1FF] text-[#263043] rounded-lg hover:bg-[#00B8E6] transition-colors font-medium"
-                >
-                  <Plus size={16} />
-                  Start Your First Investigation
-                </a>
-              </div>
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead className="text-slate-400 border-b border-[#37425B]">
-                    <tr>
-                      <th className="font-medium py-3 pr-6 text-left">
-                        Target
-                      </th>
-                      <th className="font-medium py-3 px-6 text-left">Type</th>
-                      <th className="font-medium py-3 px-6 text-left">
-                        Status
-                      </th>
-                      <th className="font-medium py-3 px-6 text-left">
-                        Risk Score
-                      </th>
-                      <th className="font-medium py-3 px-6 text-left">
-                        Created
-                      </th>
-                      <th className="font-medium py-3 pl-6 text-left">
-                        Actions
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-[#37425B]">
-                    {investigations.map((investigation) => (
-                      <tr
-                        key={investigation.id}
-                        className="hover:bg-[#303B52]/40"
-                      >
-                        <td className="py-3 pr-6 font-medium">
-                          {investigation.target_value}
-                        </td>
-                        <td className="py-3 px-6 capitalize">
-                          {investigation.target_type}
-                        </td>
-                        <td className="py-3 px-6">
-                          <div className="flex items-center gap-2">
-                            {getStatusIcon(investigation.status)}
-                            <span className="capitalize">
-                              {investigation.status}
-                            </span>
-                          </div>
-                        </td>
-                        <td className="py-3 px-6">
-                          {investigation.risk_score ? (
-                            <span
-                              className={getRiskColor(investigation.risk_score)}
-                            >
-                              {investigation.risk_score}/100
-                            </span>
-                          ) : (
-                            <span className="text-slate-400">-</span>
-                          )}
-                        </td>
-                        <td className="py-3 px-6">
-                          {new Date(
-                            investigation.created_at,
-                          ).toLocaleDateString()}
-                        </td>
-                        <td className="py-3 pl-6">
-                          <a
-                            href={`/investigations/${investigation.id}`}
-                            className="text-[#00D1FF] hover:underline"
-                          >
-                            View
-                          </a>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </div>
-        </section>
+          {listError && <div role="alert" className="st-error-banner"><AlertTriangle size={18} aria-hidden="true" /><span>Could not refresh investigations.{investigations.length > 0 ? ' Previously loaded results are shown below.' : ''}</span><button type="button" onClick={retry}>Try again</button></div>}
+          <section className="st-investigation-panel" aria-labelledby="recent-investigations-heading">
+            <div className="st-panel-heading"><div><h2 id="recent-investigations-heading">Recent investigations</h2><p>Your latest work, with its current recorded status.</p></div><a href="/investigations">View all <ArrowUpRight size={15} aria-hidden="true" /></a></div>
+            <div className="st-table-tools"><label className="st-search-field"><Search size={16} aria-hidden="true" /><span className="st-sr-only">Filter recent investigations</span><input type="search" value={query} onChange={event => setQuery(event.target.value)} placeholder="Filter by target, type or status…" /></label><span>{listLoading ? 'LOADING' : `${rows.length} SHOWN`}</span></div>
+            {listLoading && !investigations.length ? <div className="st-empty-state"><p role="status">Loading your investigations…</p></div> : !investigations.length ? <div className="st-empty-state"><div className="st-empty-icon"><Search size={27} aria-hidden="true" /></div><h3>{listError ? 'Your investigations are unavailable' : 'Every investigation starts with a lead.'}</h3><p>{listError ? 'Retry the request to load your work. No investigation records have been changed.' : 'Start with a known identifier. Keep the evidence, context and unanswered questions together.'}</p>{!listError && <a href="/investigations/new" className="st-button st-button-small"><Plus size={15} aria-hidden="true" />Start an investigation</a>}</div> : !rows.length ? <div className="st-empty-state"><h3>No matching recent investigations</h3><p>Try another filter, or open all investigations to search beyond the latest ten.</p><button type="button" className="st-button st-button-outline" onClick={() => setQuery('')}>Clear filter</button></div> : <div className="st-table-scroll"><table className="st-data-table"><caption className="st-sr-only">Recent investigations with target, type, recorded status, risk score and creation date</caption><thead><tr>{['Target', 'Type', 'Status', 'Risk score', 'Created', 'Action'].map(heading => <th key={heading} scope="col">{heading}</th>)}</tr></thead><tbody>{rows.map(investigation => {
+              const Icon = statusIcon(investigation.status);
+              const score = investigation.risk_score;
+              const validScore = (typeof score === 'number' || (typeof score === 'string' && score.trim() !== '')) && Number.isFinite(Number(score)) && Number(score) >= 0 && Number(score) <= 100;
+              const created = new Date(investigation.created_at);
+              return <tr key={investigation.id}><td className="st-target-value" title={String(investigation.target_value || '')}>{investigation.target_value}</td><td className="st-type">{investigation.target_type}</td><td><span className={`st-status st-status-${['completed','processing','failed'].includes(investigation.status) ? investigation.status : 'pending'}`}><Icon size={12} aria-hidden="true" />{investigation.status}</span></td><td>{validScore ? `${score}/100` : '—'}</td><td>{Number.isFinite(created.getTime()) ? created.toLocaleDateString() : '—'}</td><td><a href={`/investigations/${encodeURIComponent(investigation.id)}`} className="st-view-link" aria-label={`View investigation ${investigation.id}`}>View <ArrowUpRight size={14} aria-hidden="true" /></a></td></tr>;
+            })}</tbody></table></div>}
+          </section>
+          <p className="st-dashboard-note"><Shield size={14} aria-hidden="true" />Profile matches and automated scores require source review. They are not proof of identity.</p>
+        </main>
       </div>
-
-      {/* Overlay for mobile sidebar */}
-      {sidebarOpen && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
-          onClick={() => setSidebarOpen(false)}
-        ></div>
-      )}
+      {sidebarOpen && <button type="button" className="st-sidebar-overlay" aria-label="Close navigation overlay" onClick={() => { setSidebarOpen(false); menuToggle.current?.focus(); }} />}
     </div>
   );
 }

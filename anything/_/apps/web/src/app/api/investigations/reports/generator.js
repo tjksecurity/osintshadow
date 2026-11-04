@@ -1,4 +1,5 @@
 import { escapeReportText as text, safeReportUrl } from '../../../../utils/reportSafety.js';
+import { PUBLIC_SOURCES, safePublicSourceUrl } from '../../../../utils/publicSources.js';
 
 function sourceLink(url, label = url) {
   const href = safeReportUrl(url);
@@ -17,6 +18,17 @@ function peopleDataLabsSection(result) {
     <p>${text(result.message)}</p><p>Evaluated: ${text(result.checked_at)}</p>
     ${result.status === 'matched' && result.record ? `<p>Provider match likelihood: ${text(result.likelihood)}/10 (not independently verified identity or ownership)</p><pre>${rawData(result.record)}</pre>` : ''}
   </div>`;
+}
+
+function publicSourceSection(results) {
+  if (!Array.isArray(results) || !results.length) return '';
+  return `<div class="section"><h2>Public profile sources</h2><p>Candidates and validation signals only; not independently verified identity or ownership.</p>${results.map(result => `<div>
+    <h3>${text(PUBLIC_SOURCES.find(source => source.id === result.provider)?.label || 'Public source')}</h3>
+    <p>Status: ${text(result.status)}. ${text(result.message)}</p><p>Evaluated: ${text(result.evaluated_at)}</p>
+    ${result.truncated ? '<p>Limited results; not an exhaustive search.</p>' : ''}
+    ${result.status === 'candidates_found' && Array.isArray(result.records) ? `<ul>${result.records.slice(0,5).map(record => `<li>${sourceLink(safePublicSourceUrl(record.url), record.label)}<br>Source ID: ${text(record.id)}${record.context ? `<br>${text(record.context)}` : ''}</li>`).join('')}</ul>` : ''}
+    ${result.status === 'validated' && typeof result.validation?.phone_valid === 'boolean' ? `<p>Provider number format/range validation: ${result.validation.phone_valid ? 'Valid' : 'Not valid'}. This does not verify activity or owner.</p><pre>${rawData(result.validation)}</pre>` : ''}
+    </div>`).join('')}</div>`;
 }
 
 export function generateReportHTML(osintData, aiAnalysis) {
@@ -85,6 +97,7 @@ export function generateReportHTML(osintData, aiAnalysis) {
       </div>
 
       ${peopleDataLabsSection(osintData.people_data_labs)}
+      ${publicSourceSection(osintData.public_sources)}
 
       <div class="section">
         <h2>Cross-Platform Identity Graph</h2>

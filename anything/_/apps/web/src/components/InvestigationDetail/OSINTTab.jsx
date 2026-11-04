@@ -1,5 +1,6 @@
 import { JSONViewer } from "./JSONViewer";
 import { PeopleDataLabsResult } from './PeopleDataLabsResult';
+import { PublicSourceResults } from './PublicSourceResults';
 
 export function OSINTTab({ osint }) {
   // Safeguards
@@ -146,6 +147,7 @@ export function OSINTTab({ osint }) {
     <section className="bg-[#2D384E] rounded-lg p-4 overflow-auto">
       <h3 className="font-semibold mb-3">OSINT Data</h3>
       <PeopleDataLabsResult result={safeOsint.people_data_labs} />
+      <PublicSourceResults results={safeOsint.public_sources} />
 
       {/* Phone-focused context */}
       {isPhoneTarget && (
@@ -510,7 +512,7 @@ export function OSINTTab({ osint }) {
         {Object.keys(safeOsint).length === 0 && (
           <div className="text-slate-300">No OSINT data yet.</div>
         )}
-        {Object.entries(safeOsint).filter(([key]) => key !== 'people_data_labs').map(([key, value]) => (
+        {Object.entries(safeOsint).filter(([key]) => !['people_data_labs', 'public_sources'].includes(key)).map(([key, value]) => (
           <div key={key} className="border border-[#37425B] rounded-lg p-3">
             <div className="text-sm font-semibold mb-2 capitalize">{key}</div>
             <JSONViewer data={value} />

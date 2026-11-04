@@ -31,7 +31,7 @@ export async function enhanceWithAI(
 
   try {
     // Provider matches stay in their attributed section, not external AI claims.
-    const { people_data_labs: _pdl, ...analysisInput } = osintData || {};
+    const { people_data_labs: _pdl, public_sources: _publicSources, ...analysisInput } = osintData || {};
     const prompt = [
       "You are an expert OSINT investigator. You have just completed a digital investigation on the provided target.",
       "Your goal is to write a detailed investigative report that sounds like it was written by a human specialist.",

@@ -3,6 +3,7 @@ import { TargetValueInput } from "./TargetValueInput";
 import { SearchOptions } from "./SearchOptions";
 import { AdvancedOptions } from "./AdvancedOptions";
 import { targetTypes } from "./targetTypes";
+import { PublicSourceOptions } from './PublicSourceOptions';
 
 export function InvestigationForm({
   targetType,
@@ -19,6 +20,8 @@ export function InvestigationForm({
   setIncludeDeepScan,
   includePeopleDataLabs = false,
   setIncludePeopleDataLabs,
+  publicSources = [],
+  setPublicSources,
   includeCriminal,
   setIncludeCriminal,
   includeCourt,
@@ -128,6 +131,8 @@ export function InvestigationForm({
             enableRealTimeMonitoring={enableRealTimeMonitoring}
             setEnableRealTimeMonitoring={setEnableRealTimeMonitoring}
           />
+
+          <PublicSourceOptions targetType={targetType} publicSources={publicSources} setPublicSources={setPublicSources} isTrial={isTrial} />
 
           <label className="flex items-start gap-3 p-3 rounded-md border border-[#37425B]">
             <input

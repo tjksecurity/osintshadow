@@ -1,5 +1,6 @@
 import sql from "@/app/api/utils/sql";
 import { collectOSINT } from "../osint/collector.js";
+import { createPublicSourceStore } from '../osint/publicSourceStore.js';
 import {
   collectSocialData,
   createSocialProfile,
@@ -79,6 +80,9 @@ export async function processInvestigation(
       // pass deep OSINT scan flag
       includeDeepScan: !!options.includeDeepScan,
       includePeopleDataLabs: options.includePeopleDataLabs === true,
+      publicSources: options.publicSources,
+      investigationId,
+      publicSourceStore: createPublicSourceStore(sql),
       // pass license plate lookup options
       includeLicensePlate:
         options.includeLicensePlate === undefined

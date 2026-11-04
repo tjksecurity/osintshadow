@@ -4,6 +4,7 @@ import {
   createProgressReporter,
 } from "./collector/dataStructure.js";
 import { enrichPeopleDataLabs } from './peopleDataLabs.js';
+import { collectPublicSources } from './publicSources.js';
 import {
   handleEmailTarget,
   handleUsernameTarget,
@@ -43,6 +44,12 @@ import {
 export async function collectOSINT(targetType, targetValue, options = {}) {
   const data = createOSINTEnvelope(targetType, targetValue, options);
   const report = createProgressReporter(options.onProgress);
+
+  data.public_sources = await collectPublicSources(targetType, targetValue, options, { store: options.publicSourceStore });
+  if (data.public_sources.length) {
+    report({ phase: 'osint', step: 'public_sources', percent: 10,
+      message: 'Public-source lookups evaluated; provider statuses are retained separately.' });
+  }
 
   // Isolated provider output: never seed discovery or assert identity from a match.
   data.people_data_labs = await enrichPeopleDataLabs(targetType, targetValue, options);
