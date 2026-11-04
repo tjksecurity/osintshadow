@@ -27,6 +27,15 @@ const { default: LandingPage } = await load('../src/components/Landing/LandingPa
 const { DashboardView, filterInvestigationRows } = await load('../src/app/dashboard/page.jsx', { BrandLogo });
 const render = (Component, props = {}) => renderToStaticMarkup(React.createElement(Component, props));
 
+test('original logo retains its artwork and complete wordmark inside a wider viewBox', () => {
+  const html = render(BrandLogo);
+  assert.match(html, /viewBox="0 0 176 32"/);
+  assert.match(html, /aria-label="ShadowTrace"/);
+  assert.match(html, />ShadowTrace<\/text>/);
+  assert.equal((html.match(/<path\b/g) || []).length, 2);
+  assert.match(html, /<circle\b/);
+});
+
 test('landing renders one clear h1, semantic landmarks, original logo, valid local anchors', () => {
   const html = render(LandingPage);
   assert.equal((html.match(/<h1\b/g) || []).length, 1);

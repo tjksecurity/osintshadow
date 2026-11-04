@@ -13,7 +13,7 @@ export default function BrandLogo({
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 160 32"
+      viewBox="0 0 176 32"
       fill="currentColor"
       className={`${colorClass} ${className}`}
       aria-label={alt}
