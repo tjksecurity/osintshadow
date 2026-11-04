@@ -10,9 +10,11 @@ import { InvestigationForm } from "@/components/NewInvestigation/InvestigationFo
 import { InformationCard } from "@/components/NewInvestigation/InformationCard";
 import { PaywallModal } from "@/components/NewInvestigation/PaywallModal";
 import { useNewInvestigation } from "@/hooks/useNewInvestigation";
+import { useInvestigationCredits } from "@/hooks/useInvestigationCredits";
 
 export default function NewInvestigation() {
   const { data: user, loading } = useUser();
+  const { data: credits, error: creditError } = useInvestigationCredits(user?.id);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const {
@@ -77,9 +79,7 @@ export default function NewInvestigation() {
   const isAdminEmail =
     (user?.email || "").toLowerCase() === "glossontravis@gmail.com";
   const isAdmin = user?.role === "admin" || isAdminEmail;
-  const isTrial =
-    !isAdmin &&
-    (!user?.subscription_plan || user?.subscription_plan === "trial");
+  const isTrial = credits?.is_trial === true;
 
   return (
     <div className="flex min-h-screen text-white font-inter bg-[#263043]">
@@ -110,7 +110,13 @@ export default function NewInvestigation() {
             </div>
           </div>
 
-          <CreditsWarning monthlyRemaining={user?.monthly_remaining} />
+          <CreditsWarning
+            monthlyRemaining={credits?.monthly_remaining}
+            unlimited={credits?.credits_unlimited === true}
+            isTrial={isTrial}
+            loading={!credits && !creditError}
+            error={creditError}
+          />
 
           <InvestigationForm
             targetType={targetType}
@@ -146,8 +152,10 @@ export default function NewInvestigation() {
             error={error}
             errorCode={errorCode}
             handleSubmit={handleSubmit}
-            user={user}
-            isAdmin={isAdmin}
+            user={{ ...user, monthly_remaining: credits?.monthly_remaining }}
+            hasUnlimitedCredits={credits?.credits_unlimited === true}
+            creditsPending={!credits && !creditError}
+            creditError={creditError}
             isTrial={isTrial}
             includePostCollection={includePostCollection}
             setIncludePostCollection={setIncludePostCollection}

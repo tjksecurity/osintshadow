@@ -10,8 +10,8 @@ const { createInvestigation } = database;
 
 // A transaction-boundary model: this checks the actual helper's statements,
 // authorization branches and failure propagation, not PostgreSQL lock behavior.
-function harness({ plan = 'pro', credits = 1, role = 'user', insertFails = false, debitFails = false, flagsFail = false, exists = true } = {}) {
-  const state = { user: { id: 'synthetic-user', plan, credits, role }, investigations: [], transactions: 0 };
+function harness({ plan = 'pro', credits = 1, role = 'user', email = 'synthetic@example.invalid', insertFails = false, debitFails = false, flagsFail = false, exists = true } = {}) {
+  const state = { user: { id: 'synthetic-user', plan, credits, role, email }, investigations: [], transactions: 0 };
   let tail = Promise.resolve();
   const sql = () => { throw new Error('Mutation escaped its transaction.'); };
   sql.transaction = (build, options) => {
@@ -30,7 +30,9 @@ function harness({ plan = 'pro', credits = 1, role = 'user', insertFails = false
       assert.match(operation.query, /NOT EXISTS \(\s*SELECT 1 FROM investigations WHERE user_id = account.id/);
       const before = structuredClone(state);
       if (!exists) return [[], [{ investigation: null, rejection: 'USER_NOT_FOUND' }]];
-      const admin = state.user.role === 'admin';
+      assert.equal(operation.values[0], 'glossontravis@gmail.com');
+      assert.match(operation.query, /LOWER\(COALESCE\(email, ''\)\) = \?/);
+      const admin = state.user.role === 'admin' || state.user.email.toLowerCase() === operation.values[0];
       const trial = !admin && (!state.user.plan || state.user.plan === 'trial');
       if (trial && state.investigations.length) return [[{ id: state.user.id }], [{ investigation: null, rejection: 'TRIAL_EXCEEDED' }]];
       if (!admin && !trial && state.user.credits <= 0) return [[{ id: state.user.id }], [{ investigation: null, rejection: 'INSUFFICIENT_CREDITS' }]];
@@ -109,6 +111,18 @@ test('missing accounts fail with an explicit rejection and no inserted row', asy
   const h = harness({ exists: false });
   await assert.rejects(h.create(), (error) => error.code === 'USER_NOT_FOUND');
   assert.equal(h.state.investigations.length, 0);
+});
+
+test('existing owner email has repeatable zero-debit entitlement without changing role or plan', async () => {
+  const h = harness({ email: 'GLOSSONTRAVIS@GMAIL.COM', role: 'user', plan: null, credits: 0 });
+  for (let i = 0; i < 10; i++) {
+    const result = await h.create();
+    assert.deepEqual(result.__creditAuthorization, { isAdmin: true, isTrial: false });
+  }
+  assert.equal(h.state.investigations.length, 10);
+  assert.equal(h.state.user.credits, 0);
+  assert.equal(h.state.user.role, 'user');
+  assert.equal(h.state.user.plan, null);
 });
 
 async function routeHarness(options) {

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import useUser from "@/utils/useUser";
+import { useInvestigationCredits } from "@/hooks/useInvestigationCredits";
 import {
   Shield,
   Search,
@@ -26,6 +27,7 @@ import BrandLogo from "@/components/BrandLogo";
 
 export default function Billing() {
   const { data: user, loading, refetch } = useUser();
+  const { data: credits, error: creditError, refetch: refetchCredits } = useInvestigationCredits(user?.id);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [processingPlan, setProcessingPlan] = useState(null);
 
@@ -128,7 +130,7 @@ export default function Billing() {
 
         if (data?.applied) {
           // Refresh user so plan + credits update in the UI
-          await refetch();
+          await Promise.all([refetch(), refetchCredits()]);
         }
 
         // Clean URL params so refresh doesn't re-confirm
@@ -149,7 +151,7 @@ export default function Billing() {
     return () => {
       cancelled = true;
     };
-  }, [refetch]);
+  }, [refetch, refetchCredits]);
 
   const handleUpgrade = async (planId) => {
     setProcessingPlan(planId);
@@ -372,7 +374,9 @@ export default function Billing() {
                   )}
                 </p>
                 <p className="text-slate-400 text-sm">
-                  {user.monthly_remaining || 0} credits remaining this month
+                  {creditError ? 'Current credits unavailable' : !credits ? 'Checking credits...' : credits.credits_unlimited
+                    ? 'Unlimited investigation credits — no credits are deducted.'
+                    : `${credits.monthly_remaining} credits remaining this month`}
                 </p>
               </div>
               {user.stripe_customer_id && (

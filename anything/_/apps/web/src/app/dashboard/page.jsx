@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import useUser from "@/utils/useUser";
+import { useInvestigationCredits } from "@/hooks/useInvestigationCredits";
 import {
   Shield,
   Search,
@@ -27,6 +28,7 @@ import BrandLogo from "@/components/BrandLogo";
 
 export default function Dashboard() {
   const { data: user, loading } = useUser();
+  const { data: credits, error: creditError } = useInvestigationCredits(user?.id);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [investigations, setInvestigations] = useState([]);
   const [stats, setStats] = useState({
@@ -367,7 +369,7 @@ export default function Dashboard() {
                 <div>
                   <p className="text-slate-400 text-sm">Credits Remaining</p>
                   <p className="text-2xl font-bold text-white">
-                    {user?.monthly_remaining || 0}
+                    {creditError ? 'Unavailable' : !credits ? 'Loading...' : credits.credits_unlimited ? 'Unlimited' : credits.monthly_remaining}
                   </p>
                 </div>
                 <div className="w-12 h-12 bg-[#00D1FF]/10 rounded-lg flex items-center justify-center">

@@ -42,7 +42,9 @@ export function InvestigationForm({
   errorCode,
   handleSubmit,
   user,
-  isAdmin,
+  hasUnlimitedCredits = false,
+  creditsPending = false,
+  creditError = null,
   isTrial,
 }) {
   const selectedType = targetTypes.find((t) => t.value === targetType);
@@ -51,12 +53,16 @@ export function InvestigationForm({
   const hasCredits = (user?.monthly_remaining || 0) > 0;
 
   const isDisabled =
-    submitting || !hasTargetValue || (!isAdmin && !isTrial && !hasCredits);
+    submitting || creditsPending || !!creditError || !hasTargetValue || (!hasUnlimitedCredits && !isTrial && !hasCredits);
 
   let disabledReason = null;
-  if (!hasTargetValue) {
+  if (creditError) {
+    disabledReason = "Could not verify current credits";
+  } else if (creditsPending) {
+    disabledReason = "Checking credits...";
+  } else if (!hasTargetValue) {
     disabledReason = "Enter a target to start";
-  } else if (!isAdmin && !isTrial && !hasCredits) {
+  } else if (!hasUnlimitedCredits && !isTrial && !hasCredits) {
     disabledReason = "No credits remaining";
   }
 
@@ -123,8 +129,10 @@ export function InvestigationForm({
 
           <div className="flex items-center justify-between pt-4">
             <div className="text-sm text-slate-400">
-              This will use 1 credit from your remaining{" "}
-              {user?.monthly_remaining} credits
+              {creditError || creditsPending ? null : hasUnlimitedCredits
+                ? 'Unlimited investigation credits — no credits are deducted.'
+                : isTrial ? 'One trial investigation; no paid credits are deducted.'
+                : `This will use 1 credit from your remaining ${user?.monthly_remaining ?? 0} credits`}
               {disabledReason ? (
                 <div className="text-xs text-slate-500 mt-1">
                   {disabledReason}
