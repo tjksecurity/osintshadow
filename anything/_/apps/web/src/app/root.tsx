@@ -41,7 +41,6 @@ if (globalThis.window && globalThis.window !== undefined) {
   globalThis.window.fetch = fetch;
 }
 
-const LoadFontsSSR = import.meta.env.SSR ? LoadFonts : null;
 if (import.meta.hot) {
   import.meta.hot.on('update-font-links', (urls: string[]) => {
     // remove old font links
@@ -464,7 +463,7 @@ export function Layout({ children }: { children: ReactNode }) {
         <Links />
         <script type="module" src="/src/__create/dev-error-overlay.js"></script>
         <link rel="icon" href="/src/__create/favicon.png" />
-        {LoadFontsSSR ? <LoadFontsSSR /> : null}
+        <LoadFonts />
       </head>
       <body>
         <ClientOnly loader={() => children} />
