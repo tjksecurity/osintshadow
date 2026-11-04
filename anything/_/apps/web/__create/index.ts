@@ -1,6 +1,5 @@
 import { AsyncLocalStorage } from 'node:async_hooks';
 import nodeConsole from 'node:console';
-import { skipCSRFCheck } from '@auth/core';
 import Credentials from '@auth/core/providers/credentials';
 import { authHandler, initAuthConfig } from '@hono/auth-js';
 import { Pool, neonConfig } from '@neondatabase/serverless';
@@ -95,7 +94,8 @@ if (process.env.AUTH_SECRET) {
         signIn: '/account/signin',
         signOut: '/account/logout',
       },
-      skipCSRFCheck,
+      // Keep Auth.js cookie-token CSRF validation enabled. The React client
+      // obtains /api/auth/csrf before credential and sign-out submissions.
       session: {
         strategy: 'jwt',
       },
