@@ -67,19 +67,19 @@ export function TargetValueInput({
       </label>
       <div className="relative">
         <selectedType.icon
-          className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+          className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--st-muted)]"
           size={20}
         />
         <input
           type="text"
           value={targetValue}
           onChange={(e) => setTargetValue(e.target.value)}
-          className="w-full pl-12 pr-4 py-3 bg-[#37425B] border border-[#37425B] rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-[#00D1FF] focus:ring-1 focus:ring-[#00D1FF]"
+          className="w-full pl-12 pr-4 py-3 bg-[var(--st-elevated)] border border-[var(--st-line)] rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-[var(--st-accent)] focus:ring-1 focus:ring-[var(--st-accent)]"
           placeholder={selectedType?.placeholder}
           required
         />
       </div>
-      <p className="text-slate-400 text-sm mt-2">
+      <p className="text-[var(--st-muted)] text-sm mt-2">
         Enter the {selectedType?.label.toLowerCase()} you want to investigate
       </p>
       {targetType === "license_plate" && (
@@ -90,7 +90,7 @@ export function TargetValueInput({
           <select
             value={plateRegion}
             onChange={(e) => setPlateRegion(e.target.value)}
-            className="w-full bg-[#37425B] border border-[#37425B] rounded-lg px-3 py-2 text-sm"
+            className="w-full bg-[var(--st-elevated)] border border-[var(--st-line)] rounded-lg px-3 py-2 text-sm"
           >
             {usStates.map((s) => (
               <option key={s || "none"} value={s}>
@@ -98,7 +98,7 @@ export function TargetValueInput({
               </option>
             ))}
           </select>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className="text-xs text-[var(--st-muted)] mt-1">
             Some providers require a state for accurate results.
           </p>
         </div>

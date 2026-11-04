@@ -144,7 +144,7 @@ export function OSINTTab({ osint }) {
     .slice(0, 30);
 
   return (
-    <section className="bg-[#2D384E] rounded-lg p-4 overflow-auto">
+    <section className="bg-[var(--st-panel)] rounded-lg p-4 overflow-auto">
       <h3 className="font-semibold mb-3">OSINT Data</h3>
       <PeopleDataLabsResult result={safeOsint.people_data_labs} />
       <PublicSourceResults results={safeOsint.public_sources} />
@@ -153,19 +153,19 @@ export function OSINTTab({ osint }) {
       {isPhoneTarget && (
         <div className="mb-4 grid grid-cols-1 md:grid-cols-3 gap-4">
           {/* Emails near this number */}
-          <div className="border border-[#37425B] rounded-lg p-3">
+          <div className="border border-[var(--st-line)] rounded-lg p-3">
             <div className="text-sm font-semibold mb-2">
               Emails found near this number
             </div>
             {emailSeeds.length === 0 ? (
-              <div className="text-slate-400 text-sm">None detected yet.</div>
+              <div className="text-[var(--st-muted)] text-sm">None detected yet.</div>
             ) : (
               <ul className="space-y-1 max-h-56 overflow-auto pr-1">
                 {emailSeeds.map((em) => (
                   <li key={em} className="text-sm">
                     <a
                       href={`mailto:${em}`}
-                      className="text-[#00D1FF] hover:underline"
+                      className="text-[var(--st-accent)] hover:underline"
                     >
                       {em}
                     </a>
@@ -176,12 +176,12 @@ export function OSINTTab({ osint }) {
           </div>
 
           {/* Pages mentioning this number */}
-          <div className="border border-[#37425B] rounded-lg p-3">
+          <div className="border border-[var(--st-line)] rounded-lg p-3">
             <div className="text-sm font-semibold mb-2">
               Pages mentioning this number
             </div>
             {pagesMentioning.length === 0 ? (
-              <div className="text-slate-400 text-sm">None detected yet.</div>
+              <div className="text-[var(--st-muted)] text-sm">None detected yet.</div>
             ) : (
               <ul className="space-y-2 max-h-56 overflow-auto pr-1">
                 {pagesMentioning.map((item, idx) => (
@@ -190,12 +190,12 @@ export function OSINTTab({ osint }) {
                       href={item.url}
                       target="_blank"
                       rel="noreferrer"
-                      className="text-[#00D1FF] hover:underline break-all"
+                      className="text-[var(--st-accent)] hover:underline break-all"
                     >
                       {item.title || item.url}
                     </a>
                     {item.snippet && (
-                      <div className="text-xs text-slate-400 line-clamp-3">
+                      <div className="text-xs text-[var(--st-muted)] line-clamp-3">
                         {item.snippet}
                       </div>
                     )}
@@ -206,12 +206,12 @@ export function OSINTTab({ osint }) {
           </div>
 
           {/* Profiles associated with this number */}
-          <div className="border border-[#37425B] rounded-lg p-3">
+          <div className="border border-[var(--st-line)] rounded-lg p-3">
             <div className="text-sm font-semibold mb-2">
               Profiles associated with this number
             </div>
             {profilesWithPhoneEvidence.length === 0 ? (
-              <div className="text-slate-400 text-sm">None detected yet.</div>
+              <div className="text-[var(--st-muted)] text-sm">None detected yet.</div>
             ) : (
               <ul className="space-y-2 max-h-56 overflow-auto pr-1">
                 {profilesWithPhoneEvidence.map((p, idx) => (
@@ -220,17 +220,17 @@ export function OSINTTab({ osint }) {
                       href={p.profile_url}
                       target="_blank"
                       rel="noreferrer"
-                      className="text-[#00D1FF] hover:underline"
+                      className="text-[var(--st-accent)] hover:underline"
                     >
                       {p.platform || "Profile"}
                     </a>
                     {p.username && (
-                      <span className="text-slate-400"> — {p.username}</span>
+                      <span className="text-[var(--st-muted)]"> — {p.username}</span>
                     )}
                     {/* Evidence preview */}
                     {Array.isArray(p?.match_evidence?.phones) &&
                       p.match_evidence.phones.length > 0 && (
-                        <div className="text-xs text-slate-400">
+                        <div className="text-xs text-[var(--st-muted)]">
                           Mentions this number on page
                         </div>
                       )}
@@ -251,21 +251,21 @@ export function OSINTTab({ osint }) {
         deepPhones.length > 0) && (
         <div className="mb-4 grid grid-cols-1 md:grid-cols-3 gap-4">
           {/* Data Breaches */}
-          <div className="border border-[#37425B] rounded-lg p-3">
+          <div className="border border-[var(--st-line)] rounded-lg p-3">
             <div className="text-sm font-semibold mb-2">Data breaches</div>
             {hibpItems.length === 0 && openWebBreaches.length === 0 ? (
-              <div className="text-slate-400 text-sm">None detected.</div>
+              <div className="text-[var(--st-muted)] text-sm">None detected.</div>
             ) : (
               <ul className="space-y-2 max-h-56 overflow-auto pr-1">
                 {hibpItems.map((b, idx) => (
                   <li key={`hibp-${idx}`} className="text-sm">
                     <div className="font-medium">{b.name}</div>
-                    <div className="text-xs text-slate-400">
+                    <div className="text-xs text-[var(--st-muted)]">
                       {b.domain || "Unknown domain"} • {b.breach_date}
                     </div>
                     {Array.isArray(b.data_classes) &&
                       b.data_classes.length > 0 && (
-                        <div className="text-xs text-slate-400 truncate">
+                        <div className="text-xs text-[var(--st-muted)] truncate">
                           {b.data_classes.join(", ")}
                         </div>
                       )}
@@ -277,12 +277,12 @@ export function OSINTTab({ osint }) {
                       href={w.url}
                       target="_blank"
                       rel="noreferrer"
-                      className="text-[#00D1FF] hover:underline break-all"
+                      className="text-[var(--st-accent)] hover:underline break-all"
                     >
                       {w.title || w.url}
                     </a>
                     {w.snippet && (
-                      <div className="text-xs text-slate-400 line-clamp-3">
+                      <div className="text-xs text-[var(--st-muted)] line-clamp-3">
                         {w.snippet}
                       </div>
                     )}
@@ -293,10 +293,10 @@ export function OSINTTab({ osint }) {
           </div>
 
           {/* Online mentions (social first) */}
-          <div className="border border-[#37425B] rounded-lg p-3">
+          <div className="border border-[var(--st-line)] rounded-lg p-3">
             <div className="text-sm font-semibold mb-2">Mentions (social)</div>
             {socialMentions.length === 0 ? (
-              <div className="text-slate-400 text-sm">None found.</div>
+              <div className="text-[var(--st-muted)] text-sm">None found.</div>
             ) : (
               <ul className="space-y-2 max-h-56 overflow-auto pr-1">
                 {socialMentions.map((m, idx) => (
@@ -305,12 +305,12 @@ export function OSINTTab({ osint }) {
                       href={m.url}
                       target="_blank"
                       rel="noreferrer"
-                      className="text-[#00D1FF] hover:underline break-all"
+                      className="text-[var(--st-accent)] hover:underline break-all"
                     >
                       {m.title || m.url}
                     </a>
                     {m.snippet && (
-                      <div className="text-xs text-slate-400 line-clamp-3">
+                      <div className="text-xs text-[var(--st-muted)] line-clamp-3">
                         {m.snippet}
                       </div>
                     )}
@@ -321,14 +321,14 @@ export function OSINTTab({ osint }) {
           </div>
 
           {/* Deep web discovery (emails/phones) */}
-          <div className="border border-[#37425B] rounded-lg p-3">
+          <div className="border border-[var(--st-line)] rounded-lg p-3">
             <div className="text-sm font-semibold mb-2">Deep web finds</div>
             {deepEmails.length === 0 && deepPhones.length === 0 ? (
-              <div className="text-slate-400 text-sm">None harvested.</div>
+              <div className="text-[var(--st-muted)] text-sm">None harvested.</div>
             ) : (
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <div className="text-xs uppercase text-slate-400 mb-1">
+                  <div className="text-xs uppercase text-[var(--st-muted)] mb-1">
                     Emails
                   </div>
                   <ul className="space-y-1 max-h-40 overflow-auto pr-1">
@@ -336,7 +336,7 @@ export function OSINTTab({ osint }) {
                       <li key={`dem-${em}`} className="text-sm break-all">
                         <a
                           href={`mailto:${em}`}
-                          className="text-[#00D1FF] hover:underline"
+                          className="text-[var(--st-accent)] hover:underline"
                         >
                           {em}
                         </a>
@@ -345,7 +345,7 @@ export function OSINTTab({ osint }) {
                   </ul>
                 </div>
                 <div>
-                  <div className="text-xs uppercase text-slate-400 mb-1">
+                  <div className="text-xs uppercase text-[var(--st-muted)] mb-1">
                     Unverified phone candidates
                   </div>
                   <ul className="space-y-1 max-h-40 overflow-auto pr-1">
@@ -360,7 +360,7 @@ export function OSINTTab({ osint }) {
                             href={ph.source_url}
                             target="_blank"
                             rel="noreferrer"
-                            className="block text-xs text-[#00D1FF] hover:underline"
+                            className="block text-xs text-[var(--st-accent)] hover:underline"
                           >
                             Public-page source
                           </a>
@@ -368,7 +368,7 @@ export function OSINTTab({ osint }) {
                       </li>
                     ))}
                   </ul>
-                  <div className="text-xs text-slate-400 mt-2">
+                  <div className="text-xs text-[var(--st-muted)] mt-2">
                     Observations only; they do not verify ownership or identity.
                   </div>
                 </div>
@@ -380,21 +380,21 @@ export function OSINTTab({ osint }) {
 
       {/* Shodan block (shows when we have IPs; renders empty-state if no Shodan data yet) */}
       {showShodanBlock && (
-        <div className="mb-4 border border-[#37425B] rounded-lg p-3">
+        <div className="mb-4 border border-[var(--st-line)] rounded-lg p-3">
           <div className="flex items-center justify-between gap-3 mb-3">
             <div>
               <div className="text-sm font-semibold">Shodan network intel</div>
-              <div className="text-xs text-slate-400">
+              <div className="text-xs text-[var(--st-muted)]">
                 {shodanHosts.length} host(s) enriched{shodanLookupText}
               </div>
             </div>
-            <div className="text-xs text-slate-400 break-all">
+            <div className="text-xs text-[var(--st-muted)] break-all">
               {shodanIpListText}
             </div>
           </div>
 
           {shodanHosts.length === 0 ? (
-            <div className="text-slate-400 text-sm">
+            <div className="text-[var(--st-muted)] text-sm">
               No Shodan results yet. Add a{" "}
               <span className="text-slate-200">SHODAN_API_KEY</span> secret and
               rerun the investigation.
@@ -402,22 +402,22 @@ export function OSINTTab({ osint }) {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {/* Open ports */}
-              <div className="border border-[#37425B] rounded-lg p-3">
+              <div className="border border-[var(--st-line)] rounded-lg p-3">
                 <div className="text-sm font-semibold mb-2">Open ports</div>
                 {openPorts.length === 0 ? (
-                  <div className="text-slate-400 text-sm">None reported.</div>
+                  <div className="text-[var(--st-muted)] text-sm">None reported.</div>
                 ) : (
                   <div className="flex flex-wrap gap-2">
                     {openPorts.slice(0, 60).map((p) => (
                       <span
                         key={p}
-                        className="px-2 py-1 rounded bg-[#1F2937] border border-[#37425B] text-xs"
+                        className="px-2 py-1 rounded bg-[#1F2937] border border-[var(--st-line)] text-xs"
                       >
                         {p}
                       </span>
                     ))}
                     {openPorts.length > 60 && (
-                      <span className="text-xs text-slate-400">
+                      <span className="text-xs text-[var(--st-muted)]">
                         +{openPorts.length - 60} more
                       </span>
                     )}
@@ -426,10 +426,10 @@ export function OSINTTab({ osint }) {
               </div>
 
               {/* Known vulns */}
-              <div className="border border-[#37425B] rounded-lg p-3">
+              <div className="border border-[var(--st-line)] rounded-lg p-3">
                 <div className="text-sm font-semibold mb-2">Known vulns</div>
                 {knownVulns.length === 0 ? (
-                  <div className="text-slate-400 text-sm">None reported.</div>
+                  <div className="text-[var(--st-muted)] text-sm">None reported.</div>
                 ) : (
                   <ul className="space-y-1 max-h-56 overflow-auto pr-1">
                     {knownVulns.slice(0, 80).map((cve) => (
@@ -438,14 +438,14 @@ export function OSINTTab({ osint }) {
                           href={`https://nvd.nist.gov/vuln/detail/${encodeURIComponent(cve)}`}
                           target="_blank"
                           rel="noreferrer"
-                          className="text-[#00D1FF] hover:underline break-all"
+                          className="text-[var(--st-accent)] hover:underline break-all"
                         >
                           {cve}
                         </a>
                       </li>
                     ))}
                     {knownVulns.length > 80 && (
-                      <li className="text-xs text-slate-400">
+                      <li className="text-xs text-[var(--st-muted)]">
                         +{knownVulns.length - 80} more
                       </li>
                     )}
@@ -454,12 +454,12 @@ export function OSINTTab({ osint }) {
               </div>
 
               {/* Service fingerprints */}
-              <div className="border border-[#37425B] rounded-lg p-3">
+              <div className="border border-[var(--st-line)] rounded-lg p-3">
                 <div className="text-sm font-semibold mb-2">
                   Service fingerprints
                 </div>
                 {serviceFingerprints.length === 0 ? (
-                  <div className="text-slate-400 text-sm">None reported.</div>
+                  <div className="text-[var(--st-muted)] text-sm">None reported.</div>
                 ) : (
                   <ul className="space-y-2 max-h-56 overflow-auto pr-1">
                     {serviceFingerprints.map((svc, idx) => {
@@ -479,21 +479,21 @@ export function OSINTTab({ osint }) {
                           <div className="font-medium">
                             {label}
                             {ip ? (
-                              <span className="text-slate-400"> • {ip}</span>
+                              <span className="text-[var(--st-muted)]"> • {ip}</span>
                             ) : null}
                           </div>
                           {title ? (
-                            <div className="text-xs text-slate-400">
+                            <div className="text-xs text-[var(--st-muted)]">
                               HTTP title: {title}
                             </div>
                           ) : null}
                           {tls ? (
-                            <div className="text-xs text-slate-400">
+                            <div className="text-xs text-[var(--st-muted)]">
                               TLS CN: {tls}
                             </div>
                           ) : null}
                           {cpeText ? (
-                            <div className="text-xs text-slate-400 line-clamp-2">
+                            <div className="text-xs text-[var(--st-muted)] line-clamp-2">
                               CPE: {cpeText}
                             </div>
                           ) : null}
@@ -513,7 +513,7 @@ export function OSINTTab({ osint }) {
           <div className="text-slate-300">No OSINT data yet.</div>
         )}
         {Object.entries(safeOsint).filter(([key]) => !['people_data_labs', 'public_sources'].includes(key)).map(([key, value]) => (
-          <div key={key} className="border border-[#37425B] rounded-lg p-3">
+          <div key={key} className="border border-[var(--st-line)] rounded-lg p-3">
             <div className="text-sm font-semibold mb-2 capitalize">{key}</div>
             <JSONViewer data={value} />
           </div>

@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import useAuth from "@/utils/useAuth";
 import { Eye, EyeOff } from "lucide-react";
-import BrandLogo from "@/components/BrandLogo";
+import AccountLayout from "@/components/Theme/AccountLayout";
 
 export default function SignIn() {
   const [email, setEmail] = useState("");
@@ -77,96 +77,103 @@ export default function SignIn() {
   };
 
   return (
-    <div className="min-h-screen bg-[#263043] flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
-        <div className="bg-[#2D384E] rounded-lg p-8 shadow-xl">
-          <div className="text-center mb-8">
-            <div className="flex items-center justify-center mb-4">
-              <BrandLogo className="h-8 w-auto" variant="onDark" />
-            </div>
-            <p className="text-slate-400">Sign in to your account</p>
-          </div>
+    <AccountLayout
+      title="Welcome back."
+      description="Sign in to continue your research."
+    >
+      {error && (
+        <div
+          role="alert"
+          className="bg-red-500/10 border border-red-500/20 rounded-lg p-3 mb-6"
+        >
+          <p className="text-red-400 text-sm">{error}</p>
+        </div>
+      )}
 
-          {error && (
-            <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3 mb-6">
-              <p className="text-red-400 text-sm">{error}</p>
-            </div>
-          )}
+      {/* Single reliable path: handle submit via useAuth */}
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Hidden callback useful if a non-JS POST is attempted by the browser */}
+        <input type="hidden" name="callbackUrl" value={callbackUrl} />
 
-          {/* Single reliable path: handle submit via useAuth */}
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Hidden callback useful if a non-JS POST is attempted by the browser */}
-            <input type="hidden" name="callbackUrl" value={callbackUrl} />
+        <div>
+          <label
+            htmlFor="account-email"
+            className="block text-sm font-medium text-slate-300 mb-2"
+          >
+            Email
+          </label>
+          <input
+            id="account-email"
+            autoComplete="email"
+            name="email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full px-4 py-3 bg-[var(--st-elevated)] border border-[var(--st-line)] rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-[var(--st-accent)] focus:ring-1 focus:ring-[var(--st-accent)]"
+            placeholder="Enter your email"
+            required
+          />
+        </div>
 
-            <div>
-              <label className="block text-sm font-medium text-slate-300 mb-2">
-                Email
-              </label>
-              <input
-                name="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-3 bg-[#37425B] border border-[#37425B] rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-[#00D1FF] focus:ring-1 focus:ring-[#00D1FF]"
-                placeholder="Enter your email"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-slate-300 mb-2">
-                Password
-              </label>
-              <div className="relative">
-                <input
-                  name="password"
-                  type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-4 py-3 bg-[#37425B] border border-[#37425B] rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-[#00D1FF] focus:ring-1 focus:ring-[#00D1FF] pr-12"
-                  placeholder="Enter your password"
-                  required
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
-                >
-                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                </button>
-              </div>
-            </div>
-
+        <div>
+          <label
+            htmlFor="account-password"
+            className="block text-sm font-medium text-slate-300 mb-2"
+          >
+            Password
+          </label>
+          <div className="relative">
+            <input
+              id="account-password"
+              autoComplete="current-password"
+              name="password"
+              type={showPassword ? "text" : "password"}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full px-4 py-3 bg-[var(--st-elevated)] border border-[var(--st-line)] rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-[var(--st-accent)] focus:ring-1 focus:ring-[var(--st-accent)] pr-12"
+              placeholder="Enter your password"
+              required
+            />
             <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-[#00D1FF] text-[#263043] font-semibold py-3 rounded-lg hover:bg-[#00B8E6] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              aria-label={showPassword ? "Hide password" : "Show password"}
+              aria-pressed={showPassword}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--st-muted)] hover:text-white"
             >
-              {loading ? "Signing in…" : "Sign in"}
+              {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
             </button>
-          </form>
-
-          <div className="mt-6 space-y-3 text-center">
-            <p className="text-slate-400">
-              Don't have an account?{" "}
-              <a
-                href="/account/signup"
-                className="text-[#00D1FF] hover:underline"
-              >
-                Sign up
-              </a>
-            </p>
-            <p className="text-slate-400">
-              <a
-                href="/account/password/forgot"
-                className="text-[#00D1FF] hover:underline"
-              >
-                Forgot your password?
-              </a>
-            </p>
           </div>
         </div>
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full bg-[var(--st-accent)] text-[var(--st-bg)] font-semibold py-3 rounded-lg hover:bg-[var(--st-accent-hover)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {loading ? "Signing in…" : "Sign in"}
+        </button>
+      </form>
+
+      <div className="mt-6 space-y-3 text-center">
+        <p className="text-[var(--st-muted)]">
+          Don't have an account?{" "}
+          <a
+            href="/account/signup"
+            className="text-[var(--st-accent)] hover:underline"
+          >
+            Sign up
+          </a>
+        </p>
+        <p className="text-[var(--st-muted)]">
+          <a
+            href="/account/password/forgot"
+            className="text-[var(--st-accent)] hover:underline"
+          >
+            Forgot your password?
+          </a>
+        </p>
       </div>
-    </div>
+    </AccountLayout>
   );
 }

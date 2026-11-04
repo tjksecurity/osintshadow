@@ -24,114 +24,114 @@ export function SearchOptions({
         Search Options
       </h3>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <label className="flex items-center gap-3 p-3 rounded-md border border-[#37425B] bg-[#37425B]/40">
+        <label className="flex items-center gap-3 p-3 rounded-md border border-[var(--st-line)] bg-[var(--st-elevated)]/40">
           <input
             type="checkbox"
             checked={includeWebScraping}
             onChange={(e) => setIncludeWebScraping(e.target.checked)}
-            className="h-4 w-4 rounded border-slate-500 text-[#00D1FF] focus:ring-[#00D1FF]"
+            className="h-4 w-4 rounded border-slate-500 text-[var(--st-accent)] focus:ring-[var(--st-accent)]"
           />
           <div>
             <div className="font-medium text-sm">Enable Web Scraping</div>
-            <div className="text-xs text-slate-400">
+            <div className="text-xs text-[var(--st-muted)]">
               Discover extra phones/emails from hubs and contact pages
             </div>
           </div>
         </label>
-        <label className="flex items-center gap-3 p-3 rounded-md border border-[#37425B] bg-[#37425B]/40">
+        <label className="flex items-center gap-3 p-3 rounded-md border border-[var(--st-line)] bg-[var(--st-elevated)]/40">
           <input
             type="checkbox"
             checked={includeNSFW}
             onChange={(e) => setIncludeNSFW(e.target.checked)}
-            className="h-4 w-4 rounded border-slate-500 text-[#00D1FF] focus:ring-[#00D1FF]"
+            className="h-4 w-4 rounded border-slate-500 text-[var(--st-accent)] focus:ring-[var(--st-accent)]"
           />
           <div>
             <div className="font-medium text-sm">Include NSFW sources</div>
-            <div className="text-xs text-slate-400">
+            <div className="text-xs text-[var(--st-muted)]">
               Also scan adult/dating/fetish sites for handle matches
             </div>
           </div>
         </label>
 
         {/* NEW: Social media post collection option */}
-        <label className="flex items-center gap-3 p-3 rounded-md border border-[#37425B] bg-[#37425B]/40">
+        <label className="flex items-center gap-3 p-3 rounded-md border border-[var(--st-line)] bg-[var(--st-elevated)]/40">
           <input
             type="checkbox"
             checked={includePostCollection}
             onChange={(e) => setIncludePostCollection(e.target.checked)}
-            className="h-4 w-4 rounded border-slate-500 text-[#00D1FF] focus:ring-[#00D1FF]"
+            className="h-4 w-4 rounded border-slate-500 text-[var(--st-accent)] focus:ring-[var(--st-accent)]"
           />
           <div>
             <div className="font-medium text-sm flex items-center gap-2">
               <MessageSquare size={14} /> Collect social media posts
             </div>
-            <div className="text-xs text-slate-400">
+            <div className="text-xs text-[var(--st-muted)]">
               Gather recent posts to analyze patterns and connections
             </div>
           </div>
         </label>
 
-        <label className="flex items-center gap-3 p-3 rounded-md border border-[#37425B] bg-[#37425B]/40">
+        <label className="flex items-center gap-3 p-3 rounded-md border border-[var(--st-line)] bg-[var(--st-elevated)]/40">
           <input
             type="checkbox"
             checked={includeProperty}
             onChange={(e) => setIncludeProperty(e.target.checked)}
-            className="h-4 w-4 rounded border-slate-500 text-[#00D1FF] focus:ring-[#00D1FF]"
+            className="h-4 w-4 rounded border-slate-500 text-[var(--st-accent)] focus:ring-[var(--st-accent)]"
           />
           <div>
             <div className="font-medium text-sm flex items-center gap-2">
               <Landmark size={14} /> Property deeds
             </div>
-            <div className="text-xs text-slate-400">
+            <div className="text-xs text-[var(--st-muted)]">
               Address search for deed owner, buyer/seller, price
             </div>
           </div>
         </label>
-        <label className="flex items-center gap-3 p-3 rounded-md border border-[#37425B] bg-[#37425B]/40">
+        <label className="flex items-center gap-3 p-3 rounded-md border border-[var(--st-line)] bg-[var(--st-elevated)]/40">
           <input
             type="checkbox"
             checked={includeCourt}
             onChange={(e) => setIncludeCourt(e.target.checked)}
-            className="h-4 w-4 rounded border-slate-500 text-[#00D1FF] focus:ring-[#00D1FF]"
+            className="h-4 w-4 rounded border-slate-500 text-[var(--st-accent)] focus:ring-[var(--st-accent)]"
           />
           <div>
             <div className="font-medium text-sm flex items-center gap-2">
               <Gavel size={14} /> Court filings
             </div>
-            <div className="text-xs text-slate-400">
+            <div className="text-xs text-[var(--st-muted)]">
               Dockets and opinions matched by name/keywords
             </div>
           </div>
         </label>
-        <label className="flex items-center gap-3 p-3 rounded-md border border-[#37425B] bg-[#37425B]/40">
+        <label className="flex items-center gap-3 p-3 rounded-md border border-[var(--st-line)] bg-[var(--st-elevated)]/40">
           <input
             type="checkbox"
             checked={includeCriminal}
             onChange={(e) => setIncludeCriminal(e.target.checked)}
-            className="h-4 w-4 rounded border-slate-500 text-[#00D1FF] focus:ring-[#00D1FF]"
+            className="h-4 w-4 rounded border-slate-500 text-[var(--st-accent)] focus:ring-[var(--st-accent)]"
           />
           <div>
             <div className="font-medium text-sm flex items-center gap-2">
               <Fingerprint size={14} /> Criminal background
             </div>
-            <div className="text-xs text-slate-400">
+            <div className="text-xs text-[var(--st-muted)]">
               Public case mentions (best‑effort, varies by county)
             </div>
           </div>
         </label>
         {targetType === "license_plate" && (
-          <label className="flex items-center gap-3 p-3 rounded-md border border-[#37425B] bg-[#37425B]/40">
+          <label className="flex items-center gap-3 p-3 rounded-md border border-[var(--st-line)] bg-[var(--st-elevated)]/40">
             <input
               type="checkbox"
               checked={includeLicensePlate}
               onChange={(e) => setIncludeLicensePlate(e.target.checked)}
-              className="h-4 w-4 rounded border-slate-500 text-[#00D1FF] focus:ring-[#00D1FF]"
+              className="h-4 w-4 rounded border-slate-500 text-[var(--st-accent)] focus:ring-[var(--st-accent)]"
             />
             <div>
               <div className="font-medium text-sm flex items-center gap-2">
                 <Car size={14} /> License plate lookup
               </div>
-              <div className="text-xs text-slate-400">
+              <div className="text-xs text-[var(--st-muted)]">
                 Requires provider API configured in Settings (keys)
               </div>
             </div>

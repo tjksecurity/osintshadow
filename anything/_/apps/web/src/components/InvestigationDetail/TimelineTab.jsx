@@ -27,7 +27,7 @@ export default function TimelineTab({ investigation }) {
       case "low":
         return <Info className="w-4 h-4 text-blue-300" />;
       default:
-        return <Clock className="w-4 h-4 text-slate-400" />;
+        return <Clock className="w-4 h-4 text-[var(--st-muted)]" />;
     }
   };
 
@@ -42,7 +42,7 @@ export default function TimelineTab({ investigation }) {
       case "associate_discovery":
         return "bg-purple-500/10 border-purple-500/20 text-purple-200";
       default:
-        return "bg-[#303B52] border-[#37425B] text-slate-200";
+        return "bg-[var(--st-elevated)] border-[var(--st-line)] text-slate-200";
     }
   };
 
@@ -63,13 +63,13 @@ export default function TimelineTab({ investigation }) {
 
   if (events.length === 0) {
     return (
-      <section className="bg-[#2D384E] border border-[#37425B] rounded-lg p-6">
+      <section className="bg-[var(--st-panel)] border border-[var(--st-line)] rounded-lg p-6">
         <div className="text-center py-8">
-          <Calendar className="w-12 h-12 text-slate-500 mx-auto mb-4" />
+          <Calendar className="w-12 h-12 text-[var(--st-muted)] mx-auto mb-4" />
           <h3 className="text-lg font-semibold text-white mb-2">
             No Timeline Data Available
           </h3>
-          <p className="text-slate-400">
+          <p className="text-[var(--st-muted)]">
             Timeline events will appear here when the AI analysis finishes.
           </p>
         </div>
@@ -78,21 +78,21 @@ export default function TimelineTab({ investigation }) {
   }
 
   return (
-    <section className="bg-[#2D384E] border border-[#37425B] rounded-lg p-6">
+    <section className="bg-[var(--st-panel)] border border-[var(--st-line)] rounded-lg p-6">
       <div className="mb-6">
         <h3 className="text-lg font-semibold text-white mb-2 flex items-center">
-          <Calendar className="w-5 h-5 mr-2 text-[#00D1FF]" />
+          <Calendar className="w-5 h-5 mr-2 text-[var(--st-accent)]" />
           Investigation Timeline
         </h3>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <div className="bg-[#303B52] border border-[#37425B] p-4 rounded-lg">
+          <div className="bg-[var(--st-elevated)] border border-[var(--st-line)] p-4 rounded-lg">
             <div className="text-sm text-slate-300 font-medium">
               Total Events
             </div>
             <div className="text-2xl font-bold text-white">{events.length}</div>
           </div>
-          <div className="bg-[#303B52] border border-[#37425B] p-4 rounded-lg">
+          <div className="bg-[var(--st-elevated)] border border-[var(--st-line)] p-4 rounded-lg">
             <div className="text-sm text-slate-300 font-medium">Date Range</div>
             <div className="text-sm text-slate-200">
               {timeline.date_range?.earliest
@@ -104,7 +104,7 @@ export default function TimelineTab({ investigation }) {
                 : " N/A"}
             </div>
           </div>
-          <div className="bg-[#303B52] border border-[#37425B] p-4 rounded-lg">
+          <div className="bg-[var(--st-elevated)] border border-[var(--st-line)] p-4 rounded-lg">
             <div className="text-sm text-slate-300 font-medium">
               Activity Clusters
             </div>
@@ -115,7 +115,7 @@ export default function TimelineTab({ investigation }) {
         </div>
 
         {(clusters.length > 0 || patterns.length > 0) && (
-          <div className="mb-6 bg-[#263043] border border-[#37425B] p-4 rounded-lg">
+          <div className="mb-6 bg-[var(--st-bg)] border border-[var(--st-line)] p-4 rounded-lg">
             <h4 className="font-semibold text-white mb-3">Timeline Analysis</h4>
 
             {clusters.length > 0 && (
@@ -127,17 +127,17 @@ export default function TimelineTab({ investigation }) {
                   {clusters.map((cluster, index) => (
                     <div
                       key={index}
-                      className="flex items-center justify-between bg-[#2D384E] border border-[#37425B] p-3 rounded"
+                      className="flex items-center justify-between bg-[var(--st-panel)] border border-[var(--st-line)] p-3 rounded"
                     >
                       <div>
                         <div className="font-medium text-sm text-white">
                           {cluster.year}
                         </div>
-                        <div className="text-xs text-slate-400">
+                        <div className="text-xs text-[var(--st-muted)]">
                           {cluster.description}
                         </div>
                       </div>
-                      <div className="text-lg font-bold text-[#00D1FF]">
+                      <div className="text-lg font-bold text-[var(--st-accent)]">
                         {cluster.event_count}
                       </div>
                     </div>
@@ -189,17 +189,17 @@ export default function TimelineTab({ investigation }) {
 
       <div className="space-y-4">
         <h4 className="font-semibold text-white flex items-center">
-          <Clock className="w-4 h-4 mr-2 text-[#00D1FF]" />
+          <Clock className="w-4 h-4 mr-2 text-[var(--st-accent)]" />
           Event Timeline
         </h4>
 
         <div className="relative">
-          <div className="absolute left-6 top-0 bottom-0 w-px bg-[#37425B]"></div>
+          <div className="absolute left-6 top-0 bottom-0 w-px bg-[var(--st-elevated)]"></div>
 
           <div className="space-y-6">
             {events.map((event, index) => (
               <div key={index} className="relative flex items-start">
-                <div className="absolute left-4 w-4 h-4 rounded-full border-2 border-[#2D384E] bg-[#37425B] shadow-sm flex items-center justify-center">
+                <div className="absolute left-4 w-4 h-4 rounded-full border-2 border-[var(--st-panel)] bg-[var(--st-elevated)] shadow-sm flex items-center justify-center">
                   {getSeverityIcon(event.severity)}
                 </div>
 
@@ -211,7 +211,7 @@ export default function TimelineTab({ investigation }) {
                       <h5 className="font-semibold text-sm text-white">
                         {event.title || "Event"}
                       </h5>
-                      <span className="text-xs bg-[#263043] border border-[#37425B] px-2 py-1 rounded text-slate-300">
+                      <span className="text-xs bg-[var(--st-bg)] border border-[var(--st-line)] px-2 py-1 rounded text-slate-300">
                         {formatDate(event.timestamp)}
                       </span>
                     </div>
@@ -224,13 +224,13 @@ export default function TimelineTab({ investigation }) {
                       <span className="text-slate-300">
                         Source: {event.source || "Unknown"}
                       </span>
-                      <span className="text-slate-400 capitalize">
+                      <span className="text-[var(--st-muted)] capitalize">
                         {String(event.event_type || "event").replace(/_/g, " ")}
                       </span>
                     </div>
 
                     {event.details && Object.keys(event.details).length > 0 && (
-                      <div className="mt-3 pt-3 border-t border-[#37425B]">
+                      <div className="mt-3 pt-3 border-t border-[var(--st-line)]">
                         <div className="text-xs space-y-1">
                           {Object.entries(event.details).map(([key, value]) => (
                             <div
@@ -240,7 +240,7 @@ export default function TimelineTab({ investigation }) {
                               <span className="font-medium text-slate-300 capitalize">
                                 {String(key).replace(/_/g, " ")}:
                               </span>
-                              <span className="text-slate-400 ml-2 break-words text-right">
+                              <span className="text-[var(--st-muted)] ml-2 break-words text-right">
                                 {typeof value === "object"
                                   ? JSON.stringify(value)
                                   : String(value)}

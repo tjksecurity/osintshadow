@@ -73,7 +73,7 @@ export function InvestigationForm({
 
   return (
     <div className="max-w-2xl">
-      <div className="bg-[#2D384E] rounded-lg p-6">
+      <div className="bg-[var(--st-panel)] rounded-lg p-6">
         <h2 className="text-lg font-semibold mb-6">Investigation Details</h2>
 
         {error && (
@@ -134,7 +134,7 @@ export function InvestigationForm({
 
           <PublicSourceOptions targetType={targetType} publicSources={publicSources} setPublicSources={setPublicSources} isTrial={isTrial} />
 
-          <label className="flex items-start gap-3 p-3 rounded-md border border-[#37425B]">
+          <label className="flex items-start gap-3 p-3 rounded-md border border-[var(--st-line)]">
             <input
               type="checkbox"
               checked={includePeopleDataLabs && !isTrial && ['email', 'domain'].includes(targetType)}
@@ -144,7 +144,7 @@ export function InvestigationForm({
             />
             <span>
               <span className="block font-medium text-sm">People Data Labs enrichment (optional)</span>
-              <span className="block text-xs text-slate-400">
+              <span className="block text-xs text-[var(--st-muted)]">
                 Send this email or domain to People Data Labs for professional or company data.
                 Requires server configuration. Provider credits are separate from your
                 ShadowTrace credits, including unlimited accounts. Matches are not verified identity.
@@ -154,13 +154,13 @@ export function InvestigationForm({
           </label>
 
           <div className="flex items-center justify-between pt-4">
-            <div className="text-sm text-slate-400">
+            <div className="text-sm text-[var(--st-muted)]">
               {creditError || creditsPending ? null : hasUnlimitedCredits
                 ? 'Unlimited investigation credits — no credits are deducted.'
                 : isTrial ? 'One trial investigation; no paid credits are deducted.'
                 : `This will use 1 credit from your remaining ${user?.monthly_remaining ?? 0} credits`}
               {disabledReason ? (
-                <div className="text-xs text-slate-500 mt-1">
+                <div className="text-xs text-[var(--st-muted)] mt-1">
                   {disabledReason}
                 </div>
               ) : null}
@@ -168,7 +168,7 @@ export function InvestigationForm({
             <button
               type="submit"
               disabled={isDisabled}
-              className="px-6 py-3 bg-[#00D1FF] text-[#263043] font-semibold rounded-lg hover:bg-[#00B8E6] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-6 py-3 bg-[var(--st-accent)] text-[var(--st-bg)] font-semibold rounded-lg hover:bg-[var(--st-accent-hover)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {submitting ? "Starting Investigation..." : "Start Investigation"}
             </button>

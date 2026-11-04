@@ -14,8 +14,8 @@ export function TargetTypeSelector({ targetTypes, targetType, setTargetType }) {
               onClick={() => setTargetType(type.value)}
               className={`p-4 rounded-lg border transition-all ${
                 targetType === type.value
-                  ? "border-[#00D1FF] bg-[#00D1FF]/10"
-                  : "border-[#37425B] hover:border-[#37425B]/80"
+                  ? "border-[var(--st-accent)] bg-[var(--st-accent)]/10"
+                  : "border-[var(--st-line)] hover:border-[var(--st-line)]/80"
               }`}
             >
               <div className="flex flex-col items-center gap-2">
@@ -23,8 +23,8 @@ export function TargetTypeSelector({ targetTypes, targetType, setTargetType }) {
                   size={24}
                   className={
                     targetType === type.value
-                      ? "text-[#00D1FF]"
-                      : "text-slate-400"
+                      ? "text-[var(--st-accent)]"
+                      : "text-[var(--st-muted)]"
                   }
                 />
                 <span className="text-sm font-medium">{type.label}</span>

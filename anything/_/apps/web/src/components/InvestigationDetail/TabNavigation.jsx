@@ -33,7 +33,7 @@ const tabs = [
 
 export function TabNavigation({ activeTab, onTabChange }) {
   return (
-    <div className="flex items-center gap-2 border-b border-[#37425B] overflow-x-auto whitespace-nowrap">
+    <div className="flex items-center gap-2 border-b border-[var(--st-line)] overflow-x-auto whitespace-nowrap">
       {tabs.map((t) => {
         const Icon = t.icon;
         const active = activeTab === t.id;
@@ -43,8 +43,8 @@ export function TabNavigation({ activeTab, onTabChange }) {
             onClick={() => onTabChange(t.id)}
             className={`px-3 py-2 text-sm border-b-2 -mb-[1px] flex items-center gap-2 ${
               active
-                ? "border-[#00D1FF] text-white"
-                : "border-transparent text-slate-400 hover:text-white"
+                ? "border-[var(--st-accent)] text-white"
+                : "border-transparent text-[var(--st-muted)] hover:text-white"
             }`}
           >
             <Icon size={16} /> {t.label}

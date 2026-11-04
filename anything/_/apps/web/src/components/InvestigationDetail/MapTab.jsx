@@ -5,10 +5,10 @@ export function MapTab({ investigation, center }) {
 
   if (!apiKey) {
     return (
-      <section className="bg-[#2D384E] border border-[#37425B] rounded-lg p-6">
+      <section className="bg-[var(--st-panel)] border border-[var(--st-line)] rounded-lg p-6">
         <div className="text-slate-300">
           Map is not configured.
-          <div className="text-slate-400 text-sm mt-1">
+          <div className="text-[var(--st-muted)] text-sm mt-1">
             Missing NEXT_PUBLIC_GOOGLE_MAPS_API_KEY.
           </div>
         </div>
@@ -17,7 +17,7 @@ export function MapTab({ investigation, center }) {
   }
 
   return (
-    <section className="bg-[#2D384E] rounded-lg p-2">
+    <section className="bg-[var(--st-panel)] rounded-lg p-2">
       <APIProvider apiKey={apiKey}>
         <div className="w-full h-[420px] rounded overflow-hidden">
           <Map

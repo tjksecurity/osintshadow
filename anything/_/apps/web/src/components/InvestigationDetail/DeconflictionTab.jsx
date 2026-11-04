@@ -51,8 +51,8 @@ export default function DeconflictionTab({ osintRaw }) {
 
   return (
     <section className="space-y-4">
-      <div className="bg-[#2D384E] rounded-lg p-5 border border-[#37425B]">
-        <div className="flex items-center gap-2 mb-2 text-[#00D1FF]">
+      <div className="bg-[var(--st-panel)] rounded-lg p-5 border border-[var(--st-line)]">
+        <div className="flex items-center gap-2 mb-2 text-[var(--st-accent)]">
           <GitCompare size={18} />
           <h3 className="font-semibold">Source Deconfliction</h3>
         </div>
@@ -64,22 +64,22 @@ export default function DeconflictionTab({ osintRaw }) {
         </p>
 
         {!deconfliction ? (
-          <div className="mt-4 border border-[#37425B] rounded-lg p-4">
+          <div className="mt-4 border border-[var(--st-line)] rounded-lg p-4">
             <div className="flex items-center gap-2 text-slate-200">
               <AlertTriangle size={18} className="text-amber-300" />
               <div className="font-semibold">No deconfliction data yet</div>
             </div>
-            <div className="text-slate-400 text-sm mt-1">
+            <div className="text-[var(--st-muted)] text-sm mt-1">
               Run (or regenerate) the investigation to compute deconfliction.
             </div>
           </div>
         ) : (
           <div className="mt-4 space-y-4">
-            <div className="border border-[#37425B] rounded-lg p-4">
+            <div className="border border-[var(--st-line)] rounded-lg p-4">
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
                 <div className="text-slate-200 font-medium">Summary</div>
                 {generatedAtText ? (
-                  <div className="text-xs text-slate-400">
+                  <div className="text-xs text-[var(--st-muted)]">
                     Generated {generatedAtText}
                   </div>
                 ) : null}
@@ -87,7 +87,7 @@ export default function DeconflictionTab({ osintRaw }) {
 
               {counts ? (
                 <div className="mt-2 flex flex-wrap gap-2 text-xs">
-                  <span className="px-2 py-1 rounded border border-[#37425B] bg-[#263043] text-slate-200">
+                  <span className="px-2 py-1 rounded border border-[var(--st-line)] bg-[var(--st-bg)] text-slate-200">
                     Total: {counts.total}
                   </span>
                   <span
@@ -127,7 +127,7 @@ export default function DeconflictionTab({ osintRaw }) {
                     return (
                       <div
                         key={idx}
-                        className="border border-[#37425B] rounded-lg p-4"
+                        className="border border-[var(--st-line)] rounded-lg p-4"
                       >
                         <div className="flex items-center gap-2 flex-wrap">
                           <div className="font-semibold text-white">
@@ -139,7 +139,7 @@ export default function DeconflictionTab({ osintRaw }) {
                             {String(sev).toUpperCase()}
                           </div>
                           {c?.conflict_type ? (
-                            <div className="text-xs text-slate-400">
+                            <div className="text-xs text-[var(--st-muted)]">
                               {c.conflict_type}
                             </div>
                           ) : null}
@@ -153,7 +153,7 @@ export default function DeconflictionTab({ osintRaw }) {
 
                         <div className="mt-3 space-y-2">
                           {vals.length === 0 ? (
-                            <div className="text-sm text-slate-400">
+                            <div className="text-sm text-[var(--st-muted)]">
                               No competing values listed.
                             </div>
                           ) : (
@@ -166,7 +166,7 @@ export default function DeconflictionTab({ osintRaw }) {
                               return (
                                 <div
                                   key={j}
-                                  className="border border-[#37425B] rounded-lg p-3 bg-[#283247]"
+                                  className="border border-[var(--st-line)] rounded-lg p-3 bg-[#283247]"
                                 >
                                   <div className="text-slate-200 break-words">
                                     {valueText}
@@ -193,14 +193,14 @@ export default function DeconflictionTab({ osintRaw }) {
                                         return (
                                           <div
                                             key={k}
-                                            className="text-xs text-slate-400"
+                                            className="text-xs text-[var(--st-muted)]"
                                           >
                                             {url ? (
                                               <a
                                                 href={url}
                                                 target="_blank"
                                                 rel="noreferrer"
-                                                className="text-[#00D1FF] hover:underline"
+                                                className="text-[var(--st-accent)] hover:underline"
                                               >
                                                 {name}
                                               </a>
@@ -219,7 +219,7 @@ export default function DeconflictionTab({ osintRaw }) {
                                       })}
                                     </div>
                                   ) : (
-                                    <div className="text-xs text-slate-500 mt-1">
+                                    <div className="text-xs text-[var(--st-muted)] mt-1">
                                       No sources listed.
                                     </div>
                                   )}
@@ -235,7 +235,7 @@ export default function DeconflictionTab({ osintRaw }) {
               )}
             </div>
 
-            <div className="border border-[#37425B] rounded-lg p-4">
+            <div className="border border-[var(--st-line)] rounded-lg p-4">
               <div className="text-slate-200 font-medium mb-2">
                 Raw deconfliction payload
               </div>

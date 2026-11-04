@@ -137,17 +137,17 @@ export default function SettingsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#263043] flex items-center justify-center">
+      <div className="st-workspace min-h-screen bg-[var(--st-bg)] flex items-center justify-center">
         <div className="text-white">Loading...</div>
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-screen text-white font-inter bg-[#263043]">
+    <div className="st-workspace flex min-h-screen text-white font-inter bg-[var(--st-bg)]">
       {/* Sidebar Navigation */}
       <aside
-        className={`fixed md:static inset-y-0 left-0 z-50 w-[220px] bg-[#232D41] border-r border-[#37425B] transform transition-transform duration-300 ${
+        className={`fixed md:static inset-y-0 left-0 z-50 w-[220px] bg-[var(--st-inset)] border-r border-[var(--st-line)] transform transition-transform duration-300 ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
         }`}
       >
@@ -165,7 +165,7 @@ export default function SettingsPage() {
           <li>
             <a
               href="/dashboard"
-              className="flex items-center gap-3 py-2 px-6 hover:bg-[#303B52] text-slate-400 hover:text-white transition-colors"
+              className="flex items-center gap-3 py-2 px-6 hover:bg-[var(--st-elevated)] text-[var(--st-muted)] hover:text-white transition-colors"
             >
               <LayoutDashboard size={18} />
               <span>Dashboard</span>
@@ -174,7 +174,7 @@ export default function SettingsPage() {
           <li>
             <a
               href="/investigations/new"
-              className="flex items-center gap-3 py-2 px-6 hover:bg-[#303B52] text-slate-400 hover:text-white transition-colors"
+              className="flex items-center gap-3 py-2 px-6 hover:bg-[var(--st-elevated)] text-[var(--st-muted)] hover:text-white transition-colors"
             >
               <Plus size={18} />
               <span>New Investigation</span>
@@ -183,7 +183,7 @@ export default function SettingsPage() {
           <li>
             <a
               href="/investigations"
-              className="flex items-center gap-3 py-2 px-6 hover:bg-[#303B52] text-slate-400 hover:text-white transition-colors"
+              className="flex items-center gap-3 py-2 px-6 hover:bg-[var(--st-elevated)] text-[var(--st-muted)] hover:text-white transition-colors"
             >
               <FileBarChart size={18} />
               <span>Investigations</span>
@@ -192,7 +192,7 @@ export default function SettingsPage() {
           <li>
             <a
               href="/ai/chat"
-              className="flex items-center gap-3 py-2 px-6 hover:bg-[#303B52] text-slate-400 hover:text-white transition-colors"
+              className="flex items-center gap-3 py-2 px-6 hover:bg-[var(--st-elevated)] text-[var(--st-muted)] hover:text-white transition-colors"
             >
               <Sparkles size={18} />
               <span>AI Chat</span>
@@ -201,7 +201,7 @@ export default function SettingsPage() {
           <li>
             <a
               href="/map"
-              className="flex items-center gap-3 py-2 px-6 hover:bg-[#303B52] text-slate-400 hover:text-white transition-colors"
+              className="flex items-center gap-3 py-2 px-6 hover:bg-[var(--st-elevated)] text-[var(--st-muted)] hover:text-white transition-colors"
             >
               <Map size={18} />
               <span>Global Map</span>
@@ -210,13 +210,13 @@ export default function SettingsPage() {
           <li>
             <a
               href="/billing"
-              className="flex items-center gap-3 py-2 px-6 hover:bg-[#303B52] text-slate-400 hover:text-white transition-colors"
+              className="flex items-center gap-3 py-2 px-6 hover:bg-[var(--st-elevated)] text-[var(--st-muted)] hover:text-white transition-colors"
             >
               <CreditCard size={18} />
               <span>Billing</span>
             </a>
           </li>
-          <li className="flex items-center gap-3 py-2 px-6 bg-[#303B52] border-l-2 border-[#00D1FF] text-white">
+          <li className="flex items-center gap-3 py-2 px-6 bg-[var(--st-elevated)] border-l-2 border-[var(--st-accent)] text-white">
             <Settings size={18} />
             <span>Settings</span>
           </li>
@@ -224,15 +224,15 @@ export default function SettingsPage() {
 
         {isAdmin && (
           <>
-            <hr className="border-t border-[#37425B] my-4" />
-            <div className="text-slate-400 text-xs uppercase px-6 mb-2">
+            <hr className="border-t border-[var(--st-line)] my-4" />
+            <div className="text-[var(--st-muted)] text-xs uppercase px-6 mb-2">
               Admin Portal
             </div>
             <ul className="space-y-1">
               <li>
                 <a
                   href="/administration"
-                  className="flex items-center gap-3 py-2 px-6 hover:bg-[#303B52] text-slate-400 hover:text-white transition-colors"
+                  className="flex items-center gap-3 py-2 px-6 hover:bg-[var(--st-elevated)] text-[var(--st-muted)] hover:text-white transition-colors"
                 >
                   <Activity size={18} />
                   <span>Administration</span>
@@ -246,7 +246,7 @@ export default function SettingsPage() {
       {/* Main Content Wrapper */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Top Application Bar */}
-        <nav className="w-full h-14 px-6 flex items-center justify-between border-b border-[#37425B] bg-[#263043]">
+        <nav className="w-full h-14 px-6 flex items-center justify-between border-b border-[var(--st-line)] bg-[var(--st-bg)]">
           <div className="flex items-center gap-4">
             <Menu
               className="md:hidden cursor-pointer"
@@ -255,11 +255,11 @@ export default function SettingsPage() {
             />
             <div className="hidden sm:flex relative w-64">
               <Search
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--st-muted)]"
                 size={16}
               />
               <input
-                className="w-full rounded-full bg-transparent text-sm placeholder-slate-500 pl-9 pr-3 py-1.5 border border-[#37425B] focus:ring-0 focus:border-[#00D1FF] focus:outline-none"
+                className="w-full rounded-full bg-transparent text-sm placeholder-slate-500 pl-9 pr-3 py-1.5 border border-[var(--st-line)] focus:ring-0 focus:border-[var(--st-accent)] focus:outline-none"
                 placeholder="Search investigations..."
               />
             </div>
@@ -267,19 +267,19 @@ export default function SettingsPage() {
 
           <div className="flex items-center gap-6">
             <Bell
-              className="text-slate-400 hover:text-white transition cursor-pointer"
+              className="text-[var(--st-muted)] hover:text-white transition cursor-pointer"
               strokeWidth={1.5}
               size={20}
             />
             <a
               href="/ai/chat"
-              className="hidden sm:inline-flex items-center gap-2 px-3 py-1.5 border border-[#37425B] rounded hover:bg-[#37425B] text-slate-200 text-sm transition-colors"
+              className="hidden sm:inline-flex items-center gap-2 px-3 py-1.5 border border-[var(--st-line)] rounded hover:bg-[var(--st-hover)] text-slate-200 text-sm transition-colors"
             >
               <Sparkles size={16} />
               AI Chat
             </a>
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-slate-600 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-full bg-[var(--st-elevated)] flex items-center justify-center">
                 <User size={16} />
               </div>
               <span className="text-sm font-medium">
@@ -293,7 +293,7 @@ export default function SettingsPage() {
         <section className="flex-1 p-6 space-y-6 overflow-auto">
           {/* Page Header */}
           <div className="flex items-center gap-3">
-            <Settings className="text-slate-400" size={24} />
+            <Settings className="text-[var(--st-muted)]" size={24} />
             <h1 className="text-lg font-semibold">Settings</h1>
           </div>
 
@@ -311,7 +311,7 @@ export default function SettingsPage() {
           )}
 
           {/* Profile Settings */}
-          <div className="bg-[#2D384E] rounded-lg p-6">
+          <div className="bg-[var(--st-panel)] rounded-lg p-6">
             <h2 className="text-lg font-semibold mb-6">Profile Information</h2>
             <form onSubmit={handleProfileUpdate} className="space-y-4">
               <div>
@@ -322,7 +322,7 @@ export default function SettingsPage() {
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full px-4 py-3 bg-[#37425B] border border-[#37425B] rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-[#00D1FF] focus:ring-1 focus:ring-[#00D1FF]"
+                  className="w-full px-4 py-3 bg-[var(--st-elevated)] border border-[var(--st-line)] rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-[var(--st-accent)] focus:ring-1 focus:ring-[var(--st-accent)]"
                   placeholder="Enter your name"
                 />
               </div>
@@ -335,9 +335,9 @@ export default function SettingsPage() {
                   type="email"
                   value={email}
                   disabled
-                  className="w-full px-4 py-3 bg-[#37425B]/50 border border-[#37425B] rounded-lg text-slate-400 cursor-not-allowed"
+                  className="w-full px-4 py-3 bg-[var(--st-elevated)]/50 border border-[var(--st-line)] rounded-lg text-[var(--st-muted)] cursor-not-allowed"
                 />
-                <p className="mt-1 text-xs text-slate-400">
+                <p className="mt-1 text-xs text-[var(--st-muted)]">
                   Email cannot be changed
                 </p>
               </div>
@@ -345,7 +345,7 @@ export default function SettingsPage() {
               <button
                 type="submit"
                 disabled={saving}
-                className="flex items-center gap-2 px-4 py-2 bg-[#00D1FF] text-[#263043] rounded-lg hover:bg-[#00B8E6] transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-center gap-2 px-4 py-2 bg-[var(--st-accent)] text-[var(--st-bg)] rounded-lg hover:bg-[var(--st-accent-hover)] transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Save size={16} />
                 {saving ? "Saving..." : "Save Changes"}
@@ -354,7 +354,7 @@ export default function SettingsPage() {
           </div>
 
           {/* Password Change */}
-          <div className="bg-[#2D384E] rounded-lg p-6">
+          <div className="bg-[var(--st-panel)] rounded-lg p-6">
             <h2 className="text-lg font-semibold mb-6">Change Password</h2>
             <form onSubmit={handlePasswordChange} className="space-y-4">
               <div>
@@ -366,14 +366,14 @@ export default function SettingsPage() {
                     type={showPasswords ? "text" : "password"}
                     value={currentPassword}
                     onChange={(e) => setCurrentPassword(e.target.value)}
-                    className="w-full px-4 py-3 bg-[#37425B] border border-[#37425B] rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-[#00D1FF] focus:ring-1 focus:ring-[#00D1FF] pr-12"
+                    className="w-full px-4 py-3 bg-[var(--st-elevated)] border border-[var(--st-line)] rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-[var(--st-accent)] focus:ring-1 focus:ring-[var(--st-accent)] pr-12"
                     placeholder="Enter current password"
                     autoComplete="current-password"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPasswords(!showPasswords)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--st-muted)] hover:text-white"
                   >
                     {showPasswords ? <EyeOff size={20} /> : <Eye size={20} />}
                   </button>
@@ -388,7 +388,7 @@ export default function SettingsPage() {
                   type={showPasswords ? "text" : "password"}
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
-                  className="w-full px-4 py-3 bg-[#37425B] border border-[#37425B] rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-[#00D1FF] focus:ring-1 focus:ring-[#00D1FF]"
+                  className="w-full px-4 py-3 bg-[var(--st-elevated)] border border-[var(--st-line)] rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-[var(--st-accent)] focus:ring-1 focus:ring-[var(--st-accent)]"
                   placeholder="Enter new password"
                   autoComplete="new-password"
                 />
@@ -402,7 +402,7 @@ export default function SettingsPage() {
                   type={showPasswords ? "text" : "password"}
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="w-full px-4 py-3 bg-[#37425B] border border-[#37425B] rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-[#00D1FF] focus:ring-1 focus:ring-[#00D1FF]"
+                  className="w-full px-4 py-3 bg-[var(--st-elevated)] border border-[var(--st-line)] rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-[var(--st-accent)] focus:ring-1 focus:ring-[var(--st-accent)]"
                   placeholder="Confirm new password"
                   autoComplete="new-password"
                 />
@@ -411,7 +411,7 @@ export default function SettingsPage() {
               <button
                 type="submit"
                 disabled={saving}
-                className="flex items-center gap-2 px-4 py-2 bg-[#00D1FF] text-[#263043] rounded-lg hover:bg-[#00B8E6] transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-center gap-2 px-4 py-2 bg-[var(--st-accent)] text-[var(--st-bg)] rounded-lg hover:bg-[var(--st-accent-hover)] transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Save size={16} />
                 {saving ? "Changing..." : "Change Password"}
@@ -420,19 +420,19 @@ export default function SettingsPage() {
           </div>
 
           {/* Account Actions */}
-          <div className="bg-[#2D384E] rounded-lg p-6">
+          <div className="bg-[var(--st-panel)] rounded-lg p-6">
             <h2 className="text-lg font-semibold mb-6">Account Actions</h2>
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="font-medium">Sign Out</p>
-                  <p className="text-sm text-slate-400">
+                  <p className="text-sm text-[var(--st-muted)]">
                     Sign out of your account
                   </p>
                 </div>
                 <button
                   onClick={handleLogout}
-                  className="flex items-center gap-2 px-4 py-2 border border-[#37425B] rounded-lg hover:bg-[#37425B] transition-colors font-medium"
+                  className="flex items-center gap-2 px-4 py-2 border border-[var(--st-line)] rounded-lg hover:bg-[var(--st-hover)] transition-colors font-medium"
                 >
                   <LogOut size={16} />
                   Sign Out
@@ -442,23 +442,23 @@ export default function SettingsPage() {
           </div>
 
           {/* Account Info */}
-          <div className="bg-[#2D384E] rounded-lg p-6">
+          <div className="bg-[var(--st-panel)] rounded-lg p-6">
             <h2 className="text-lg font-semibold mb-6">Account Information</h2>
             <div className="space-y-3 text-sm">
               <div className="flex justify-between">
-                <span className="text-slate-400">Account Type</span>
+                <span className="text-[var(--st-muted)]">Account Type</span>
                 <span className="font-medium capitalize">
                   {user?.subscription_plan || "Free"}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-400">Credits Remaining</span>
+                <span className="text-[var(--st-muted)]">Credits Remaining</span>
                 <span className="font-medium">
                   {user?.monthly_remaining || 0}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-400">Role</span>
+                <span className="text-[var(--st-muted)]">Role</span>
                 <span className="font-medium capitalize">
                   {user?.role || "User"}
                 </span>

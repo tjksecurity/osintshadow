@@ -90,7 +90,7 @@ export default function GlobalMapPage() {
 
   if (loading || isLoading) {
     return (
-      <div className="min-h-screen bg-[#263043] text-white flex items-center justify-center">
+      <div className="st-workspace min-h-screen bg-[var(--st-bg)] text-white flex items-center justify-center">
         Loading map...
       </div>
     );
@@ -100,8 +100,8 @@ export default function GlobalMapPage() {
 
   if (!apiKey) {
     return (
-      <div className="min-h-screen bg-[#263043] text-white">
-        <header className="border-b border-[#37425B]">
+      <div className="st-workspace min-h-screen bg-[var(--st-bg)] text-white">
+        <header className="border-b border-[var(--st-line)]">
           <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <BrandLogo className="h-6 w-auto" variant="onDark" />
@@ -111,7 +111,7 @@ export default function GlobalMapPage() {
         </header>
 
         <main className="max-w-6xl mx-auto px-6 py-6">
-          <div className="bg-[#2D384E] border border-[#37425B] rounded-lg p-6">
+          <div className="bg-[var(--st-panel)] border border-[var(--st-line)] rounded-lg p-6">
             <div className="text-lg font-semibold">Map not configured</div>
             <div className="text-slate-300 mt-2">
               Missing NEXT_PUBLIC_GOOGLE_MAPS_API_KEY.
@@ -127,8 +127,8 @@ export default function GlobalMapPage() {
     : { lat: 20, lng: 0 };
 
   return (
-    <div className="min-h-screen bg-[#263043] text-white">
-      <header className="border-b border-[#37425B]">
+    <div className="st-workspace min-h-screen bg-[var(--st-bg)] text-white">
+      <header className="border-b border-[var(--st-line)]">
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <BrandLogo className="h-6 w-auto" variant="onDark" />
@@ -136,7 +136,7 @@ export default function GlobalMapPage() {
           </div>
           <button
             onClick={() => refetch()}
-            className="px-3 py-1.5 border border-[#37425B] rounded hover:bg-[#37425B] flex items-center gap-2"
+            className="px-3 py-1.5 border border-[var(--st-line)] rounded hover:bg-[var(--st-hover)] flex items-center gap-2"
           >
             <RefreshCw size={16} /> Refresh
           </button>
@@ -145,19 +145,19 @@ export default function GlobalMapPage() {
 
       <main className="max-w-6xl mx-auto px-6 py-4 space-y-4">
         {/* Filters */}
-        <div className="bg-[#2D384E] rounded-lg p-4">
+        <div className="bg-[var(--st-panel)] rounded-lg p-4">
           <div className="flex items-center gap-2 mb-3">
             <Filter size={16} /> <span className="font-semibold">Filters</span>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
             <div>
-              <label className="text-xs text-slate-400 flex items-center gap-1 mb-1">
+              <label className="text-xs text-[var(--st-muted)] flex items-center gap-1 mb-1">
                 <Flag size={12} /> Risk
               </label>
               <select
                 value={riskLevel}
                 onChange={(e) => setRiskLevel(e.target.value)}
-                className="w-full bg-[#37425B] border border-[#37425B] rounded px-3 py-2 text-sm"
+                className="w-full bg-[var(--st-elevated)] border border-[var(--st-line)] rounded px-3 py-2 text-sm"
               >
                 <option value="">All</option>
                 <option value="low">Low</option>
@@ -167,13 +167,13 @@ export default function GlobalMapPage() {
               </select>
             </div>
             <div>
-              <label className="text-xs text-slate-400 mb-1 flex items-center gap-1">
+              <label className="text-xs text-[var(--st-muted)] mb-1 flex items-center gap-1">
                 <Globe size={12} /> Type
               </label>
               <select
                 value={typeFilter}
                 onChange={(e) => setTypeFilter(e.target.value)}
-                className="w-full bg-[#37425B] border border-[#37425B] rounded px-3 py-2 text-sm"
+                className="w-full bg-[var(--st-elevated)] border border-[var(--st-line)] rounded px-3 py-2 text-sm"
               >
                 <option value="">All</option>
                 <option value="email">Email</option>
@@ -184,35 +184,35 @@ export default function GlobalMapPage() {
               </select>
             </div>
             <div>
-              <label className="text-xs text-slate-400 mb-1 flex items-center gap-1">
+              <label className="text-xs text-[var(--st-muted)] mb-1 flex items-center gap-1">
                 <Calendar size={12} /> Start
               </label>
               <input
                 type="date"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
-                className="w-full bg-[#37425B] border border-[#37425B] rounded px-3 py-2 text-sm"
+                className="w-full bg-[var(--st-elevated)] border border-[var(--st-line)] rounded px-3 py-2 text-sm"
               />
             </div>
             <div>
-              <label className="text-xs text-slate-400 mb-1 flex items-center gap-1">
+              <label className="text-xs text-[var(--st-muted)] mb-1 flex items-center gap-1">
                 <Calendar size={12} /> End
               </label>
               <input
                 type="date"
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
-                className="w-full bg-[#37425B] border border-[#37425B] rounded px-3 py-2 text-sm"
+                className="w-full bg-[var(--st-elevated)] border border-[var(--st-line)] rounded px-3 py-2 text-sm"
               />
             </div>
             <div>
-              <label className="text-xs text-slate-400 mb-1 flex items-center gap-1">
+              <label className="text-xs text-[var(--st-muted)] mb-1 flex items-center gap-1">
                 <MapPin size={12} /> Cluster Size
               </label>
               <select
                 value={String(clusterSize)}
                 onChange={(e) => setClusterSize(Number(e.target.value))}
-                className="w-full bg-[#37425B] border border-[#37425B] rounded px-3 py-2 text-sm"
+                className="w-full bg-[var(--st-elevated)] border border-[var(--st-line)] rounded px-3 py-2 text-sm"
               >
                 <option value="1">Large</option>
                 <option value="0.5">Medium</option>
@@ -223,7 +223,7 @@ export default function GlobalMapPage() {
         </div>
 
         {/* Map */}
-        <div className="bg-[#2D384E] rounded-lg p-2">
+        <div className="bg-[var(--st-panel)] rounded-lg p-2">
           <APIProvider apiKey={apiKey}>
             <div className="w-full h-[520px] rounded overflow-hidden">
               <GoogleMap
@@ -257,22 +257,22 @@ export default function GlobalMapPage() {
 
         {/* Selection panel */}
         {selected && (
-          <div className="bg-[#2D384E] rounded-lg p-4">
-            <div className="text-sm text-slate-400 mb-2">Selection</div>
+          <div className="bg-[var(--st-panel)] rounded-lg p-4">
+            <div className="text-sm text-[var(--st-muted)] mb-2">Selection</div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
               {selected.items.map((m) => (
                 <a
                   key={m.id}
                   href={`/investigations/${m.investigation_id}`}
-                  className="block border border-[#37425B] rounded p-3 hover:bg-[#303B52]"
+                  className="block border border-[var(--st-line)] rounded p-3 hover:bg-[var(--st-elevated)]"
                 >
-                  <div className="text-xs text-slate-400">
+                  <div className="text-xs text-[var(--st-muted)]">
                     {m.risk_level?.toUpperCase() || "NA"} • {m.target_type}
                   </div>
                   <div className="font-semibold truncate">
                     {m.label || m.target_value}
                   </div>
-                  <div className="text-xs text-slate-400">
+                  <div className="text-xs text-[var(--st-muted)]">
                     {Number(m.lat).toFixed(4)}, {Number(m.lng).toFixed(4)}
                   </div>
                 </a>

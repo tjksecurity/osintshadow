@@ -8,7 +8,7 @@ function JSONNode({ label, value, level = 0 }) {
 
   if (value === null || value === undefined) {
     return (
-      <div style={indentStyle} className="text-slate-400 text-sm italic">
+      <div style={indentStyle} className="text-[var(--st-muted)] text-sm italic">
         {label != null ? `${label}: ` : ""}null
       </div>
     );
@@ -18,7 +18,7 @@ function JSONNode({ label, value, level = 0 }) {
     const text = typeof value === "string" ? value : String(value);
     return (
       <div style={indentStyle} className="text-slate-200 text-sm break-words">
-        {label != null && <span className="text-slate-400 mr-1">{label}:</span>}
+        {label != null && <span className="text-[var(--st-muted)] mr-1">{label}:</span>}
         <span>{text}</span>
       </div>
     );
@@ -33,19 +33,19 @@ function JSONNode({ label, value, level = 0 }) {
         type="button"
         onClick={() => setOpen((v) => !v)}
         style={indentStyle}
-        className="w-full text-left py-1.5 hover:bg-[#37425B] rounded flex items-center gap-2"
+        className="w-full text-left py-1.5 hover:bg-[var(--st-hover)] rounded flex items-center gap-2"
       >
         <span
           className={`inline-block w-4 h-4 text-center leading-4 rounded-sm ${
             open
-              ? "bg-[#00D1FF]/20 text-[#00D1FF]"
-              : "bg-slate-600/40 text-slate-300"
+              ? "bg-[var(--st-accent)]/20 text-[var(--st-accent)]"
+              : "bg-[var(--st-elevated)] text-slate-300"
           }`}
         >
           {open ? "−" : "+"}
         </span>
         {label != null && <span className="text-slate-300">{label}</span>}
-        <span className="text-slate-400">{header}</span>
+        <span className="text-[var(--st-muted)]">{header}</span>
       </button>
       {open && (
         <div className="mt-1">
@@ -69,7 +69,7 @@ function JSONNode({ label, value, level = 0 }) {
 
 export function JSONViewer({ data }) {
   return (
-    <div className="border border-[#37425B] rounded-lg p-3 bg-[#283247] overflow-auto">
+    <div className="border border-[var(--st-line)] rounded-lg p-3 bg-[#283247] overflow-auto">
       <JSONNode value={data} level={0} />
     </div>
   );

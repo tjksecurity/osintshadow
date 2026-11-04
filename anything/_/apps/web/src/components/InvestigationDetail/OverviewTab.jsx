@@ -19,8 +19,8 @@ export function OverviewTab({ ai, parseSeverity, chipClasses }) {
       Malicious: "text-red-400 border-red-400 bg-red-400/10",
       Suspicious: "text-amber-400 border-amber-400 bg-amber-400/10",
       Safe: "text-emerald-400 border-emerald-400 bg-emerald-400/10",
-      Unknown: "text-slate-400 border-slate-400 bg-slate-400/10",
-    }[verdict] || "text-slate-400 border-slate-400 bg-slate-400/10";
+      Unknown: "text-[var(--st-muted)] border-slate-400 bg-slate-400/10",
+    }[verdict] || "text-[var(--st-muted)] border-slate-400 bg-slate-400/10";
 
   return (
     <section className="space-y-6">
@@ -41,8 +41,8 @@ export function OverviewTab({ ai, parseSeverity, chipClasses }) {
       </div>
 
       {/* Narrative Report */}
-      <div className="bg-[#2D384E] rounded-lg p-5 border border-[#37425B]">
-        <div className="flex items-center gap-2 mb-3 text-[#00D1FF]">
+      <div className="bg-[var(--st-panel)] rounded-lg p-5 border border-[var(--st-line)]">
+        <div className="flex items-center gap-2 mb-3 text-[var(--st-accent)]">
           <FileText size={18} />
           <h3 className="font-semibold">Investigator's Report</h3>
         </div>
@@ -54,7 +54,7 @@ export function OverviewTab({ ai, parseSeverity, chipClasses }) {
       {/* Two columns: Findings & Anomalies */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Key Findings */}
-        <div className="bg-[#2D384E] rounded-lg p-5 border border-[#37425B]">
+        <div className="bg-[var(--st-panel)] rounded-lg p-5 border border-[var(--st-line)]">
           <div className="flex items-center gap-2 mb-3 text-emerald-400">
             <CheckCircle size={18} />
             <h3 className="font-semibold">Key Findings</h3>
@@ -69,14 +69,14 @@ export function OverviewTab({ ai, parseSeverity, chipClasses }) {
               ))}
             </ul>
           ) : (
-            <div className="text-slate-400 text-sm">
+            <div className="text-[var(--st-muted)] text-sm">
               No specific findings highlighted.
             </div>
           )}
         </div>
 
         {/* Technical Anomalies */}
-        <div className="bg-[#2D384E] rounded-lg p-5 border border-[#37425B]">
+        <div className="bg-[var(--st-panel)] rounded-lg p-5 border border-[var(--st-line)]">
           <div className="flex items-center gap-2 mb-3 text-amber-400">
             <AlertTriangle size={18} />
             <h3 className="font-semibold">Technical Anomalies</h3>
@@ -100,16 +100,16 @@ export function OverviewTab({ ai, parseSeverity, chipClasses }) {
                 })}
             </div>
           ) : (
-            <p className="text-slate-400 text-sm">None detected.</p>
+            <p className="text-[var(--st-muted)] text-sm">None detected.</p>
           )}
         </div>
       </div>
 
       {/* Investigation Log (Terminal style) */}
-      <div className="bg-[#1E2330] rounded-lg p-0 border border-[#37425B] overflow-hidden font-mono text-sm">
-        <div className="bg-[#2D384E] p-2 px-4 flex items-center gap-2 border-b border-[#37425B]">
-          <Terminal size={14} className="text-slate-400" />
-          <span className="text-slate-400 text-xs font-semibold uppercase tracking-wider">
+      <div className="bg-[#1E2330] rounded-lg p-0 border border-[var(--st-line)] overflow-hidden font-mono text-sm">
+        <div className="bg-[var(--st-panel)] p-2 px-4 flex items-center gap-2 border-b border-[var(--st-line)]">
+          <Terminal size={14} className="text-[var(--st-muted)]" />
+          <span className="text-[var(--st-muted)] text-xs font-semibold uppercase tracking-wider">
             Investigation Log
           </span>
         </div>
@@ -117,17 +117,17 @@ export function OverviewTab({ ai, parseSeverity, chipClasses }) {
           {logs.length > 0 ? (
             logs.map((log, i) => (
               <div key={i} className="flex gap-3 text-slate-300">
-                <span className="text-slate-500 select-none">
+                <span className="text-[var(--st-muted)] select-none">
                   {(i + 1).toString().padStart(2, "0")}
                 </span>
                 <span>{log}</span>
               </div>
             ))
           ) : (
-            <div className="text-slate-500 italic">Log not available.</div>
+            <div className="text-[var(--st-muted)] italic">Log not available.</div>
           )}
-          <div className="flex gap-3 text-[#00D1FF] animate-pulse">
-            <span className="text-slate-500 select-none">
+          <div className="flex gap-3 text-[var(--st-accent)] animate-pulse">
+            <span className="text-[var(--st-muted)] select-none">
               {((logs.length || 0) + 1).toString().padStart(2, "0")}
             </span>
             <span>Investigation completed.</span>

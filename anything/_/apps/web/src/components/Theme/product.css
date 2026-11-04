@@ -1,0 +1,100 @@
+@import '../Landing/shadowtrace.css';
+
+/* One product palette, shared by the landing, account and working routes. */
+.st-product {
+  --st-bg: #080d12; --st-panel: #0f171f; --st-inset: #0b131a;
+  --st-elevated: #14222d; --st-line: #26323d; --st-hover: #1d2d37;
+  --st-muted: #a2b2be; --st-accent: #8edfff; --st-accent-hover: #b9ecff;
+  --st-ink: #f3f7f9;
+  min-height: 100vh; background: var(--st-bg); color: var(--st-ink);
+  font-family: Inter, 'Segoe UI', Arial, sans-serif; line-height: 1.55;
+  font-synthesis: none;
+}
+.st-product *, .st-product *::before, .st-product *::after { box-sizing: border-box; }
+.st-product :is(button, input, select, textarea) { font-family: inherit; }
+.st-product :is(a, button, input, textarea, select, summary):focus-visible { outline: 2px solid var(--st-accent) !important; outline-offset: 4px; }
+.st-product button:disabled { cursor: not-allowed; }
+.st-product select { color-scheme: dark; }
+.st-route-loading { min-height: 100vh; background: var(--st-bg); }
+
+/* Account screens use the same editorial hierarchy as the homepage. */
+.st-account-page { min-height: 100svh; display: flex; flex-direction: column; }
+.st-account-header, .st-account-footer { width: min(1360px, calc(100% - 96px)); margin-inline: auto; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+.st-account-header { min-height: 96px; border-bottom: 1px solid var(--st-line); }
+.st-account-header-link { display: inline-flex; align-items: center; gap: 12px; min-height: 44px; font-size: 12px; color: #bdcdd8; text-decoration: none; }
+.st-account-header-link:hover { color: var(--st-accent); }
+.st-account-grid { flex: 1; width: min(1180px, calc(100% - 96px)); margin: auto; display: grid; grid-template-columns: 1fr 450px; gap: clamp(48px, 8vw, 120px); align-items: center; padding-block: 72px; }
+.st-account-intro { min-width: 0; }
+.st-account-intro h2 { font-size: clamp(42px, 4.7vw, 64px); line-height: 1.08; font-weight: 500; letter-spacing: -.06em; margin: 0; }
+.st-account-intro h2 span { color: #8799a9; }
+.st-account-description { max-width: 410px; color: var(--st-muted); font-size: 14px; line-height: 1.9; margin: 28px 0 36px; }
+.st-account-diagram { border: 1px solid var(--st-line); border-radius: 8px; max-width: 480px; background: radial-gradient(ellipse at center, #193c4c50, transparent 70%), var(--st-inset); margin-bottom: 32px; overflow: hidden; }
+.st-account-diagram-label { display: flex; justify-content: space-between; gap: 12px; padding: 16px 20px; border-bottom: 1px solid var(--st-line); color: #9aacbc; font: 9px 'Courier New', monospace; letter-spacing: .1em; }
+.st-account-flow { display: flex; align-items: center; justify-content: space-between; padding: 30px 20px; gap: 12px; }
+.st-account-flow > div { display: grid; justify-items: center; gap: 12px; color: var(--st-accent); }
+.st-account-flow span { font: 9px 'Courier New', monospace; letter-spacing: .12em; color: #d0e1eb; }
+.st-account-flow small { font-size: 10px; color: var(--st-muted); text-align: center; }
+.st-account-flow i { flex: 1; height: 1px; background: #39586a; max-width: 36px; }
+.st-account-diagram > p { border-top: 1px solid var(--st-line); margin: 0; padding: 14px 20px; font-size: 10px; color: var(--st-muted); }
+.st-account-card { min-width: 0; padding: 38px; border: 1px solid #30424f; border-radius: 8px; background: linear-gradient(145deg, #13212c, var(--st-panel) 65%); box-shadow: 0 30px 80px #0003; animation: st-account-enter .4s ease-out both; }
+.st-account-card-heading { margin-bottom: 30px; }
+.st-account-card-heading .st-eyebrow { font-size: 9px; margin-bottom: 18px; }
+.st-account-card h1 { margin: 0 0 14px; font-size: 36px; line-height: 1.15; letter-spacing: -.05em; font-weight: 500; }
+.st-account-card-heading > p:last-child { margin: 0; color: var(--st-muted); font-size: 13px; line-height: 1.8; }
+.st-account-card label { font-size: 12px; font-weight: 500; color: #c4d3dd; }
+.st-account-card input:not([type=hidden]) { min-height: 48px; border-radius: 5px; font-size: 14px; background: var(--st-inset); border-color: #30424f; color: var(--st-ink); }
+.st-account-card input::placeholder { color: #8c9eac; }
+.st-account-card input:focus { border-color: var(--st-accent); }
+.st-account-card button[type=submit] { min-height: 50px; border-radius: 5px; font-size: 13px; font-weight: 600; background: var(--st-accent); color: var(--st-bg); }
+.st-account-card button[type=submit]:hover:not(:disabled) { background: var(--st-accent-hover); }
+.st-account-card button[aria-label*="password"] { min-width: 44px; min-height: 44px; right: 4px; display: grid; place-items: center; }
+.st-account-card form + div, .st-account-card .st-account-links { font-size: 12px; }
+.st-account-card a { color: var(--st-accent); text-underline-offset: 4px; }
+.st-account-footer { padding-block: 24px; border-top: 1px solid var(--st-line); font-size: 10px; color: #8fa4b3; }
+@keyframes st-account-enter { from { opacity: .5; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+/* Existing working layouts retain their controls, state and data bindings. */
+.st-workspace { background: var(--st-bg); color: var(--st-ink); }
+.st-workspace h1 { font-size: clamp(28px, 3vw, 40px); font-weight: 500; letter-spacing: -.05em; line-height: 1.15; }
+.st-workspace h2 { font-weight: 500; letter-spacing: -.025em; }
+.st-workspace :is(input, textarea, select):not([type=hidden]):not([type=checkbox]):not([type=radio]):not([type=range]):not([type=color]) { border-radius: 5px; min-height: 44px; font-size: 14px; }
+.st-workspace :is(input, textarea)::placeholder { color: #8b9fac; }
+.st-workspace button:not([role=tab]) { min-height: 40px; }
+.st-workspace > aside { width: 244px; background: var(--st-inset); border-color: var(--st-line); padding-top: 12px; }
+.st-workspace > aside > div:first-child { min-height: 72px; padding-inline: 24px; }
+.st-workspace > aside > div:first-child svg[aria-label=ShadowTrace] { width: 156px; height: 32px; }
+.st-workspace > aside > ul { padding-inline: 14px; }
+.st-workspace > aside :is(li > a, li:not(:has(a))) { min-height: 44px; border-radius: 5px; font-size: 12px; padding: 12px 14px; }
+.st-workspace > aside li { margin-bottom: 4px; }
+.st-workspace > aside hr { margin: 24px 18px; }
+.st-workspace > div.flex-1 { min-width: 0; }
+.st-workspace > div > header, .st-workspace > header, .st-workspace > div > nav { background: var(--st-inset); border-color: var(--st-line); }
+.st-workspace > div > nav { min-height: 81px; height: auto; padding: 16px 40px; }
+.st-workspace > header > div { min-height: 81px; flex-wrap: wrap; gap: 20px; }
+.st-workspace > header > div > div { flex-wrap: wrap; }
+.st-workspace > aside li[class*="border-l"] { border-left: 0; color: var(--st-accent); }
+.st-workspace > div > section { padding: 40px; }
+.st-workspace > main, .st-workspace > div > main { padding-block: 36px; }
+.st-workspace :is(button, a)[class*="bg-[var(--st-accent)]"] { color: var(--st-bg); font-weight: 600; border-radius: 5px; }
+.st-workspace :is(div, section, article)[class*="bg-[var(--st-panel)]"] { border: 1px solid var(--st-line); border-radius: 8px; }
+.st-workspace table { font-size: 13px; }
+.st-workspace th { font-size: 10px; letter-spacing: .07em; font-weight: 500; }
+.st-workspace :is(pre, code) { font-size: 12px; }
+
+@media (min-width: 768px) { .st-workspace > aside { position: sticky; top: 0; height: 100vh; overflow-y: auto; flex-shrink: 0; } }
+@media (max-width: 1000px) { .st-account-grid { gap: 40px; grid-template-columns: 1fr 410px; }.st-account-card { padding: 30px; }.st-account-flow { gap: 8px; padding-inline: 16px; }.st-account-flow i { max-width: 15px; }.st-account-flow small { font-size: 9px; } }
+@media (max-width: 767px) {
+  .st-account-header, .st-account-footer, .st-account-grid { width: calc(100% - 40px); }
+  .st-account-header { min-height: 80px; }.st-account-header .st-logo { width: 140px; }.st-account-header-link { max-width: 150px; font-size: 10px; gap: 6px; }
+  .st-account-grid { grid-template-columns: 1fr; gap: 32px; padding-block: 36px; max-width: 540px; }
+  .st-account-intro .st-eyebrow { font-size: 8px; margin-bottom: 20px; }.st-account-intro h2 { font-size: 42px; }
+  .st-account-description { margin: 20px 0; font-size: 13px; }.st-account-diagram { display: none; }.st-account-intro > .st-text-link { display: none; }
+  .st-account-card { padding: 28px 24px; }.st-account-card h1 { font-size: 32px; }.st-account-card input:not([type=hidden]) { font-size: 16px; }
+  .st-account-footer { align-items: flex-start; flex-direction: column; gap: 6px; }
+  .st-workspace > div > nav { padding: 16px 20px; min-height: 72px; gap: 12px; }
+  .st-workspace > div > nav > div:last-child { min-width: 0; gap: 12px; }
+  .st-workspace > div > nav > div:last-child > div { min-width: 0; }
+  .st-workspace > div > nav > div:last-child span { max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .st-workspace > div > section { padding: 24px 20px; }.st-workspace > main, .st-workspace > div > main { padding: 24px 20px; }
+}
+@media (prefers-reduced-motion: reduce) { .st-account-card { animation: none; }.st-product *, .st-product *::before, .st-product *::after { scroll-behavior: auto !important; } }

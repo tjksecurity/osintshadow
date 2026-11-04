@@ -16,10 +16,10 @@ export function InvestigationHeader({
   const aiChatHref = invId ? `/ai/chat?investigationId=${invId}` : "/ai/chat";
 
   return (
-    <header className="border-b border-[#37425B]">
+    <header className="border-b border-[var(--st-line)]">
       <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <a href="/dashboard" className="p-2 hover:bg-[#37425B] rounded-lg">
+          <a href="/dashboard" className="p-2 hover:bg-[var(--st-hover)] rounded-lg">
             <ArrowLeft size={18} />
           </a>
           <BrandLogo className="h-6 w-auto" variant="onDark" />
@@ -27,7 +27,7 @@ export function InvestigationHeader({
             <div className="font-semibold">
               {invId ? `Investigation #${invId}` : "Investigation"}
             </div>
-            <div className="text-slate-400 text-sm">
+            <div className="text-[var(--st-muted)] text-sm">
               {invType}: {invValue}
             </div>
           </div>
@@ -36,20 +36,20 @@ export function InvestigationHeader({
           {statusBadge}
           <a
             href={aiChatHref}
-            className="px-3 py-1.5 border border-[#37425B] rounded hover:bg-[#37425B] flex items-center gap-2"
+            className="px-3 py-1.5 border border-[var(--st-line)] rounded hover:bg-[var(--st-hover)] flex items-center gap-2"
           >
             <MessageSquare size={16} /> Ask OSINT Copilot
           </a>
           <button
             onClick={onRefresh}
-            className="px-3 py-1.5 border border-[#37425B] rounded hover:bg-[#37425B] flex items-center gap-2"
+            className="px-3 py-1.5 border border-[var(--st-line)] rounded hover:bg-[var(--st-hover)] flex items-center gap-2"
           >
             <RefreshCw size={16} /> Refresh
           </button>
           <button
             onClick={onRegenerate}
             disabled={isRegenerating}
-            className="px-3 py-1.5 border border-[#37425B] rounded hover:bg-[#37425B] flex items-center gap-2 disabled:opacity-60"
+            className="px-3 py-1.5 border border-[var(--st-line)] rounded hover:bg-[var(--st-hover)] flex items-center gap-2 disabled:opacity-60"
           >
             <Sparkles size={16} />
             {isRegenerating ? "Regenerating…" : "Regenerate with AI"}

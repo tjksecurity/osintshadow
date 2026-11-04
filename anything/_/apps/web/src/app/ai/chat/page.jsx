@@ -452,7 +452,7 @@ export default function AIChatPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#263043] text-white flex items-center justify-center">
+      <div className="st-workspace min-h-screen bg-[var(--st-bg)] text-white flex items-center justify-center">
         Loading...
       </div>
     );
@@ -460,15 +460,15 @@ export default function AIChatPage() {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-[#263043] text-white flex items-center justify-center p-6">
-        <div className="max-w-md w-full bg-[#2D384E] rounded-lg p-6 text-center">
+      <div className="st-workspace min-h-screen bg-[var(--st-bg)] text-white flex items-center justify-center p-6">
+        <div className="max-w-md w-full bg-[var(--st-panel)] rounded-lg p-6 text-center">
           <div className="text-lg font-semibold mb-2">Please sign in</div>
           <div className="text-slate-300 mb-4">
             You need to sign in to use the AI chat.
           </div>
           <a
             href="/account/signin"
-            className="inline-block px-4 py-2 rounded border border-[#37425B] hover:bg-[#37425B]"
+            className="inline-block px-4 py-2 rounded border border-[var(--st-line)] hover:bg-[var(--st-hover)]"
           >
             Go to Sign In
           </a>
@@ -489,13 +489,13 @@ export default function AIChatPage() {
     : "No case selected";
 
   return (
-    <div className="min-h-screen bg-[#263043] text-white">
-      <header className="border-b border-[#37425B]">
+    <div className="st-workspace min-h-screen bg-[var(--st-bg)] text-white">
+      <header className="border-b border-[var(--st-line)]">
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="font-semibold">{headerText}</div>
           <a
             href="/dashboard"
-            className="text-sm px-3 py-1.5 border border-[#37425B] rounded hover:bg-[#37425B]"
+            className="text-sm px-3 py-1.5 border border-[var(--st-line)] rounded hover:bg-[var(--st-hover)]"
           >
             Back to Dashboard
           </a>
@@ -504,7 +504,7 @@ export default function AIChatPage() {
 
       <main className="max-w-6xl mx-auto px-6 py-6 grid grid-cols-1 md:grid-cols-[320px_1fr] gap-6">
         {/* LEFT: context / tools */}
-        <aside className="bg-[#2D384E] rounded-lg p-4 h-fit">
+        <aside className="bg-[var(--st-panel)] rounded-lg p-4 h-fit">
           <div className="text-sm font-semibold mb-2">Case context</div>
           <div className="text-xs text-slate-300 mb-3">
             Pick a case so the chat can use your investigation data.
@@ -521,7 +521,7 @@ export default function AIChatPage() {
                   const val = e.target.value;
                   setSelectedInvestigationId(val || null);
                 }}
-                className="w-full bg-[#37425B] border border-[#37425B] rounded px-3 py-2 text-sm"
+                className="w-full bg-[var(--st-elevated)] border border-[var(--st-line)] rounded px-3 py-2 text-sm"
               >
                 <option value="">No case</option>
                 {invSelectOptions.slice(0, 200).map((inv) => {
@@ -535,7 +535,7 @@ export default function AIChatPage() {
               </select>
 
               {investigationsQuery.isLoading && (
-                <div className="text-xs text-slate-400 mt-2">
+                <div className="text-xs text-[var(--st-muted)] mt-2">
                   Loading cases…
                 </div>
               )}
@@ -546,7 +546,7 @@ export default function AIChatPage() {
               )}
               {investigationDetailQuery.isLoading &&
                 selectedInvestigationId && (
-                  <div className="text-xs text-slate-400 mt-2">
+                  <div className="text-xs text-[var(--st-muted)] mt-2">
                     Loading case details…
                   </div>
                 )}
@@ -557,7 +557,7 @@ export default function AIChatPage() {
               )}
             </div>
 
-            <div className="border-t border-[#37425B] pt-3">
+            <div className="border-t border-[var(--st-line)] pt-3">
               <div className="text-xs text-slate-300 mb-2">
                 Use these datasets
               </div>
@@ -589,7 +589,7 @@ export default function AIChatPage() {
               </div>
             </div>
 
-            <div className="border-t border-[#37425B] pt-3">
+            <div className="border-t border-[var(--st-line)] pt-3">
               <div className="text-xs text-slate-300 mb-2">Quick prompts</div>
               <div className="flex flex-col gap-2">
                 <button
@@ -599,7 +599,7 @@ export default function AIChatPage() {
                       "Summarize the selected investigation like an investigator briefing, and cite which evidence supports each point.",
                     )
                   }
-                  className="text-left text-sm px-3 py-2 rounded border border-[#37425B] hover:bg-[#37425B]"
+                  className="text-left text-sm px-3 py-2 rounded border border-[var(--st-line)] hover:bg-[var(--st-hover)]"
                 >
                   Summarize case
                 </button>
@@ -610,7 +610,7 @@ export default function AIChatPage() {
                       "What are the highest-risk signals in this case? Give me 5 follow-up actions to validate or disprove them.",
                     )
                   }
-                  className="text-left text-sm px-3 py-2 rounded border border-[#37425B] hover:bg-[#37425B]"
+                  className="text-left text-sm px-3 py-2 rounded border border-[var(--st-line)] hover:bg-[var(--st-hover)]"
                 >
                   Risk + next steps
                 </button>
@@ -621,7 +621,7 @@ export default function AIChatPage() {
                       "Review the social posts analytics and suspicious patterns. What do they suggest, and what would you monitor next?",
                     )
                   }
-                  className="text-left text-sm px-3 py-2 rounded border border-[#37425B] hover:bg-[#37425B]"
+                  className="text-left text-sm px-3 py-2 rounded border border-[var(--st-line)] hover:bg-[var(--st-hover)]"
                 >
                   Social analysis
                 </button>
@@ -632,7 +632,7 @@ export default function AIChatPage() {
                       "Explain any Shodan findings (open ports, service fingerprints, known vulns) and what they might imply.",
                     )
                   }
-                  className="text-left text-sm px-3 py-2 rounded border border-[#37425B] hover:bg-[#37425B]"
+                  className="text-left text-sm px-3 py-2 rounded border border-[var(--st-line)] hover:bg-[var(--st-hover)]"
                 >
                   Shodan analysis
                 </button>
@@ -640,10 +640,10 @@ export default function AIChatPage() {
             </div>
 
             {selectedInvestigationId && (
-              <div className="border-t border-[#37425B] pt-3">
+              <div className="border-t border-[var(--st-line)] pt-3">
                 <a
                   href={`/investigations/${selectedInvestigationId}`}
-                  className="inline-block w-full text-center text-sm px-3 py-2 rounded border border-[#37425B] hover:bg-[#37425B]"
+                  className="inline-block w-full text-center text-sm px-3 py-2 rounded border border-[var(--st-line)] hover:bg-[var(--st-hover)]"
                 >
                   Open case page
                 </a>
@@ -660,18 +660,18 @@ export default function AIChatPage() {
             </div>
           )}
 
-          <div className="bg-[#2D384E] rounded-lg p-4 h-[60vh] overflow-y-auto">
+          <div className="bg-[var(--st-panel)] rounded-lg p-4 h-[60vh] overflow-y-auto">
             <div className="space-y-3">
               {messages
                 .filter((m) => m.role !== "system")
                 .map((m, idx) => {
                   const author = m.role === "user" ? "You" : "Assistant";
                   const bubbleColor =
-                    m.role === "user" ? "bg-[#37425B]" : "bg-[#303B52]";
+                    m.role === "user" ? "bg-[var(--st-elevated)]" : "bg-[var(--st-elevated)]";
                   const content = m.content;
                   return (
                     <div key={idx} className="flex flex-col gap-1">
-                      <div className="text-xs text-slate-400">{author}</div>
+                      <div className="text-xs text-[var(--st-muted)]">{author}</div>
                       <div className={`rounded p-3 text-sm ${bubbleColor}`}>
                         {content}
                       </div>
@@ -680,8 +680,8 @@ export default function AIChatPage() {
                 })}
               {streamingMessage && (
                 <div className="flex flex-col gap-1">
-                  <div className="text-xs text-slate-400">Assistant</div>
-                  <div className="rounded p-3 text-sm bg-[#303B52] whitespace-pre-wrap">
+                  <div className="text-xs text-[var(--st-muted)]">Assistant</div>
+                  <div className="rounded p-3 text-sm bg-[var(--st-elevated)] whitespace-pre-wrap">
                     {streamingMessage}
                   </div>
                 </div>
@@ -689,13 +689,13 @@ export default function AIChatPage() {
             </div>
           </div>
 
-          <div className="bg-[#2D384E] rounded-lg p-3">
+          <div className="bg-[var(--st-panel)] rounded-lg p-3">
             <div className="flex flex-col md:flex-row gap-3 items-stretch md:items-end">
               <textarea
                 ref={inputRef}
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                className="w-full bg-[#37425B] border border-[#37425B] rounded p-3 text-sm min-h-[80px]"
+                className="w-full bg-[var(--st-elevated)] border border-[var(--st-line)] rounded p-3 text-sm min-h-[80px]"
                 placeholder={
                   selectedInvestigationId
                     ? "Ask about the selected case…"
@@ -706,19 +706,19 @@ export default function AIChatPage() {
               <button
                 onClick={handleSend}
                 disabled={isSending || input.trim().length === 0}
-                className="md:w-[160px] w-full px-4 py-2 rounded border border-[#37425B] hover:bg-[#37425B] disabled:opacity-70"
+                className="md:w-[160px] w-full px-4 py-2 rounded border border-[var(--st-line)] hover:bg-[var(--st-hover)] disabled:opacity-70"
               >
                 {isSending ? "Sending…" : "Send"}
               </button>
             </div>
-            <div className="text-xs text-slate-400 mt-2">
+            <div className="text-xs text-[var(--st-muted)] mt-2">
               Tip: if results look stale, re-run the investigation and then ask
               again.
             </div>
           </div>
 
           {lastAssistantMessage && (
-            <div className="text-xs text-slate-400">
+            <div className="text-xs text-[var(--st-muted)]">
               You can ask follow-ups like “what evidence supports that?” or
               “what’s the next best lead?”.
             </div>

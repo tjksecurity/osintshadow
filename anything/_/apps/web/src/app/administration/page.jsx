@@ -36,10 +36,10 @@ export default function AdministrationPage() {
   }, [user, isAdmin, loading]);
 
   return (
-    <div className="flex min-h-screen text-white font-inter bg-[#263043]">
+    <div className="st-workspace flex min-h-screen text-white font-inter bg-[var(--st-bg)]">
       {/* Sidebar Navigation */}
       <aside
-        className={`fixed md:static inset-y-0 left-0 z-50 w-[220px] bg-[#232D41] border-r border-[#37425B] transform transition-transform duration-300 ${
+        className={`fixed md:static inset-y-0 left-0 z-50 w-[220px] bg-[var(--st-inset)] border-r border-[var(--st-line)] transform transition-transform duration-300 ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
         }`}
       >
@@ -57,7 +57,7 @@ export default function AdministrationPage() {
           <li>
             <a
               href="/dashboard"
-              className="flex items-center gap-3 py-2 px-6 hover:bg-[#303B52] text-slate-400 hover:text-white transition-colors"
+              className="flex items-center gap-3 py-2 px-6 hover:bg-[var(--st-elevated)] text-[var(--st-muted)] hover:text-white transition-colors"
             >
               <LayoutDashboard size={18} />
               <span>Dashboard</span>
@@ -66,7 +66,7 @@ export default function AdministrationPage() {
           <li>
             <a
               href="/investigations"
-              className="flex items-center gap-3 py-2 px-6 hover:bg-[#303B52] text-slate-400 hover:text-white transition-colors"
+              className="flex items-center gap-3 py-2 px-6 hover:bg-[var(--st-elevated)] text-[var(--st-muted)] hover:text-white transition-colors"
             >
               <FileBarChart size={18} />
               <span>Investigations</span>
@@ -75,7 +75,7 @@ export default function AdministrationPage() {
           <li>
             <a
               href="/map"
-              className="flex items-center gap-3 py-2 px-6 hover:bg-[#303B52] text-slate-400 hover:text-white transition-colors"
+              className="flex items-center gap-3 py-2 px-6 hover:bg-[var(--st-elevated)] text-[var(--st-muted)] hover:text-white transition-colors"
             >
               <Map size={18} />
               <span>Global Map</span>
@@ -84,7 +84,7 @@ export default function AdministrationPage() {
           <li>
             <a
               href="/billing"
-              className="flex items-center gap-3 py-2 px-6 hover:bg-[#303B52] text-slate-400 hover:text-white transition-colors"
+              className="flex items-center gap-3 py-2 px-6 hover:bg-[var(--st-elevated)] text-[var(--st-muted)] hover:text-white transition-colors"
             >
               <CreditCard size={18} />
               <span>Billing</span>
@@ -93,7 +93,7 @@ export default function AdministrationPage() {
           <li>
             <a
               href="/settings"
-              className="flex items-center gap-3 py-2 px-6 hover:bg-[#303B52] text-slate-400 hover:text-white transition-colors"
+              className="flex items-center gap-3 py-2 px-6 hover:bg-[var(--st-elevated)] text-[var(--st-muted)] hover:text-white transition-colors"
             >
               <Settings size={18} />
               <span>Settings</span>
@@ -103,7 +103,7 @@ export default function AdministrationPage() {
 
         {(user?.role === "admin" || isAdmin) && (
           <>
-            <hr className="border-t border-[#37425B] my-4" />
+            <hr className="border-t border-[var(--st-line)] my-4" />
             <div className="text-slate-200 text-xs uppercase px-6 mb-2">
               Administration
             </div>
@@ -111,7 +111,7 @@ export default function AdministrationPage() {
               <li>
                 <a
                   href="/administration"
-                  className="flex items-center gap-3 py-2 px-6 bg-[#303B52] border-l-2 border-[#00D1FF] text-white"
+                  className="flex items-center gap-3 py-2 px-6 bg-[var(--st-elevated)] border-l-2 border-[var(--st-accent)] text-white"
                 >
                   <Activity size={18} />
                   <span>Administration</span>
@@ -125,7 +125,7 @@ export default function AdministrationPage() {
       {/* Main Content Wrapper */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Top Application Bar */}
-        <nav className="w-full h-14 px-6 flex items-center justify-between border-b border-[#37425B] bg-[#263043]">
+        <nav className="w-full h-14 px-6 flex items-center justify-between border-b border-[var(--st-line)] bg-[var(--st-bg)]">
           <div className="flex items-center gap-4">
             <Menu
               className="md:hidden cursor-pointer"
@@ -134,11 +134,11 @@ export default function AdministrationPage() {
             />
             <div className="hidden sm:flex relative w-64">
               <Search
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--st-muted)]"
                 size={16}
               />
               <input
-                className="w-full rounded-full bg-transparent text-sm placeholder-slate-500 pl-9 pr-3 py-1.5 border border-[#37425B] focus:ring-0 focus:border-[#00D1FF] focus:outline-none"
+                className="w-full rounded-full bg-transparent text-sm placeholder-slate-500 pl-9 pr-3 py-1.5 border border-[var(--st-line)] focus:ring-0 focus:border-[var(--st-accent)] focus:outline-none"
                 placeholder="Search logs..."
               />
             </div>
@@ -146,12 +146,12 @@ export default function AdministrationPage() {
 
           <div className="flex items-center gap-6">
             <Bell
-              className="text-slate-400 hover:text-white transition cursor-pointer"
+              className="text-[var(--st-muted)] hover:text-white transition cursor-pointer"
               strokeWidth={1.5}
               size={20}
             />
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-slate-600 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-full bg-[var(--st-elevated)] flex items-center justify-center">
                 <UserIcon size={16} />
               </div>
               <span className="text-sm font-medium">
@@ -169,7 +169,7 @@ export default function AdministrationPage() {
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Logs Panel */}
-            <div className="lg:col-span-2 bg-[#2D384E] rounded-lg p-4">
+            <div className="lg:col-span-2 bg-[var(--st-panel)] rounded-lg p-4">
               <div className="flex items-center justify-between mb-3">
                 <h2 className="font-semibold">Recent Logs</h2>
                 <LogsRefresh />
@@ -178,21 +178,21 @@ export default function AdministrationPage() {
             </div>
 
             {/* User Tools Panel */}
-            <div className="bg-[#2D384E] rounded-lg p-4">
+            <div className="bg-[var(--st-panel)] rounded-lg p-4">
               <h2 className="font-semibold mb-3">User Tools</h2>
               <PasswordResetTool />
-              <hr className="border-[#37425B] my-4" />
+              <hr className="border-[var(--st-line)] my-4" />
               <MakeAdminTool />
-              <hr className="border-[#37425B] my-4" />
+              <hr className="border-[var(--st-line)] my-4" />
               <GrantCreditsTool />
-              <hr className="border-[#37425B] my-4" />
+              <hr className="border-[var(--st-line)] my-4" />
               <NormalizeEmailsTool />
-              <hr className="border-[#37425B] my-4" />
+              <hr className="border-[var(--st-line)] my-4" />
               <WeeklyReportTool />
             </div>
 
             {/* AI Chat Logs Panel */}
-            <div className="lg:col-span-2 bg-[#2D384E] rounded-lg p-4">
+            <div className="lg:col-span-2 bg-[var(--st-panel)] rounded-lg p-4">
               <div className="flex items-center justify-between mb-3">
                 <h2 className="font-semibold">AI Chat Logs</h2>
                 <LogsRefreshAIChat />
@@ -211,7 +211,7 @@ function LogsRefresh() {
   return (
     <button
       onClick={() => qc.invalidateQueries({ queryKey: ["admin_logs"] })}
-      className="flex items-center gap-2 px-3 py-1.5 border border-[#37425B] rounded hover:bg-[#37425B] text-sm"
+      className="flex items-center gap-2 px-3 py-1.5 border border-[var(--st-line)] rounded hover:bg-[var(--st-hover)] text-sm"
     >
       <RefreshCw size={14} /> Refresh
     </button>
@@ -235,16 +235,16 @@ function LogsTable() {
   return (
     <div className="overflow-x-auto">
       <table className="w-full text-sm">
-        <thead className="text-slate-400 border-b border-[#37425B]">
+        <thead className="text-[var(--st-muted)] border-b border-[var(--st-line)]">
           <tr>
             <th className="py-2 text-left">Time</th>
             <th className="py-2 text-left">Type</th>
             <th className="py-2 text-left">Message</th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-[#37425B]">
+        <tbody className="divide-y divide-[var(--st-line)]">
           {logs.map((l) => (
-            <tr key={l.id} className="hover:bg-[#303B52]/40">
+            <tr key={l.id} className="hover:bg-[var(--st-elevated)]/40">
               <td className="py-2 pr-4 whitespace-nowrap">
                 {new Date(l.created_at).toLocaleString()}
               </td>
@@ -252,7 +252,7 @@ function LogsTable() {
               <td className="py-2">
                 <div className="text-slate-200">{l.message}</div>
                 {l.metadata_json ? (
-                  <div className="text-slate-400 text-xs mt-1 break-words">
+                  <div className="text-[var(--st-muted)] text-xs mt-1 break-words">
                     {JSON.stringify(l.metadata_json)}
                   </div>
                 ) : null}
@@ -261,7 +261,7 @@ function LogsTable() {
           ))}
         </tbody>
       </table>
-      {logs.length === 0 && <div className="text-slate-400">No logs yet.</div>}
+      {logs.length === 0 && <div className="text-[var(--st-muted)]">No logs yet.</div>}
     </div>
   );
 }
@@ -271,7 +271,7 @@ function LogsRefreshAIChat() {
   return (
     <button
       onClick={() => qc.invalidateQueries({ queryKey: ["admin_logs_ai_chat"] })}
-      className="flex items-center gap-2 px-3 py-1.5 border border-[#37425B] rounded hover:bg-[#37425B] text-sm"
+      className="flex items-center gap-2 px-3 py-1.5 border border-[var(--st-line)] rounded hover:bg-[var(--st-hover)] text-sm"
     >
       <RefreshCw size={14} /> Refresh
     </button>
@@ -297,7 +297,7 @@ function AIChatLogsTable() {
   return (
     <div className="overflow-x-auto">
       <table className="w-full text-sm">
-        <thead className="text-slate-400 border-b border-[#37425B]">
+        <thead className="text-[var(--st-muted)] border-b border-[var(--st-line)]">
           <tr>
             <th className="py-2 text-left">Time</th>
             <th className="py-2 text-left">User</th>
@@ -305,12 +305,12 @@ function AIChatLogsTable() {
             <th className="py-2 text-left">Preview</th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-[#37425B]">
+        <tbody className="divide-y divide-[var(--st-line)]">
           {logs.map((l) => {
             const m = l.metadata_json || {};
             const action = m.action || "event";
             return (
-              <tr key={l.id} className="hover:bg-[#303B52]/40">
+              <tr key={l.id} className="hover:bg-[var(--st-elevated)]/40">
                 <td className="py-2 pr-4 whitespace-nowrap">
                   {new Date(l.created_at).toLocaleString()}
                 </td>
@@ -327,7 +327,7 @@ function AIChatLogsTable() {
         </tbody>
       </table>
       {logs.length === 0 && (
-        <div className="text-slate-400">
+        <div className="text-[var(--st-muted)]">
           No AI chat usage in the recent entries.
         </div>
       )}
@@ -370,11 +370,11 @@ function PasswordResetTool() {
           placeholder="user@example.com"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="flex-1 bg-[#37425B] border border-[#37425B] rounded px-3 py-2 text-sm"
+          className="flex-1 bg-[var(--st-elevated)] border border-[var(--st-line)] rounded px-3 py-2 text-sm"
         />
         <button
           onClick={() => email && resetMut.mutate(email)}
-          className="px-3 py-2 bg-[#00D1FF] text-[#263043] rounded text-sm"
+          className="px-3 py-2 bg-[var(--st-accent)] text-[var(--st-bg)] rounded text-sm"
           disabled={!email || resetMut.isLoading}
         >
           {resetMut.isLoading ? "Sending..." : "Send"}
@@ -383,7 +383,7 @@ function PasswordResetTool() {
       {msg && <div className="text-slate-300 text-xs mt-2">{msg}</div>}
       {link && (
         <div className="text-xs mt-2">
-          <a href={link} className="text-[#00D1FF] underline break-all">
+          <a href={link} className="text-[var(--st-accent)] underline break-all">
             Open reset link
           </a>
         </div>
@@ -418,11 +418,11 @@ function MakeAdminTool() {
           placeholder="user@example.com"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="flex-1 bg-[#37425B] border border-[#37425B] rounded px-3 py-2 text-sm"
+          className="flex-1 bg-[var(--st-elevated)] border border-[var(--st-line)] rounded px-3 py-2 text-sm"
         />
         <button
           onClick={() => email && mut.mutate({ email })}
-          className="px-3 py-2 bg-[#00D1FF] text-[#263043] rounded text-sm flex items-center gap-1"
+          className="px-3 py-2 bg-[var(--st-accent)] text-[var(--st-bg)] rounded text-sm flex items-center gap-1"
           disabled={!email || mut.isLoading}
         >
           <Crown size={14} /> {mut.isLoading ? "Promoting..." : "Promote"}
@@ -464,19 +464,19 @@ function GrantCreditsTool() {
           placeholder="user@example.com"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="flex-1 bg-[#37425B] border border-[#37425B] rounded px-3 py-2 text-sm"
+          className="flex-1 bg-[var(--st-elevated)] border border-[var(--st-line)] rounded px-3 py-2 text-sm"
         />
         <input
           type="number"
           value={amount}
           onChange={(e) => setAmount(parseInt(e.target.value || "0", 10))}
-          className="w-28 bg-[#37425B] border border-[#37425B] rounded px-3 py-2 text-sm"
+          className="w-28 bg-[var(--st-elevated)] border border-[var(--st-line)] rounded px-3 py-2 text-sm"
         />
         <button
           onClick={() =>
             email && Number.isInteger(amount) && mut.mutate({ email, amount })
           }
-          className="px-3 py-2 bg-[#00D1FF] text-[#263043] rounded text-sm"
+          className="px-3 py-2 bg-[var(--st-accent)] text-[var(--st-bg)] rounded text-sm"
           disabled={!email || !Number.isInteger(amount) || mut.isLoading}
         >
           {mut.isLoading ? "Saving..." : "Save"}
@@ -508,7 +508,7 @@ function NormalizeEmailsTool() {
       <h3 className="text-sm font-semibold mb-2">Maintenance</h3>
       <button
         onClick={() => mut.mutate()}
-        className="px-3 py-2 border border-[#37425B] rounded hover:bg-[#37425B] text-sm"
+        className="px-3 py-2 border border-[var(--st-line)] rounded hover:bg-[var(--st-hover)] text-sm"
         disabled={mut.isLoading}
       >
         {mut.isLoading ? "Running..." : "Normalize all emails to lowercase"}
@@ -551,14 +551,14 @@ function WeeklyReportTool() {
       <h3 className="text-sm font-semibold mb-2">AI Chat Weekly Report</h3>
       <button
         onClick={() => mut.mutate()}
-        className="px-3 py-2 border border-[#37425B] rounded hover:bg-[#37425B] text-sm"
+        className="px-3 py-2 border border-[var(--st-line)] rounded hover:bg-[var(--st-hover)] text-sm"
         disabled={mut.isLoading}
       >
         {mut.isLoading ? "Sending..." : "Send report now"}
       </button>
       {msg && <div className="text-slate-300 text-xs mt-2">{msg}</div>}
       {sentTo.length > 0 && (
-        <div className="text-slate-400 text-xs mt-1">
+        <div className="text-[var(--st-muted)] text-xs mt-1">
           To: {sentTo.join(", ")}
         </div>
       )}

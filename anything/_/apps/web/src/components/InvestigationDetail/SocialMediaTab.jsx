@@ -120,7 +120,7 @@ export function SocialMediaTab({ investigationId }) {
     return (
       <div className="flex items-center justify-center py-8">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-        <span className="ml-2 text-slate-400">
+        <span className="ml-2 text-[var(--st-muted)]">
           Loading social media data...
         </span>
       </div>
@@ -150,11 +150,11 @@ export function SocialMediaTab({ investigationId }) {
   if (profiles.length === 0) {
     return (
       <div className="text-center py-12">
-        <Users className="mx-auto text-slate-400 mb-4" size={48} />
+        <Users className="mx-auto text-[var(--st-muted)] mb-4" size={48} />
         <h3 className="text-lg font-medium text-slate-300 mb-2">
           No Social Media Profiles Found
         </h3>
-        <p className="text-slate-400">
+        <p className="text-[var(--st-muted)]">
           No social media profiles were discovered for this investigation
           target.
         </p>
@@ -175,7 +175,7 @@ export function SocialMediaTab({ investigationId }) {
             {platformSummary.map((platform) => (
               <div
                 key={platform.platform}
-                className="bg-[#37425B] rounded-lg p-4 hover:bg-[#3D4A5C] transition-colors cursor-pointer"
+                className="bg-[var(--st-elevated)] rounded-lg p-4 hover:bg-[var(--st-hover)] transition-colors cursor-pointer"
                 onClick={() => setSelectedPlatform(platform.platform)}
               >
                 <div className="flex items-center justify-between mb-2">
@@ -193,20 +193,20 @@ export function SocialMediaTab({ investigationId }) {
                 </div>
                 <div className="space-y-1">
                   <div className="flex justify-between text-sm">
-                    <span className="text-slate-400">Profiles:</span>
+                    <span className="text-[var(--st-muted)]">Profiles:</span>
                     <span className="text-slate-200">
                       {platform.profile_count}
                     </span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-slate-400">Avg Risk:</span>
+                    <span className="text-[var(--st-muted)]">Avg Risk:</span>
                     <span className={getRiskColor(platform.avg_risk_score)}>
                       {Math.round(platform.avg_risk_score || 0)}%
                     </span>
                   </div>
                   {platform.verified_count > 0 && (
                     <div className="flex justify-between text-sm">
-                      <span className="text-slate-400">Verified:</span>
+                      <span className="text-[var(--st-muted)]">Verified:</span>
                       <span className="text-blue-400">
                         {platform.verified_count}
                       </span>
@@ -227,7 +227,7 @@ export function SocialMediaTab({ investigationId }) {
             className={`px-3 py-1 rounded-full text-sm transition-colors ${
               selectedPlatform === "all"
                 ? "bg-blue-500 text-white"
-                : "bg-slate-600 text-slate-300 hover:bg-slate-500"
+                : "bg-[var(--st-elevated)] text-slate-300 hover:bg-[var(--st-hover)]"
             }`}
           >
             All Platforms
@@ -239,12 +239,12 @@ export function SocialMediaTab({ investigationId }) {
               className={`px-3 py-1 rounded-full text-sm transition-colors flex items-center gap-1 ${
                 selectedPlatform === platform.platform
                   ? "bg-blue-500 text-white"
-                  : "bg-slate-600 text-slate-300 hover:bg-slate-500"
+                  : "bg-[var(--st-elevated)] text-slate-300 hover:bg-[var(--st-hover)]"
               }`}
             >
               <span>{getPlatformIcon(platform.platform)}</span>
               <span className="capitalize">{platform.platform}</span>
-              <span className="bg-slate-700/50 px-1 rounded text-xs">
+              <span className="bg-[var(--st-inset)] px-1 rounded text-xs">
                 {platform.profile_count}
               </span>
             </button>
@@ -254,7 +254,7 @@ export function SocialMediaTab({ investigationId }) {
         <select
           value={sortBy}
           onChange={(e) => setSortBy(e.target.value)}
-          className="px-3 py-2 bg-[#37425B] text-slate-200 rounded-md border border-slate-500 focus:border-blue-500"
+          className="px-3 py-2 bg-[var(--st-elevated)] text-slate-200 rounded-md border border-slate-500 focus:border-blue-500"
         >
           <option value="risk_score">Sort by Risk Score</option>
           <option value="followers">Sort by Followers</option>
@@ -268,7 +268,7 @@ export function SocialMediaTab({ investigationId }) {
         {sortedProfiles.map((profile) => (
           <div
             key={profile.id}
-            className="bg-[#37425B] rounded-lg p-4 hover:bg-[#3D4A5C] transition-colors cursor-pointer"
+            className="bg-[var(--st-elevated)] rounded-lg p-4 hover:bg-[var(--st-hover)] transition-colors cursor-pointer"
             onClick={() => setSelectedProfile(profile)}
           >
             <div className="flex items-start justify-between mb-3">
@@ -285,13 +285,13 @@ export function SocialMediaTab({ investigationId }) {
                       }}
                     />
                   ) : (
-                    <div className="w-10 h-10 bg-slate-600 rounded-full flex items-center justify-center">
+                    <div className="w-10 h-10 bg-[var(--st-elevated)] rounded-full flex items-center justify-center">
                       <span className="text-lg">
                         {getPlatformIcon(profile.platform)}
                       </span>
                     </div>
                   )}
-                  <div className="w-10 h-10 bg-slate-600 rounded-full items-center justify-center hidden">
+                  <div className="w-10 h-10 bg-[var(--st-elevated)] rounded-full items-center justify-center hidden">
                     <span className="text-lg">
                       {getPlatformIcon(profile.platform)}
                     </span>
@@ -308,16 +308,16 @@ export function SocialMediaTab({ investigationId }) {
                   </div>
                   {profile.display_name &&
                     profile.display_name !== profile.username && (
-                      <p className="text-sm text-slate-400">
+                      <p className="text-sm text-[var(--st-muted)]">
                         {profile.display_name}
                       </p>
                     )}
                   <div className="flex items-center gap-2 mt-1">
-                    <span className="text-xs text-slate-500 capitalize">
+                    <span className="text-xs text-[var(--st-muted)] capitalize">
                       {profile.platform}
                     </span>
-                    <span className="text-xs text-slate-500">•</span>
-                    <span className="text-xs text-slate-500">
+                    <span className="text-xs text-[var(--st-muted)]">•</span>
+                    <span className="text-xs text-[var(--st-muted)]">
                       {formatNumber(profile.followers_count)} followers
                     </span>
                   </div>
@@ -339,12 +339,12 @@ export function SocialMediaTab({ investigationId }) {
             </div>
 
             {profile.bio && (
-              <p className="text-sm text-slate-400 mb-3 line-clamp-2">
+              <p className="text-sm text-[var(--st-muted)] mb-3 line-clamp-2">
                 {profile.bio}
               </p>
             )}
 
-            <div className="flex items-center justify-between text-xs text-slate-500">
+            <div className="flex items-center justify-between text-xs text-[var(--st-muted)]">
               <div className="flex items-center gap-4">
                 <span>{formatNumber(profile.following_count)} following</span>
                 <span>{formatNumber(profile.posts_count)} posts</span>
@@ -380,12 +380,12 @@ export function SocialMediaTab({ investigationId }) {
             <Eye size={20} />
             Real-time Monitoring
           </h3>
-          <div className="bg-[#37425B] rounded-lg p-4">
+          <div className="bg-[var(--st-elevated)] rounded-lg p-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {monitoring.map((monitor, index) => (
                 <div
                   key={index}
-                  className="flex items-center justify-between p-3 bg-slate-600/30 rounded-lg"
+                  className="flex items-center justify-between p-3 bg-[var(--st-elevated)] rounded-lg"
                 >
                   <div className="flex items-center gap-2">
                     <span>{getPlatformIcon(monitor.platform)}</span>
@@ -393,7 +393,7 @@ export function SocialMediaTab({ investigationId }) {
                       <div className="text-sm font-medium text-slate-200">
                         {monitor.target_username}
                       </div>
-                      <div className="text-xs text-slate-400 capitalize">
+                      <div className="text-xs text-[var(--st-muted)] capitalize">
                         {monitor.platform}
                       </div>
                     </div>
@@ -402,7 +402,7 @@ export function SocialMediaTab({ investigationId }) {
                     <StatusBadge
                       status={monitor.monitoring_active ? "active" : "inactive"}
                     />
-                    <div className="text-xs text-slate-500 mt-1">
+                    <div className="text-xs text-[var(--st-muted)] mt-1">
                       {monitor.posts_collected} posts
                     </div>
                   </div>
@@ -416,7 +416,7 @@ export function SocialMediaTab({ investigationId }) {
       {/* Profile Detail Modal */}
       {selectedProfile && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <div className="bg-[#2D384E] rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="bg-[var(--st-panel)] rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center gap-3">
@@ -427,7 +427,7 @@ export function SocialMediaTab({ investigationId }) {
                       className="w-16 h-16 rounded-full"
                     />
                   ) : (
-                    <div className="w-16 h-16 bg-slate-600 rounded-full flex items-center justify-center">
+                    <div className="w-16 h-16 bg-[var(--st-elevated)] rounded-full flex items-center justify-center">
                       <span className="text-2xl">
                         {getPlatformIcon(selectedProfile.platform)}
                       </span>
@@ -443,18 +443,18 @@ export function SocialMediaTab({ investigationId }) {
                       )}
                     </div>
                     {selectedProfile.display_name && (
-                      <p className="text-slate-400">
+                      <p className="text-[var(--st-muted)]">
                         {selectedProfile.display_name}
                       </p>
                     )}
                     <div className="flex items-center gap-2 mt-1">
-                      <span className="text-sm text-slate-500 capitalize">
+                      <span className="text-sm text-[var(--st-muted)] capitalize">
                         {selectedProfile.platform}
                       </span>
                       {selectedProfile.discovery_method && (
                         <>
-                          <span className="text-slate-500">•</span>
-                          <span className="text-sm text-slate-500">
+                          <span className="text-[var(--st-muted)]">•</span>
+                          <span className="text-sm text-[var(--st-muted)]">
                             Found via{" "}
                             {selectedProfile.discovery_method.replace("_", " ")}
                           </span>
@@ -465,7 +465,7 @@ export function SocialMediaTab({ investigationId }) {
                 </div>
                 <button
                   onClick={() => setSelectedProfile(null)}
-                  className="text-slate-400 hover:text-slate-200 text-xl"
+                  className="text-[var(--st-muted)] hover:text-slate-200 text-xl"
                 >
                   ×
                 </button>
@@ -476,36 +476,36 @@ export function SocialMediaTab({ investigationId }) {
                   <h3 className="text-sm font-medium text-slate-300 mb-2">
                     Bio
                   </h3>
-                  <p className="text-slate-400">{selectedProfile.bio}</p>
+                  <p className="text-[var(--st-muted)]">{selectedProfile.bio}</p>
                 </div>
               )}
 
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
-                <div className="text-center p-3 bg-slate-600/20 rounded-lg">
+                <div className="text-center p-3 bg-[var(--st-elevated)] rounded-lg">
                   <div className="text-lg font-semibold text-slate-200">
                     {formatNumber(selectedProfile.followers_count)}
                   </div>
-                  <div className="text-xs text-slate-400">Followers</div>
+                  <div className="text-xs text-[var(--st-muted)]">Followers</div>
                 </div>
-                <div className="text-center p-3 bg-slate-600/20 rounded-lg">
+                <div className="text-center p-3 bg-[var(--st-elevated)] rounded-lg">
                   <div className="text-lg font-semibold text-slate-200">
                     {formatNumber(selectedProfile.following_count)}
                   </div>
-                  <div className="text-xs text-slate-400">Following</div>
+                  <div className="text-xs text-[var(--st-muted)]">Following</div>
                 </div>
-                <div className="text-center p-3 bg-slate-600/20 rounded-lg">
+                <div className="text-center p-3 bg-[var(--st-elevated)] rounded-lg">
                   <div className="text-lg font-semibold text-slate-200">
                     {formatNumber(selectedProfile.posts_count)}
                   </div>
-                  <div className="text-xs text-slate-400">Posts</div>
+                  <div className="text-xs text-[var(--st-muted)]">Posts</div>
                 </div>
-                <div className="text-center p-3 bg-slate-600/20 rounded-lg">
+                <div className="text-center p-3 bg-[var(--st-elevated)] rounded-lg">
                   <div
                     className={`text-lg font-semibold ${getRiskColor(selectedProfile.risk_score)}`}
                   >
                     {selectedProfile.risk_score || 0}%
                   </div>
-                  <div className="text-xs text-slate-400">Risk Score</div>
+                  <div className="text-xs text-[var(--st-muted)]">Risk Score</div>
                 </div>
               </div>
 
@@ -523,7 +523,7 @@ export function SocialMediaTab({ investigationId }) {
                 )}
                 <button
                   onClick={() => setSelectedProfile(null)}
-                  className="px-4 py-2 bg-slate-600 hover:bg-slate-500 text-slate-200 rounded-md transition-colors"
+                  className="px-4 py-2 bg-[var(--st-elevated)] hover:bg-[var(--st-hover)] text-slate-200 rounded-md transition-colors"
                 >
                   Close
                 </button>

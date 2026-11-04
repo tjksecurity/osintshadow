@@ -74,7 +74,7 @@ export default function NewInvestigation() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#263043] flex items-center justify-center">
+      <div className="st-workspace min-h-screen bg-[var(--st-bg)] flex items-center justify-center">
         <div className="text-white">Loading...</div>
       </div>
     );
@@ -86,7 +86,7 @@ export default function NewInvestigation() {
   const isTrial = credits?.is_trial === true;
 
   return (
-    <div className="flex min-h-screen text-white font-inter bg-[#263043]">
+    <div className="st-workspace flex min-h-screen text-white font-inter bg-[var(--st-bg)]">
       <Sidebar
         sidebarOpen={sidebarOpen}
         setSidebarOpen={setSidebarOpen}
@@ -104,12 +104,12 @@ export default function NewInvestigation() {
           <div className="flex items-center gap-4">
             <a
               href="/dashboard"
-              className="p-2 hover:bg-[#37425B] rounded-lg transition-colors"
+              className="p-2 hover:bg-[var(--st-hover)] rounded-lg transition-colors"
             >
-              <ArrowLeft className="text-slate-400" size={20} />
+              <ArrowLeft className="text-[var(--st-muted)]" size={20} />
             </a>
             <div className="flex items-center gap-3">
-              <Plus className="text-slate-400" size={24} />
+              <Plus className="text-[var(--st-muted)]" size={24} />
               <h1 className="text-lg font-semibold">New Investigation</h1>
             </div>
           </div>

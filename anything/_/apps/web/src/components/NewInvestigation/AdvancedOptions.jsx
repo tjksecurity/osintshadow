@@ -37,35 +37,35 @@ export function AdvancedOptions({
           <Shield size={14} /> Advanced / Deep Scan
         </h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <label className="flex items-center gap-3 p-3 rounded-md border border-[#37425B] bg-[#37425B]/40 border-l-4 border-l-[#00D1FF]">
+          <label className="flex items-center gap-3 p-3 rounded-md border border-[var(--st-line)] bg-[var(--st-elevated)]/40 border-l-4 border-l-[var(--st-accent)]">
             <input
               type="checkbox"
               checked={includeDeepScan}
               onChange={(e) => setIncludeDeepScan(e.target.checked)}
-              className="h-4 w-4 rounded border-slate-500 text-[#00D1FF] focus:ring-[#00D1FF]"
+              className="h-4 w-4 rounded border-slate-500 text-[var(--st-accent)] focus:ring-[var(--st-accent)]"
             />
             <div>
               <div className="font-medium text-sm flex items-center gap-2">
                 Deep scan (OSINT)
               </div>
-              <div className="text-xs text-slate-400">
+              <div className="text-xs text-[var(--st-muted)]">
                 Wider username permutations and more hubs (longer run)
               </div>
             </div>
           </label>
 
-          <label className="flex items-center gap-3 p-3 rounded-md border border-[#37425B] bg-[#37425B]/40 border-l-4 border-l-[#00D1FF]">
+          <label className="flex items-center gap-3 p-3 rounded-md border border-[var(--st-line)] bg-[var(--st-elevated)]/40 border-l-4 border-l-[var(--st-accent)]">
             <input
               type="checkbox"
               checked={includeDeepImageScan}
               onChange={(e) => setIncludeDeepImageScan(e.target.checked)}
-              className="h-4 w-4 rounded border-slate-500 text-[#00D1FF] focus:ring-[#00D1FF]"
+              className="h-4 w-4 rounded border-slate-500 text-[var(--st-accent)] focus:ring-[var(--st-accent)]"
             />
             <div>
               <div className="font-medium text-sm flex items-center gap-2">
                 <ImageIcon size={14} /> Deep image scan
               </div>
-              <div className="text-xs text-slate-400">
+              <div className="text-xs text-[var(--st-muted)]">
                 Fetch more pages and images (longer run)
               </div>
             </div>
@@ -79,7 +79,7 @@ export function AdvancedOptions({
         </h3>
 
         <div className="space-y-4">
-          <label className="flex items-center gap-3 p-3 rounded-md border border-[#37425B] bg-[#37425B]/40 border-l-4 border-l-[#9333EA]">
+          <label className="flex items-center gap-3 p-3 rounded-md border border-[var(--st-line)] bg-[var(--st-elevated)]/40 border-l-4 border-l-[#9333EA]">
             <input
               type="checkbox"
               checked={includeSocialMedia}
@@ -90,7 +90,7 @@ export function AdvancedOptions({
               <div className="font-medium text-sm">
                 Enable social media search
               </div>
-              <div className="text-xs text-slate-400">
+              <div className="text-xs text-[var(--st-muted)]">
                 Search for profiles across social platforms
               </div>
             </div>
@@ -99,14 +99,14 @@ export function AdvancedOptions({
           {includeSocialMedia && (
             <div className="ml-7 space-y-3">
               <div>
-                <h4 className="text-xs font-medium text-slate-400 mb-2">
+                <h4 className="text-xs font-medium text-[var(--st-muted)] mb-2">
                   Platforms to search:
                 </h4>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                   {allPlatforms.map((platform) => (
                     <label
                       key={platform.id}
-                      className="flex items-center gap-2 p-2 rounded border border-slate-600 bg-slate-700/30 hover:bg-slate-600/30 transition-colors"
+                      className="flex items-center gap-2 p-2 rounded border border-[var(--st-line)] bg-[var(--st-inset)] hover:bg-[var(--st-hover)] transition-colors"
                     >
                       <input
                         type="checkbox"
@@ -125,7 +125,7 @@ export function AdvancedOptions({
                 </div>
               </div>
 
-              <label className="flex items-center gap-3 p-3 rounded-md border border-[#37425B] bg-[#37425B]/40 border-l-4 border-l-[#F59E0B]">
+              <label className="flex items-center gap-3 p-3 rounded-md border border-[var(--st-line)] bg-[var(--st-elevated)]/40 border-l-4 border-l-[#F59E0B]">
                 <input
                   type="checkbox"
                   checked={enableRealTimeMonitoring}
@@ -138,7 +138,7 @@ export function AdvancedOptions({
                   <div className="font-medium text-sm flex items-center gap-2">
                     <Eye size={14} /> Real-time monitoring
                   </div>
-                  <div className="text-xs text-slate-400">
+                  <div className="text-xs text-[var(--st-muted)]">
                     Monitor high-confidence profiles for new activity
                   </div>
                 </div>

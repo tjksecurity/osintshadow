@@ -54,7 +54,7 @@ class ErrorBoundary extends React.Component {
   render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen bg-[#263043] text-white p-6">
+        <div className="st-workspace min-h-screen bg-[var(--st-bg)] text-white p-6">
           <div className="max-w-5xl mx-auto">
             <a
               href="/dashboard"
@@ -70,7 +70,7 @@ class ErrorBoundary extends React.Component {
               <div className="mt-3">
                 <button
                   onClick={() => window.location.reload()}
-                  className="px-3 py-1.5 border border-[#37425B] rounded hover:bg-[#37425B]"
+                  className="px-3 py-1.5 border border-[var(--st-line)] rounded hover:bg-[var(--st-hover)]"
                 >
                   Reload page
                 </button>
@@ -404,7 +404,7 @@ export default function InvestigationDetail(props) {
 
   if (userLoading || isLoading) {
     return (
-      <div className="min-h-screen bg-[#263043] flex items-center justify-center text-white">
+      <div className="st-workspace min-h-screen bg-[var(--st-bg)] flex items-center justify-center text-white">
         Loading...
       </div>
     );
@@ -412,7 +412,7 @@ export default function InvestigationDetail(props) {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-[#263043] text-white p-6">
+      <div className="st-workspace min-h-screen bg-[var(--st-bg)] text-white p-6">
         <div className="max-w-5xl mx-auto">
           <a
             href="/dashboard"
@@ -434,14 +434,14 @@ export default function InvestigationDetail(props) {
   // Render a lightweight placeholder instead of null to avoid any accidental reads
   if (!investigation) {
     return (
-      <div className="min-h-screen bg-[#263043] text-white p-6">
+      <div className="st-workspace min-h-screen bg-[var(--st-bg)] text-white p-6">
         <div className="max-w-5xl mx-auto">
-          <div className="h-8 w-48 bg-[#2D384E] rounded mb-4" />
-          <div className="h-6 w-72 bg-[#2D384E] rounded mb-6" />
+          <div className="h-8 w-48 bg-[var(--st-panel)] rounded mb-4" />
+          <div className="h-6 w-72 bg-[var(--st-panel)] rounded mb-6" />
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="h-32 bg-[#2D384E] rounded" />
-            <div className="h-32 bg-[#2D384E] rounded" />
-            <div className="h-32 bg-[#2D384E] rounded" />
+            <div className="h-32 bg-[var(--st-panel)] rounded" />
+            <div className="h-32 bg-[var(--st-panel)] rounded" />
+            <div className="h-32 bg-[var(--st-panel)] rounded" />
           </div>
         </div>
       </div>
@@ -450,7 +450,7 @@ export default function InvestigationDetail(props) {
 
   return (
     <ErrorBoundary>
-      <div className="min-h-screen bg-[#263043] text-white">
+      <div className="st-workspace min-h-screen bg-[var(--st-bg)] text-white">
         <InvestigationHeader
           investigation={investigation}
           statusBadge={<StatusBadge status={investigation.status} />}
@@ -472,7 +472,7 @@ export default function InvestigationDetail(props) {
           />
 
           {/* Live progress */}
-          <section className="bg-[#2D384E] border border-[#37425B] rounded-xl p-4">
+          <section className="bg-[var(--st-panel)] border border-[var(--st-line)] rounded-xl p-4">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
               <div>
                 <div className="text-sm text-slate-300">Live status</div>
@@ -492,20 +492,20 @@ export default function InvestigationDetail(props) {
                   </div>
                 ) : null}
                 {isPolling ? (
-                  <div className="text-xs text-slate-400 mt-1">
+                  <div className="text-xs text-[var(--st-muted)] mt-1">
                     Keep this page open while processing. Leaving or suspending
                     it pauses new steps; reopening it resumes saved progress.
                   </div>
                 ) : null}
 
                 {lastEventId !== null ? (
-                  <div className="text-xs text-slate-500 mt-1">
+                  <div className="text-xs text-[var(--st-muted)] mt-1">
                     Last event id: {lastEventId}
                   </div>
                 ) : null}
 
                 {debugTimingEnabled ? (
-                  <div className="text-xs text-slate-500 mt-2">
+                  <div className="text-xs text-[var(--st-muted)] mt-2">
                     Server-Timing (debug)
                     {serverTimingLines.length === 0 ? (
                       <div className="mt-1">No Server-Timing data yet.</div>
@@ -519,7 +519,7 @@ export default function InvestigationDetail(props) {
                       </ul>
                     )}
                     {timingSummary ? (
-                      <div className="mt-2 text-slate-500">
+                      <div className="mt-2 text-[var(--st-muted)]">
                         API timing: auth {timingSummary.authMs}ms · inv{" "}
                         {timingSummary.invMs}ms · events{" "}
                         {timingSummary.eventsMs}ms · total{" "}
@@ -534,19 +534,19 @@ export default function InvestigationDetail(props) {
                 <div className="flex items-center justify-between text-sm text-slate-300">
                   <span>{progressPercent}%</span>
                   {lastUpdatedTime ? (
-                    <span className="text-slate-400">
+                    <span className="text-[var(--st-muted)]">
                       Updated {lastUpdatedTime}
                     </span>
                   ) : (
-                    <span className="text-slate-400">No updates yet</span>
+                    <span className="text-[var(--st-muted)]">No updates yet</span>
                   )}
                 </div>
                 {pollTime ? (
-                  <div className="text-xs text-slate-500 mt-1">
+                  <div className="text-xs text-[var(--st-muted)] mt-1">
                     Last checked {pollTime}
                   </div>
                 ) : null}
-                <div className="h-2 bg-[#263043] rounded mt-2 overflow-hidden">
+                <div className="h-2 bg-[var(--st-bg)] rounded mt-2 overflow-hidden">
                   <div
                     className="h-2 bg-[#4F8CFF]"
                     style={{
@@ -554,7 +554,7 @@ export default function InvestigationDetail(props) {
                     }}
                   />
                 </div>
-                <div className="text-xs text-slate-400 mt-2">
+                <div className="text-xs text-[var(--st-muted)] mt-2">
                   {remainingCount === 0
                     ? "Nothing left"
                     : `${remainingCount} step(s) left`}
@@ -570,7 +570,7 @@ export default function InvestigationDetail(props) {
                   ) : s.state === "current" ? (
                     <Loader2 size={18} className="text-[#4F8CFF]" />
                   ) : (
-                    <Circle size={18} className="text-slate-500" />
+                    <Circle size={18} className="text-[var(--st-muted)]" />
                   );
 
                 const textClass =
@@ -578,12 +578,12 @@ export default function InvestigationDetail(props) {
                     ? "text-slate-200"
                     : s.state === "current"
                       ? "text-white"
-                      : "text-slate-400";
+                      : "text-[var(--st-muted)]";
 
                 return (
                   <div
                     key={s.key}
-                    className="flex items-center gap-2 border border-[#37425B] rounded-lg px-3 py-2"
+                    className="flex items-center gap-2 border border-[var(--st-line)] rounded-lg px-3 py-2"
                   >
                     {icon}
                     <div className={textClass}>{s.label}</div>
@@ -593,7 +593,7 @@ export default function InvestigationDetail(props) {
             </div>
 
             {progressLoading ? (
-              <div className="text-sm text-slate-400 mt-3">
+              <div className="text-sm text-[var(--st-muted)] mt-3">
                 Loading progress…
               </div>
             ) : null}

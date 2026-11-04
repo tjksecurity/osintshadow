@@ -207,7 +207,7 @@ export default function Billing() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#263043] flex items-center justify-center">
+      <div className="st-workspace min-h-screen bg-[var(--st-bg)] flex items-center justify-center">
         <div className="text-white">Loading...</div>
       </div>
     );
@@ -219,10 +219,10 @@ export default function Billing() {
   }
 
   return (
-    <div className="flex min-h-screen text-white font-inter bg-[#263043]">
+    <div className="st-workspace flex min-h-screen text-white font-inter bg-[var(--st-bg)]">
       {/* Sidebar Navigation */}
       <aside
-        className={`fixed md:static inset-y-0 left-0 z-50 w-[220px] bg-[#232D41] border-r border-[#37425B] transform transition-transform duration-300 ${
+        className={`fixed md:static inset-y-0 left-0 z-50 w-[220px] bg-[var(--st-inset)] border-r border-[var(--st-line)] transform transition-transform duration-300 ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
         }`}
       >
@@ -240,7 +240,7 @@ export default function Billing() {
           <li>
             <a
               href="/dashboard"
-              className="flex items-center gap-3 py-2 px-6 hover:bg-[#303B52] text-slate-400 hover:text-white transition-colors"
+              className="flex items-center gap-3 py-2 px-6 hover:bg-[var(--st-elevated)] text-[var(--st-muted)] hover:text-white transition-colors"
             >
               <LayoutDashboard size={18} />
               <span>Dashboard</span>
@@ -249,7 +249,7 @@ export default function Billing() {
           <li>
             <a
               href="/investigations/new"
-              className="flex items-center gap-3 py-2 px-6 hover:bg-[#303B52] text-slate-400 hover:text-white transition-colors"
+              className="flex items-center gap-3 py-2 px-6 hover:bg-[var(--st-elevated)] text-[var(--st-muted)] hover:text-white transition-colors"
             >
               <Plus size={18} />
               <span>New Investigation</span>
@@ -258,7 +258,7 @@ export default function Billing() {
           <li>
             <a
               href="/investigations"
-              className="flex items-center gap-3 py-2 px-6 hover:bg-[#303B52] text-slate-400 hover:text-white transition-colors"
+              className="flex items-center gap-3 py-2 px-6 hover:bg-[var(--st-elevated)] text-[var(--st-muted)] hover:text-white transition-colors"
             >
               <FileBarChart size={18} />
               <span>Investigations</span>
@@ -267,20 +267,20 @@ export default function Billing() {
           <li>
             <a
               href="/map"
-              className="flex items-center gap-3 py-2 px-6 hover:bg-[#303B52] text-slate-400 hover:text-white transition-colors"
+              className="flex items-center gap-3 py-2 px-6 hover:bg-[var(--st-elevated)] text-[var(--st-muted)] hover:text-white transition-colors"
             >
               <Map size={18} />
               <span>Global Map</span>
             </a>
           </li>
-          <li className="flex items-center gap-3 py-2 px-6 bg-[#303B52] border-l-2 border-[#00D1FF] text-white">
+          <li className="flex items-center gap-3 py-2 px-6 bg-[var(--st-elevated)] border-l-2 border-[var(--st-accent)] text-white">
             <CreditCard size={18} />
             <span>Billing</span>
           </li>
           <li>
             <a
               href="/settings"
-              className="flex items-center gap-3 py-2 px-6 hover:bg-[#303B52] text-slate-400 hover:text-white transition-colors"
+              className="flex items-center gap-3 py-2 px-6 hover:bg-[var(--st-elevated)] text-[var(--st-muted)] hover:text-white transition-colors"
             >
               <Settings size={18} />
               <span>Settings</span>
@@ -290,15 +290,15 @@ export default function Billing() {
 
         {isAdmin && (
           <>
-            <hr className="border-t border-[#37425B] my-4" />
-            <div className="text-slate-400 text-xs uppercase px-6 mb-2">
+            <hr className="border-t border-[var(--st-line)] my-4" />
+            <div className="text-[var(--st-muted)] text-xs uppercase px-6 mb-2">
               Admin Portal
             </div>
             <ul className="space-y-1">
               <li>
                 <a
                   href="/administration"
-                  className="flex items-center gap-3 py-2 px-6 hover:bg-[#303B52] text-slate-400 hover:text-white transition-colors"
+                  className="flex items-center gap-3 py-2 px-6 hover:bg-[var(--st-elevated)] text-[var(--st-muted)] hover:text-white transition-colors"
                 >
                   <Activity size={18} />
                   <span>Administration</span>
@@ -312,7 +312,7 @@ export default function Billing() {
       {/* Main Content Wrapper */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Top Application Bar */}
-        <nav className="w-full h-14 px-6 flex items-center justify-between border-b border-[#37425B] bg-[#263043]">
+        <nav className="w-full h-14 px-6 flex items-center justify-between border-b border-[var(--st-line)] bg-[var(--st-bg)]">
           <div className="flex items-center gap-4">
             <Menu
               className="md:hidden cursor-pointer"
@@ -321,11 +321,11 @@ export default function Billing() {
             />
             <div className="hidden sm:flex relative w-64">
               <Search
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--st-muted)]"
                 size={16}
               />
               <input
-                className="w-full rounded-full bg-transparent text-sm placeholder-slate-500 pl-9 pr-3 py-1.5 border border-[#37425B] focus:ring-0 focus:border-[#00D1FF] focus:outline-none"
+                className="w-full rounded-full bg-transparent text-sm placeholder-slate-500 pl-9 pr-3 py-1.5 border border-[var(--st-line)] focus:ring-0 focus:border-[var(--st-accent)] focus:outline-none"
                 placeholder="Search investigations..."
               />
             </div>
@@ -333,12 +333,12 @@ export default function Billing() {
 
           <div className="flex items-center gap-6">
             <Bell
-              className="text-slate-400 hover:text-white transition cursor-pointer"
+              className="text-[var(--st-muted)] hover:text-white transition cursor-pointer"
               strokeWidth={1.5}
               size={20}
             />
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-slate-600 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-full bg-[var(--st-elevated)] flex items-center justify-center">
                 <User size={16} />
               </div>
               <span className="text-sm font-medium">
@@ -352,12 +352,12 @@ export default function Billing() {
         <section className="flex-1 p-6 space-y-6 overflow-auto">
           {/* Page Header */}
           <div className="flex items-center gap-3">
-            <CreditCard className="text-slate-400" size={24} />
+            <CreditCard className="text-[var(--st-muted)]" size={24} />
             <h1 className="text-lg font-semibold">Billing & Subscription</h1>
           </div>
 
           {/* Current Plan Status */}
-          <div className="bg-[#2D384E] rounded-lg p-6">
+          <div className="bg-[var(--st-panel)] rounded-lg p-6">
             <h2 className="text-lg font-semibold mb-4">Current Plan</h2>
             <div className="flex items-center justify-between">
               <div>
@@ -373,7 +373,7 @@ export default function Billing() {
                     "No active subscription"
                   )}
                 </p>
-                <p className="text-slate-400 text-sm">
+                <p className="text-[var(--st-muted)] text-sm">
                   {creditError ? 'Current credits unavailable' : !credits ? 'Checking credits...' : credits.credits_unlimited
                     ? 'Unlimited investigation credits — no credits are deducted.'
                     : `${credits.monthly_remaining} credits remaining this month`}
@@ -382,7 +382,7 @@ export default function Billing() {
               {user.stripe_customer_id && (
                 <button
                   onClick={handleManageBilling}
-                  className="px-4 py-2 border border-[#37425B] rounded-lg hover:bg-[#37425B] transition-colors"
+                  className="px-4 py-2 border border-[var(--st-line)] rounded-lg hover:bg-[var(--st-hover)] transition-colors"
                 >
                   Manage Billing
                 </button>
@@ -401,15 +401,15 @@ export default function Billing() {
                 return (
                   <div
                     key={plan.id}
-                    className={`relative bg-[#2D384E] rounded-lg p-6 border transition-all ${
+                    className={`relative bg-[var(--st-panel)] rounded-lg p-6 border transition-all ${
                       plan.popular
-                        ? "border-[#00D1FF] ring-1 ring-[#00D1FF]/20"
-                        : "border-[#37425B] hover:border-[#37425B]/80"
+                        ? "border-[var(--st-accent)] ring-1 ring-[var(--st-accent)]/20"
+                        : "border-[var(--st-line)] hover:border-[var(--st-line)]/80"
                     }`}
                   >
                     {plan.popular && (
                       <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                        <span className="bg-[#00D1FF] text-[#263043] px-3 py-1 rounded-full text-xs font-semibold">
+                        <span className="bg-[var(--st-accent)] text-[var(--st-bg)] px-3 py-1 rounded-full text-xs font-semibold">
                           Most Popular
                         </span>
                       </div>
@@ -418,7 +418,7 @@ export default function Billing() {
                     <div className="text-center mb-6">
                       <IconComponent
                         className={`mx-auto mb-3 ${
-                          plan.popular ? "text-[#00D1FF]" : "text-slate-400"
+                          plan.popular ? "text-[var(--st-accent)]" : "text-[var(--st-muted)]"
                         }`}
                         size={32}
                       />
@@ -430,10 +430,10 @@ export default function Billing() {
                           ${plan.price}
                         </span>
                         {!plan.lifetime && (
-                          <span className="text-slate-400">/month</span>
+                          <span className="text-[var(--st-muted)]">/month</span>
                         )}
                       </div>
-                      <p className="text-slate-400 text-sm">
+                      <p className="text-[var(--st-muted)] text-sm">
                         {plan.credits} investigations{" "}
                         {plan.lifetime ? "per month for life" : "per month"}
                       </p>
@@ -461,8 +461,8 @@ export default function Billing() {
                         isCurrentPlan
                           ? "bg-green-500/20 text-green-400 cursor-not-allowed"
                           : plan.popular
-                            ? "bg-[#00D1FF] text-[#263043] hover:bg-[#00B8E6]"
-                            : "bg-[#37425B] text-white hover:bg-[#303B52]"
+                            ? "bg-[var(--st-accent)] text-[var(--st-bg)] hover:bg-[var(--st-accent-hover)]"
+                            : "bg-[var(--st-elevated)] text-white hover:bg-[var(--st-elevated)]"
                       } disabled:opacity-50 disabled:cursor-not-allowed`}
                     >
                       {processingPlan === plan.id
@@ -480,7 +480,7 @@ export default function Billing() {
           </div>
 
           {/* FAQ Section */}
-          <div className="bg-[#2D384E] rounded-lg p-6">
+          <div className="bg-[var(--st-panel)] rounded-lg p-6">
             <h2 className="text-lg font-semibold mb-6">
               Frequently Asked Questions
             </h2>
@@ -489,7 +489,7 @@ export default function Billing() {
                 <h3 className="font-medium mb-2">
                   What happens if I run out of credits?
                 </h3>
-                <p className="text-slate-400 text-sm">
+                <p className="text-[var(--st-muted)] text-sm">
                   You won't be able to start new investigations until your
                   credits reset at the beginning of the next billing cycle or
                   you upgrade your plan.
@@ -499,7 +499,7 @@ export default function Billing() {
                 <h3 className="font-medium mb-2">
                   Can I change my plan anytime?
                 </h3>
-                <p className="text-slate-400 text-sm">
+                <p className="text-[var(--st-muted)] text-sm">
                   Yes, you can upgrade or downgrade your plan at any time.
                   Changes will be prorated and take effect immediately.
                 </p>
@@ -508,14 +508,14 @@ export default function Billing() {
                 <h3 className="font-medium mb-2">
                   What payment methods do you accept?
                 </h3>
-                <p className="text-slate-400 text-sm">
+                <p className="text-[var(--st-muted)] text-sm">
                   We accept all major credit cards through Stripe's secure
                   payment processing.
                 </p>
               </div>
               <div>
                 <h3 className="font-medium mb-2">Is there a free trial?</h3>
-                <p className="text-slate-400 text-sm">
+                <p className="text-[var(--st-muted)] text-sm">
                   New users get 3 free investigation credits to try the platform
                   before subscribing.
                 </p>

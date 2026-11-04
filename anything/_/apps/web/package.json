@@ -6,7 +6,7 @@
 		"dev": "react-router dev",
 		"build": "react-router build && node scripts/stage-runtime.mjs",
 		"start": "node build/server/index.js",
-		"test": "vitest run && node --test test/auth-security.test.mjs test/auth-persistence.test.mjs test/auth-csrf.test.mjs test/stripe-confirm-security.test.mjs test/stripe-webhook-fulfillment.test.mjs test/stripe-renewal-security.test.mjs test/investigation-credit-atomicity.test.mjs test/investigation-privacy.test.mjs test/investigation-runner.test.mjs test/account-credits.test.mjs test/people-data-labs.test.mjs test/public-sources.test.mjs test/public-source-store.test.mjs test/public-sources-integration.test.mjs test/visual-refresh.test.mjs test/root-hydration.test.mjs test/phone-validation.test.mjs test/report-safety.test.mjs test/serverless-entry.test.mjs test/deployment-preflight.test.mjs test/package-runtime.test.mjs",
+		"test": "vitest run && node --test test/auth-security.test.mjs test/auth-persistence.test.mjs test/auth-csrf.test.mjs test/stripe-confirm-security.test.mjs test/stripe-webhook-fulfillment.test.mjs test/stripe-renewal-security.test.mjs test/investigation-credit-atomicity.test.mjs test/investigation-privacy.test.mjs test/investigation-runner.test.mjs test/account-credits.test.mjs test/people-data-labs.test.mjs test/public-sources.test.mjs test/public-source-store.test.mjs test/public-sources-integration.test.mjs test/visual-refresh.test.mjs test/sitewide-theme.test.mjs test/root-hydration.test.mjs test/phone-validation.test.mjs test/report-safety.test.mjs test/serverless-entry.test.mjs test/deployment-preflight.test.mjs test/package-runtime.test.mjs",
 		"check:deployment": "node scripts/check-deployment.mjs",
 		"typecheck": "react-router typegen && tsc --noEmit"
 	},

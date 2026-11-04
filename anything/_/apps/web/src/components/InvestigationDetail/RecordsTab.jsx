@@ -33,9 +33,9 @@ export function RecordsTab({ osint }) {
   };
 
   const Section = ({ icon: Icon, title, children }) => (
-    <section className="bg-[#2D384E] rounded-lg p-4">
+    <section className="bg-[var(--st-panel)] rounded-lg p-4">
       <div className="flex items-center gap-2 mb-3">
-        <Icon size={18} className="text-[#00D1FF]" />
+        <Icon size={18} className="text-[var(--st-accent)]" />
         <h3 className="font-semibold">{title}</h3>
       </div>
       {children}
@@ -43,7 +43,7 @@ export function RecordsTab({ osint }) {
   );
 
   const Empty = ({ note }) => (
-    <div className="text-slate-400 text-sm">{note || "No records found."}</div>
+    <div className="text-[var(--st-muted)] text-sm">{note || "No records found."}</div>
   );
 
   const ErrorList = ({ errors }) =>
@@ -73,7 +73,7 @@ export function RecordsTab({ osint }) {
               </thead>
               <tbody>
                 {deeds.map((d, i) => (
-                  <tr key={i} className="border-t border-[#37425B]">
+                  <tr key={i} className="border-t border-[var(--st-line)]">
                     <td className="py-2 pr-3">{d.address || "—"}</td>
                     <td className="py-2 pr-3">
                       {d.owner || "—"}
@@ -90,7 +90,7 @@ export function RecordsTab({ osint }) {
                     <td className="py-2 pr-3">
                       {d.source?.url ? (
                         <a
-                          className="text-[#00D1FF] inline-flex items-center gap-1"
+                          className="text-[var(--st-accent)] inline-flex items-center gap-1"
                           href={d.source.url}
                           target="_blank"
                           rel="noopener"
@@ -129,7 +129,7 @@ export function RecordsTab({ osint }) {
               </thead>
               <tbody>
                 {filings.map((f, i) => (
-                  <tr key={i} className="border-t border-[#37425B]">
+                  <tr key={i} className="border-t border-[var(--st-line)]">
                     <td className="py-2 pr-3">{f.case_name || "—"}</td>
                     <td className="py-2 pr-3">{f.court || "—"}</td>
                     <td className="py-2 pr-3">{f.date_filed || "—"}</td>
@@ -141,7 +141,7 @@ export function RecordsTab({ osint }) {
                     <td className="py-2 pr-3">
                       {f.url ? (
                         <a
-                          className="text-[#00D1FF] inline-flex items-center gap-1"
+                          className="text-[var(--st-accent)] inline-flex items-center gap-1"
                           href={f.url}
                           target="_blank"
                           rel="noopener"
@@ -178,7 +178,7 @@ export function RecordsTab({ osint }) {
               </thead>
               <tbody>
                 {criminal.map((c, i) => (
-                  <tr key={i} className="border-t border-[#37425B]">
+                  <tr key={i} className="border-t border-[var(--st-line)]">
                     <td className="py-2 pr-3">{c.case_name || "—"}</td>
                     <td className="py-2 pr-3">{c.court || "—"}</td>
                     <td className="py-2 pr-3">{c.date_filed || "—"}</td>
@@ -186,7 +186,7 @@ export function RecordsTab({ osint }) {
                     <td className="py-2 pr-3">
                       {c.url ? (
                         <a
-                          className="text-[#00D1FF] inline-flex items-center gap-1"
+                          className="text-[var(--st-accent)] inline-flex items-center gap-1"
                           href={c.url}
                           target="_blank"
                           rel="noopener"
@@ -228,7 +228,7 @@ export function RecordsTab({ osint }) {
               </thead>
               <tbody>
                 {plates.map((p, i) => (
-                  <tr key={i} className="border-t border-[#37425B]">
+                  <tr key={i} className="border-t border-[var(--st-line)]">
                     <td className="py-2 pr-3">{p.plate || "—"}</td>
                     <td className="py-2 pr-3">{p.state || "—"}</td>
                     <td className="py-2 pr-3">{p.vin || "—"}</td>
@@ -248,7 +248,7 @@ export function RecordsTab({ osint }) {
                     <td className="py-2 pr-3">
                       {p.source?.url ? (
                         <a
-                          className="text-[#00D1FF] inline-flex items-center gap-1"
+                          className="text-[var(--st-accent)] inline-flex items-center gap-1"
                           href={p.source.url}
                           target="_blank"
                           rel="noopener"

@@ -66,7 +66,7 @@ export default function SocialPostsTab({ investigation }) {
       case "reddit":
         return `${base} bg-orange-500/10 border-orange-500/20 text-orange-200`;
       default:
-        return `${base} bg-[#303B52] border-[#37425B] text-slate-200`;
+        return `${base} bg-[var(--st-elevated)] border-[var(--st-line)] text-slate-200`;
     }
   };
 
@@ -85,7 +85,7 @@ export default function SocialPostsTab({ investigation }) {
       };
     return {
       label: "Neutral",
-      className: `${base} text-slate-200 bg-[#263043] border-[#37425B]`,
+      className: `${base} text-slate-200 bg-[var(--st-bg)] border-[var(--st-line)]`,
     };
   };
 
@@ -98,7 +98,7 @@ export default function SocialPostsTab({ investigation }) {
       case "low":
         return "bg-blue-500/10 border-blue-500/20 text-blue-200";
       default:
-        return "bg-[#263043] border-[#37425B] text-slate-200";
+        return "bg-[var(--st-bg)] border-[var(--st-line)] text-slate-200";
     }
   };
 
@@ -184,21 +184,21 @@ export default function SocialPostsTab({ investigation }) {
 
   if (!hasAnySocialPostData) {
     return (
-      <section className="bg-[#2D384E] border border-[#37425B] rounded-lg p-6">
+      <section className="bg-[var(--st-panel)] border border-[var(--st-line)] rounded-lg p-6">
         <div className="text-center py-8">
-          <MessageSquare className="w-12 h-12 text-slate-500 mx-auto mb-4" />
+          <MessageSquare className="w-12 h-12 text-[var(--st-muted)] mx-auto mb-4" />
           <h3 className="text-lg font-semibold text-white mb-2">
             No Social Media Posts
           </h3>
-          <p className="text-slate-400">
+          <p className="text-[var(--st-muted)]">
             Posts will appear here when collected from identified profiles.
           </p>
-          <p className="text-slate-400 mt-2">
+          <p className="text-[var(--st-muted)] mt-2">
             ShadowTrace does not generate sample posts. To collect real posts,
             you’ll need platform APIs (or another approved data source) wired
             into the collector.
           </p>
-          <p className="text-slate-400 mt-2">
+          <p className="text-[var(--st-muted)] mt-2">
             If you just enabled post collection, rerun the investigation.
           </p>
         </div>
@@ -207,15 +207,15 @@ export default function SocialPostsTab({ investigation }) {
   }
 
   return (
-    <section className="bg-[#2D384E] border border-[#37425B] rounded-lg p-6">
+    <section className="bg-[var(--st-panel)] border border-[var(--st-line)] rounded-lg p-6">
       <div className="mb-6">
         <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
-          <MessageSquare className="w-5 h-5 mr-2 text-[#00D1FF]" />
+          <MessageSquare className="w-5 h-5 mr-2 text-[var(--st-accent)]" />
           Social Media Posts & Activity
         </h3>
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <div className="bg-[#303B52] border border-[#37425B] p-4 rounded-lg">
+          <div className="bg-[var(--st-elevated)] border border-[var(--st-line)] p-4 rounded-lg">
             <div className="text-sm text-slate-300 font-medium">
               Total Posts
             </div>
@@ -223,19 +223,19 @@ export default function SocialPostsTab({ investigation }) {
               {analytics.total_posts || 0}
             </div>
           </div>
-          <div className="bg-[#303B52] border border-[#37425B] p-4 rounded-lg">
+          <div className="bg-[var(--st-elevated)] border border-[var(--st-line)] p-4 rounded-lg">
             <div className="text-sm text-slate-300 font-medium">Platforms</div>
             <div className="text-2xl font-bold text-white">
               {Object.keys(analytics.platforms || {}).length}
             </div>
           </div>
-          <div className="bg-[#303B52] border border-[#37425B] p-4 rounded-lg">
+          <div className="bg-[var(--st-elevated)] border border-[var(--st-line)] p-4 rounded-lg">
             <div className="text-sm text-slate-300 font-medium">Mentions</div>
             <div className="text-2xl font-bold text-white">
               {(analytics.mentions_found || []).length}
             </div>
           </div>
-          <div className="bg-[#303B52] border border-[#37425B] p-4 rounded-lg">
+          <div className="bg-[var(--st-elevated)] border border-[var(--st-line)] p-4 rounded-lg">
             <div className="text-sm text-slate-300 font-medium">Patterns</div>
             <div className="text-2xl font-bold text-white">
               {suspiciousPatterns.length}
@@ -272,9 +272,9 @@ export default function SocialPostsTab({ investigation }) {
         )}
 
         {analytics.platforms && Object.keys(analytics.platforms).length > 0 && (
-          <div className="mb-6 bg-[#263043] border border-[#37425B] p-4 rounded-lg">
+          <div className="mb-6 bg-[var(--st-bg)] border border-[var(--st-line)] p-4 rounded-lg">
             <h4 className="font-semibold text-white mb-3 flex items-center">
-              <BarChart className="w-4 h-4 mr-2 text-[#00D1FF]" />
+              <BarChart className="w-4 h-4 mr-2 text-[var(--st-accent)]" />
               Posts by Platform
             </h4>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -296,22 +296,22 @@ export default function SocialPostsTab({ investigation }) {
 
         <div className="flex flex-col sm:flex-row gap-4 mb-6">
           <div className="relative flex-1">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400" />
+            <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-[var(--st-muted)]" />
             <input
               type="text"
               placeholder="Search posts, hashtags, mentions..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 bg-[#37425B] border border-[#37425B] rounded-lg focus:outline-none focus:border-[#00D1FF] text-slate-100"
+              className="w-full pl-10 pr-4 py-2 bg-[var(--st-elevated)] border border-[var(--st-line)] rounded-lg focus:outline-none focus:border-[var(--st-accent)] text-slate-100"
             />
           </div>
 
           <div className="relative">
-            <Filter className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400" />
+            <Filter className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-[var(--st-muted)]" />
             <select
               value={selectedPlatform}
               onChange={(e) => setSelectedPlatform(e.target.value)}
-              className="pl-10 pr-8 py-2 bg-[#37425B] border border-[#37425B] rounded-lg focus:outline-none focus:border-[#00D1FF] text-slate-100 appearance-none"
+              className="pl-10 pr-8 py-2 bg-[var(--st-elevated)] border border-[var(--st-line)] rounded-lg focus:outline-none focus:border-[var(--st-accent)] text-slate-100 appearance-none"
             >
               {platforms.map((platform) => {
                 const label =
@@ -348,7 +348,7 @@ export default function SocialPostsTab({ investigation }) {
 
       <div className="space-y-4">
         <h4 className="font-semibold text-white flex items-center">
-          <MessageSquare className="w-4 h-4 mr-2 text-[#00D1FF]" />
+          <MessageSquare className="w-4 h-4 mr-2 text-[var(--st-accent)]" />
           Recent Posts ({filteredPosts.length})
         </h4>
 
@@ -359,7 +359,7 @@ export default function SocialPostsTab({ investigation }) {
             return (
               <div
                 key={index}
-                className="border border-[#37425B] rounded-lg p-4 bg-[#303B52]/30"
+                className="border border-[var(--st-line)] rounded-lg p-4 bg-[var(--st-elevated)]/30"
               >
                 <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3 mb-3">
                   <div className="flex flex-wrap items-center gap-2">
@@ -383,7 +383,7 @@ export default function SocialPostsTab({ investigation }) {
                     )}
                   </div>
 
-                  <div className="flex items-center text-xs text-slate-400">
+                  <div className="flex items-center text-xs text-[var(--st-muted)]">
                     <Clock className="w-3 h-3 mr-1" />
                     {formatDate(post.posted_at)}
                   </div>
@@ -398,7 +398,7 @@ export default function SocialPostsTab({ investigation }) {
                 <div className="space-y-2">
                   {Array.isArray(post.hashtags) && post.hashtags.length > 0 && (
                     <div className="flex items-center text-xs gap-2">
-                      <Hash className="w-3 h-3 text-slate-400" />
+                      <Hash className="w-3 h-3 text-[var(--st-muted)]" />
                       <div className="flex flex-wrap gap-1">
                         {post.hashtags.slice(0, 10).map((tag, tagIndex) => (
                           <span
@@ -409,7 +409,7 @@ export default function SocialPostsTab({ investigation }) {
                           </span>
                         ))}
                         {post.hashtags.length > 10 && (
-                          <span className="text-slate-400">
+                          <span className="text-[var(--st-muted)]">
                             +{post.hashtags.length - 10} more
                           </span>
                         )}
@@ -419,7 +419,7 @@ export default function SocialPostsTab({ investigation }) {
 
                   {Array.isArray(post.mentions) && post.mentions.length > 0 && (
                     <div className="flex items-center text-xs gap-2">
-                      <AtSign className="w-3 h-3 text-slate-400" />
+                      <AtSign className="w-3 h-3 text-[var(--st-muted)]" />
                       <div className="flex flex-wrap gap-1">
                         {post.mentions
                           .slice(0, 5)
@@ -432,7 +432,7 @@ export default function SocialPostsTab({ investigation }) {
                             </span>
                           ))}
                         {post.mentions.length > 5 && (
-                          <span className="text-slate-400">
+                          <span className="text-[var(--st-muted)]">
                             +{post.mentions.length - 5} more
                           </span>
                         )}
@@ -442,14 +442,14 @@ export default function SocialPostsTab({ investigation }) {
 
                   {post.location_data && (
                     <div className="flex items-center text-xs gap-2">
-                      <MapPin className="w-3 h-3 text-slate-400" />
+                      <MapPin className="w-3 h-3 text-[var(--st-muted)]" />
                       <span className="text-slate-300">
                         {post.location_data.city}, {post.location_data.country}
                       </span>
                     </div>
                   )}
 
-                  <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-slate-400">
+                  <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-[var(--st-muted)]">
                     <div className="flex flex-wrap items-center gap-4">
                       <span>Type: {post.post_type || "text"}</span>
                       {typeof post.engagement_score === "number" && (
@@ -462,7 +462,7 @@ export default function SocialPostsTab({ investigation }) {
             );
           })
         ) : (
-          <div className="text-center py-8 text-slate-400">
+          <div className="text-center py-8 text-[var(--st-muted)]">
             {analytics.total_posts > 0 && posts.length === 0
               ? "Posts were collected, but none were saved for display yet. Rerun the investigation after updating."
               : searchTerm || selectedPlatform !== "all" || showSuspiciousOnly
@@ -472,7 +472,7 @@ export default function SocialPostsTab({ investigation }) {
         )}
 
         {filteredPosts.length > 50 && (
-          <div className="text-center py-4 text-slate-400">
+          <div className="text-center py-4 text-[var(--st-muted)]">
             Showing first 50 posts. Use filters to narrow results.
           </div>
         )}

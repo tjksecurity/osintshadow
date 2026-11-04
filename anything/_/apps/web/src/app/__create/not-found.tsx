@@ -2,6 +2,8 @@ import fg from 'fast-glob';
 import type { Route } from './+types/not-found';
 import { useNavigate } from 'react-router';
 import { useCallback, useEffect, useState } from 'react';
+import BrandLogo from '@/components/BrandLogo';
+import '@/components/Theme/product.css';
 
 export async function loader({ params }: Route.LoaderArgs) {
   const matches = await fg('src/**/page.{js,jsx,ts,tsx}');
@@ -88,8 +90,9 @@ export default function CreateDefaultNotFoundPage({
   }, [missingPath]);
 
   return (
-    <div className="flex sm:w-full w-screen sm:min-w-[850px] flex-col">
-      <div className="flex w-full items-center gap-2 p-5">
+    <div className="flex st-product st-workspace w-full min-h-screen flex-col">
+      <div className="flex w-full items-center flex-wrap gap-4 p-5 border-b border-[var(--st-line)]">
+        <a href="/" aria-label="ShadowTrace home"><BrandLogo className="st-logo" /></a>
         <button
           type="button"
           onClick={handleBack}
@@ -120,7 +123,7 @@ export default function CreateDefaultNotFoundPage({
             />
           </svg>
         </button>
-        <div className="flex flex-row divide-x divide-gray-200 rounded-[8px] h-8 w-[300px] border border-gray-200 bg-gray-50 text-gray-500">
+        <div className="flex flex-row divide-x divide-[var(--st-line)] rounded-[8px] h-8 w-[300px] border border-[var(--st-line)] bg-[var(--st-inset)] text-[var(--st-muted)]">
           <div className="flex items-center px-[14px] py-[5px]">
             <span>/</span>
           </div>
@@ -137,27 +140,27 @@ export default function CreateDefaultNotFoundPage({
       </div>
 
       <div className="flex flex-grow flex-col items-center justify-center pt-[100px] text-center gap-[20px]">
-        <h1 className="text-4xl font-medium text-gray-900 px-2">
+        <h1 className="text-4xl font-medium text-[var(--st-ink)] px-2">
           Uh-oh! This page doesn't exist (yet).
         </h1>
 
-        <p className="pt-4 pb-12 px-2 text-gray-500">
+        <p className="pt-4 pb-12 px-2 text-[var(--st-muted)]">
           Looks like "<span className="font-bold">/{missingPath}</span>" isn't part of your project.
           But no worries, you've got options!
         </p>
 
         <div className="px-[20px] w-full">
-          <div className="flex flex-row justify-center items-center w-full max-w-[800px] mx-auto border border-gray-200 rounded-lg p-[20px] mb-[40px] gap-[20px]">
+          <div className="flex flex-row justify-center items-center w-full max-w-[800px] mx-auto border border-[var(--st-line)] rounded-lg p-[20px] mb-[40px] gap-[20px]">
             <div className="flex flex-col gap-[5px] items-start self-start w-1/2">
-              <p className="text-sm text-black text-left">Build it from scratch</p>
-              <p className="text-sm text-gray-500 text-left">
+              <p className="text-sm text-[var(--st-ink)] text-left">Build it from scratch</p>
+              <p className="text-sm text-[var(--st-muted)] text-left">
                 Create a new page to live at "<span>/{missingPath}</span>"
               </p>
             </div>
             <div className="flex flex-row items-center justify-end w-1/2">
               <button
                 type="button"
-                className="bg-black text-white px-[10px] py-[5px] rounded-md"
+                className="bg-[var(--st-accent)] text-[var(--st-bg)] px-[10px] py-[5px] rounded-md"
                 onClick={() => handleCreatePage()}
               >
                 Create Page
@@ -167,7 +170,7 @@ export default function CreateDefaultNotFoundPage({
         </div>
 
         <div className="pb-20 lg:pb-[80px]">
-          <p className="flex items-center text-gray-500">
+          <p className="flex items-center text-[var(--st-muted)]">
             Check out all your project's routes here ↓
           </p>
         </div>
@@ -181,10 +184,10 @@ export default function CreateDefaultNotFoundPage({
                   type="button"
                   onClick={() => handleSearch(route.cleanRoute || '')}
                   key={route.id}
-                  className="flex flex-row justify-between text-center items-center p-4 rounded-lg bg-white shadow-sm w-full hover:bg-gray-50"
+                  className="flex flex-row justify-between text-center items-center p-4 rounded-lg bg-[var(--st-panel)] shadow-sm w-full hover:bg-[var(--st-inset)]"
                 >
-                  <h3 className="font-medium text-gray-900">{route.name}</h3>
-                  <p className="text-sm text-gray-400">{route.cleanRoute}</p>
+                  <h3 className="font-medium text-[var(--st-ink)]">{route.name}</h3>
+                  <p className="text-sm text-[var(--st-muted)]">{route.cleanRoute}</p>
                 </button>
               ))}
             </div>
@@ -197,14 +200,14 @@ export default function CreateDefaultNotFoundPage({
                 className="flex flex-col flex-grow basis-full sm:basis-[calc(50%-0.375rem)] xl:basis-[calc(33.333%-0.5rem)]"
               >
                 <div className="w-full flex-1 flex flex-col items-center ">
-                  <div className="relative w-full max-w-[350px] h-48 sm:h-56 lg:h-64 overflow-hidden rounded-[8px] border border-comeback-gray-75 transition-all group-hover:shadow-md">
+                  <div className="relative w-full max-w-[350px] h-48 sm:h-56 lg:h-64 overflow-hidden rounded-[8px] border border-[var(--st-line)] transition-all group-hover:shadow-md">
                     <button
                       type="button"
                       onClick={() => handleSearch(route.url.replace(/^\//, ''))}
-                      className="h-full w-full rounded-[8px] bg-gray-50 bg-cover"
+                      className="h-full w-full rounded-[8px] bg-[var(--st-inset)] bg-cover"
                     />
                   </div>
-                  <p className="pt-3 text-left text-gray-500 w-full max-w-[350px]">{route.path}</p>
+                  <p className="pt-3 text-left text-[var(--st-muted)] w-full max-w-[350px]">{route.path}</p>
                 </div>
               </div>
             ))}

@@ -11,12 +11,12 @@ export function ReportTab({ investigation, user }) {
 
   return (
     <section className="space-y-4">
-      <div className="bg-[#2D384E] rounded-lg p-4">
+      <div className="bg-[var(--st-panel)] rounded-lg p-4">
         <div className="flex items-center justify-between">
           <h3 className="font-semibold">HTML Report</h3>
           {pdfUrl && !isTrial && (
             <a
-              className="text-[#00D1FF] hover:underline"
+              className="text-[var(--st-accent)] hover:underline"
               href={pdfUrl}
               target="_blank"
               rel="noreferrer"

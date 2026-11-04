@@ -69,7 +69,7 @@ export default function AssociatesTab({ investigation }) {
       default:
         return {
           label,
-          className: `${base} bg-[#303B52] border-[#37425B] text-slate-200`,
+          className: `${base} bg-[var(--st-elevated)] border-[var(--st-line)] text-slate-200`,
         };
     }
   };
@@ -142,13 +142,13 @@ export default function AssociatesTab({ investigation }) {
 
   if (!associates.length) {
     return (
-      <section className="bg-[#2D384E] border border-[#37425B] rounded-lg p-6">
+      <section className="bg-[var(--st-panel)] border border-[var(--st-line)] rounded-lg p-6">
         <div className="text-center py-8">
-          <Users className="w-12 h-12 text-slate-500 mx-auto mb-4" />
+          <Users className="w-12 h-12 text-[var(--st-muted)] mx-auto mb-4" />
           <h3 className="text-lg font-semibold text-white mb-2">
             No Associates Found
           </h3>
-          <p className="text-slate-400">
+          <p className="text-[var(--st-muted)]">
             Associates and connections will appear here when AI analysis
             finishes.
           </p>
@@ -158,33 +158,33 @@ export default function AssociatesTab({ investigation }) {
   }
 
   return (
-    <section className="bg-[#2D384E] border border-[#37425B] rounded-lg p-6">
+    <section className="bg-[var(--st-panel)] border border-[var(--st-line)] rounded-lg p-6">
       <div className="mb-6">
         <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
-          <Users className="w-5 h-5 mr-2 text-[#00D1FF]" />
+          <Users className="w-5 h-5 mr-2 text-[var(--st-accent)]" />
           Known Associates & Connections
         </h3>
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <div className="bg-[#303B52] border border-[#37425B] p-4 rounded-lg">
+          <div className="bg-[var(--st-elevated)] border border-[var(--st-line)] p-4 rounded-lg">
             <div className="text-sm text-slate-300 font-medium">Total</div>
             <div className="text-2xl font-bold text-white">
               {associates.length}
             </div>
           </div>
-          <div className="bg-[#303B52] border border-[#37425B] p-4 rounded-lg">
+          <div className="bg-[var(--st-elevated)] border border-[var(--st-line)] p-4 rounded-lg">
             <div className="text-sm text-slate-300 font-medium">Family</div>
             <div className="text-2xl font-bold text-white">
               {associateCounts.family || 0}
             </div>
           </div>
-          <div className="bg-[#303B52] border border-[#37425B] p-4 rounded-lg">
+          <div className="bg-[var(--st-elevated)] border border-[var(--st-line)] p-4 rounded-lg">
             <div className="text-sm text-slate-300 font-medium">Social</div>
             <div className="text-2xl font-bold text-white">
               {associateCounts.social_connection || 0}
             </div>
           </div>
-          <div className="bg-[#303B52] border border-[#37425B] p-4 rounded-lg">
+          <div className="bg-[var(--st-elevated)] border border-[var(--st-line)] p-4 rounded-lg">
             <div className="text-sm text-slate-300 font-medium">High Risk</div>
             <div className="text-2xl font-bold text-white">
               {highRiskAssociates.length}
@@ -209,22 +209,22 @@ export default function AssociatesTab({ investigation }) {
 
         <div className="flex flex-col sm:flex-row gap-4 mb-6">
           <div className="relative flex-1">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400" />
+            <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-[var(--st-muted)]" />
             <input
               type="text"
               placeholder="Search associates..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 bg-[#37425B] border border-[#37425B] rounded-lg focus:outline-none focus:border-[#00D1FF] text-slate-100"
+              className="w-full pl-10 pr-4 py-2 bg-[var(--st-elevated)] border border-[var(--st-line)] rounded-lg focus:outline-none focus:border-[var(--st-accent)] text-slate-100"
             />
           </div>
 
           <div className="relative">
-            <Filter className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400" />
+            <Filter className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-[var(--st-muted)]" />
             <select
               value={selectedFilter}
               onChange={(e) => setSelectedFilter(e.target.value)}
-              className="pl-10 pr-8 py-2 bg-[#37425B] border border-[#37425B] rounded-lg focus:outline-none focus:border-[#00D1FF] text-slate-100 appearance-none"
+              className="pl-10 pr-8 py-2 bg-[var(--st-elevated)] border border-[var(--st-line)] rounded-lg focus:outline-none focus:border-[var(--st-accent)] text-slate-100 appearance-none"
             >
               {relationshipTypes.map((type) => (
                 <option key={type} value={type}>
@@ -259,7 +259,7 @@ export default function AssociatesTab({ investigation }) {
             return (
               <div
                 key={index}
-                className="border border-[#37425B] rounded-lg p-4 bg-[#303B52]/30"
+                className="border border-[var(--st-line)] rounded-lg p-4 bg-[var(--st-elevated)]/30"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex-1">
@@ -273,13 +273,13 @@ export default function AssociatesTab({ investigation }) {
 
                     <div className="flex flex-wrap items-center gap-4 mb-3">
                       <div className="flex items-center gap-2">
-                        <span className="text-xs text-slate-400">
+                        <span className="text-xs text-[var(--st-muted)]">
                           Confidence:
                         </span>
                         <span className={conf.className}>{conf.label}</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="text-xs text-slate-400">Sources:</span>
+                        <span className="text-xs text-[var(--st-muted)]">Sources:</span>
                         <span className="text-xs text-slate-200">
                           {sources.length}
                         </span>
@@ -295,7 +295,7 @@ export default function AssociatesTab({ investigation }) {
                           {contexts.map((context, ctxIndex) => (
                             <div
                               key={ctxIndex}
-                              className="text-xs text-slate-300 bg-[#263043] border border-[#37425B] px-2 py-1 rounded"
+                              className="text-xs text-slate-300 bg-[var(--st-bg)] border border-[var(--st-line)] px-2 py-1 rounded"
                             >
                               {context}
                             </div>
@@ -325,7 +325,7 @@ export default function AssociatesTab({ investigation }) {
 
                     {associate?.additional_data &&
                       Object.keys(associate.additional_data).length > 0 && (
-                        <div className="mt-3 pt-3 border-t border-[#37425B]">
+                        <div className="mt-3 pt-3 border-t border-[var(--st-line)]">
                           <h5 className="text-xs font-semibold text-slate-300 mb-2">
                             Additional Information
                           </h5>
@@ -336,7 +336,7 @@ export default function AssociatesTab({ investigation }) {
                                   key={key}
                                   className="flex justify-between gap-2"
                                 >
-                                  <span className="text-slate-400 capitalize">
+                                  <span className="text-[var(--st-muted)] capitalize">
                                     {String(key).replace(/_/g, " ")}:
                                   </span>
                                   <span className="text-slate-200 ml-2 break-words text-right">
@@ -350,7 +350,7 @@ export default function AssociatesTab({ investigation }) {
                       )}
 
                     {sources.length > 0 && (
-                      <div className="mt-3 pt-3 border-t border-[#37425B]">
+                      <div className="mt-3 pt-3 border-t border-[var(--st-line)]">
                         <h5 className="text-xs font-semibold text-slate-300 mb-1">
                           Data Sources
                         </h5>
@@ -358,7 +358,7 @@ export default function AssociatesTab({ investigation }) {
                           {sources.map((source, sourceIndex) => (
                             <span
                               key={sourceIndex}
-                              className="inline-flex items-center px-2 py-1 bg-[#263043] border border-[#37425B] text-slate-200 text-xs rounded"
+                              className="inline-flex items-center px-2 py-1 bg-[var(--st-bg)] border border-[var(--st-line)] text-slate-200 text-xs rounded"
                             >
                               {String(source).replace(/_/g, " ")}
                             </span>
@@ -368,7 +368,7 @@ export default function AssociatesTab({ investigation }) {
                     )}
 
                     {associate?.discovered_at && (
-                      <div className="mt-2 text-xs text-slate-400">
+                      <div className="mt-2 text-xs text-[var(--st-muted)]">
                         Discovered:{" "}
                         {new Date(associate.discovered_at).toLocaleString()}
                       </div>
@@ -379,7 +379,7 @@ export default function AssociatesTab({ investigation }) {
             );
           })
         ) : (
-          <div className="text-center py-8 text-slate-400">
+          <div className="text-center py-8 text-[var(--st-muted)]">
             {searchTerm || selectedFilter !== "all"
               ? "No associates match your filters."
               : "No associates found for this investigation."}

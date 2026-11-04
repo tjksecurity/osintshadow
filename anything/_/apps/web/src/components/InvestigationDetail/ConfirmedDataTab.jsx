@@ -31,7 +31,7 @@ export function ConfirmedDataTab({ confirmed, hasConfirmed, osintRaw }) {
 
   return (
     <section className="space-y-4">
-      <div className="bg-[#2D384E] rounded-lg p-4">
+      <div className="bg-[var(--st-panel)] rounded-lg p-4">
         <h3 className="font-semibold mb-1">Confirmed Data</h3>
         <p className="text-slate-300 text-sm mb-3">
           Curated by AI from evidence-backed and high-confidence items. This
@@ -39,7 +39,7 @@ export function ConfirmedDataTab({ confirmed, hasConfirmed, osintRaw }) {
         </p>
 
         {/* Deconfliction */}
-        <div className="border border-[#37425B] rounded-lg p-3 mb-4">
+        <div className="border border-[var(--st-line)] rounded-lg p-3 mb-4">
           <div className="font-semibold mb-1">Deconfliction</div>
           <div className="text-slate-300 text-sm">
             Flags places where different sources disagree on key identity
@@ -47,7 +47,7 @@ export function ConfirmedDataTab({ confirmed, hasConfirmed, osintRaw }) {
           </div>
 
           {!deconfliction ? (
-            <div className="text-slate-400 text-sm mt-2">
+            <div className="text-[var(--st-muted)] text-sm mt-2">
               No deconfliction results yet.
             </div>
           ) : !hasConflicts ? (
@@ -57,7 +57,7 @@ export function ConfirmedDataTab({ confirmed, hasConfirmed, osintRaw }) {
           ) : (
             <div className="mt-3 space-y-3">
               {counts ? (
-                <div className="text-xs text-slate-400">
+                <div className="text-xs text-[var(--st-muted)]">
                   Total: {counts.total} • High: {counts.high} • Medium:{" "}
                   {counts.medium} • Low: {counts.low}
                 </div>
@@ -73,7 +73,7 @@ export function ConfirmedDataTab({ confirmed, hasConfirmed, osintRaw }) {
                 return (
                   <div
                     key={idx}
-                    className="border border-[#37425B] rounded-lg p-3"
+                    className="border border-[var(--st-line)] rounded-lg p-3"
                   >
                     <div className="flex items-center gap-2 flex-wrap">
                       <div className="font-semibold">{title}</div>
@@ -108,7 +108,7 @@ export function ConfirmedDataTab({ confirmed, hasConfirmed, osintRaw }) {
                               {valueText}
                             </div>
                             {sourceText ? (
-                              <div className="text-xs text-slate-400">
+                              <div className="text-xs text-[var(--st-muted)]">
                                 Sources: {sourceText}
                               </div>
                             ) : null}
@@ -132,10 +132,10 @@ export function ConfirmedDataTab({ confirmed, hasConfirmed, osintRaw }) {
         {hasConfirmed && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Profiles */}
-            <div className="border border-[#37425B] rounded-lg p-3">
+            <div className="border border-[var(--st-line)] rounded-lg p-3">
               <div className="font-semibold mb-2">Profiles</div>
               {confirmedProfiles.length === 0 ? (
-                <div className="text-slate-400 text-sm">None</div>
+                <div className="text-[var(--st-muted)] text-sm">None</div>
               ) : (
                 <ul className="space-y-2">
                   {confirmedProfiles.map((p, idx) => {
@@ -146,16 +146,16 @@ export function ConfirmedDataTab({ confirmed, hasConfirmed, osintRaw }) {
                           href={p.url}
                           target="_blank"
                           rel="noreferrer"
-                          className="text-[#00D1FF] hover:underline"
+                          className="text-[var(--st-accent)] hover:underline"
                         >
                           {p.platform}
                         </a>
-                        <span className="text-slate-400">
+                        <span className="text-[var(--st-muted)]">
                           {" "}
                           — {p.handle || "(unknown handle)"}
                         </span>
                         {reasons && (
-                          <div className="text-xs text-slate-400">
+                          <div className="text-xs text-[var(--st-muted)]">
                             Reasons: {reasons}
                           </div>
                         )}
@@ -167,10 +167,10 @@ export function ConfirmedDataTab({ confirmed, hasConfirmed, osintRaw }) {
             </div>
 
             {/* Phones */}
-            <div className="border border-[#37425B] rounded-lg p-3">
+            <div className="border border-[var(--st-line)] rounded-lg p-3">
               <div className="font-semibold mb-2">Phone References</div>
               {confirmedPhones.length === 0 ? (
-                <div className="text-slate-400 text-sm">None</div>
+                <div className="text-[var(--st-muted)] text-sm">None</div>
               ) : (
                 <ul className="space-y-2">
                   {confirmedPhones.map((ph, idx) => {
@@ -180,11 +180,11 @@ export function ConfirmedDataTab({ confirmed, hasConfirmed, osintRaw }) {
                     return (
                       <li key={idx} className="text-sm">
                         <span className="text-slate-200">{ph.phone}</span>
-                        <div className="text-xs text-slate-400">
+                        <div className="text-xs text-[var(--st-muted)]">
                           Public reference only; ownership is not verified.
                         </div>
                         {reasons && (
-                          <div className="text-xs text-slate-400">
+                          <div className="text-xs text-[var(--st-muted)]">
                             Reasons: {reasons}
                           </div>
                         )}
@@ -195,7 +195,7 @@ export function ConfirmedDataTab({ confirmed, hasConfirmed, osintRaw }) {
                               href={src.seed_source_url}
                               target="_blank"
                               rel="noreferrer"
-                              className="text-[#00D1FF] hover:underline"
+                              className="text-[var(--st-accent)] hover:underline"
                             >
                               {src.seed_source_url}
                             </a>
@@ -209,10 +209,10 @@ export function ConfirmedDataTab({ confirmed, hasConfirmed, osintRaw }) {
             </div>
 
             {/* Emails */}
-            <div className="border border-[#37425B] rounded-lg p-3">
+            <div className="border border-[var(--st-line)] rounded-lg p-3">
               <div className="font-semibold mb-2">Emails</div>
               {confirmedEmails.length === 0 ? (
-                <div className="text-slate-400 text-sm">None</div>
+                <div className="text-[var(--st-muted)] text-sm">None</div>
               ) : (
                 <ul className="space-y-2">
                   {confirmedEmails.map((em, idx) => {
@@ -221,7 +221,7 @@ export function ConfirmedDataTab({ confirmed, hasConfirmed, osintRaw }) {
                       <li key={idx} className="text-sm">
                         <span className="text-slate-200">{em.email}</span>
                         {reasons && (
-                          <div className="text-xs text-slate-400">
+                          <div className="text-xs text-[var(--st-muted)]">
                             Reasons: {reasons}
                           </div>
                         )}
@@ -233,10 +233,10 @@ export function ConfirmedDataTab({ confirmed, hasConfirmed, osintRaw }) {
             </div>
 
             {/* Domains */}
-            <div className="border border-[#37425B] rounded-lg p-3">
+            <div className="border border-[var(--st-line)] rounded-lg p-3">
               <div className="font-semibold mb-2">Domains</div>
               {confirmedDomains.length === 0 ? (
-                <div className="text-slate-400 text-sm">None</div>
+                <div className="text-[var(--st-muted)] text-sm">None</div>
               ) : (
                 <ul className="space-y-2">
                   {confirmedDomains.map((d, idx) => {
@@ -245,7 +245,7 @@ export function ConfirmedDataTab({ confirmed, hasConfirmed, osintRaw }) {
                       <li key={idx} className="text-sm">
                         <span className="text-slate-200">{d.domain}</span>
                         {reasons && (
-                          <div className="text-xs text-slate-400">
+                          <div className="text-xs text-[var(--st-muted)]">
                             Reasons: {reasons}
                           </div>
                         )}
@@ -257,10 +257,10 @@ export function ConfirmedDataTab({ confirmed, hasConfirmed, osintRaw }) {
             </div>
 
             {/* Handles */}
-            <div className="border border-[#37425B] rounded-lg p-3">
+            <div className="border border-[var(--st-line)] rounded-lg p-3">
               <div className="font-semibold mb-2">Handles</div>
               {confirmedHandles.length === 0 ? (
-                <div className="text-slate-400 text-sm">None</div>
+                <div className="text-[var(--st-muted)] text-sm">None</div>
               ) : (
                 <ul className="space-y-2">
                   {confirmedHandles.map((h, idx) => {
@@ -268,12 +268,12 @@ export function ConfirmedDataTab({ confirmed, hasConfirmed, osintRaw }) {
                     return (
                       <li key={idx} className="text-sm">
                         <span className="text-slate-200">{h.handle}</span>
-                        <span className="text-slate-400">
+                        <span className="text-[var(--st-muted)]">
                           {" "}
                           — confidence {Math.round((h.confidence || 0) * 100)}%
                         </span>
                         {reasons && (
-                          <div className="text-xs text-slate-400">
+                          <div className="text-xs text-[var(--st-muted)]">
                             Reasons: {reasons}
                           </div>
                         )}

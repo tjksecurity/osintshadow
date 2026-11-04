@@ -17,7 +17,7 @@ export function ImagesTab({ investigation, imagesItems, hasImages }) {
 
   return (
     <section className="space-y-4">
-      <div className="bg-[#2D384E] rounded-lg p-4">
+      <div className="bg-[var(--st-panel)] rounded-lg p-4">
         <div className="flex items-center justify-between">
           <h3 className="font-semibold flex items-center gap-2">
             <ImageIcon size={16} /> Images Recovered
@@ -26,14 +26,14 @@ export function ImagesTab({ investigation, imagesItems, hasImages }) {
             {hasImages && invId && (
               <a
                 href={downloadHref}
-                className="px-3 py-1.5 border border-[#37425B] rounded hover:bg-[#37425B] text-sm"
+                className="px-3 py-1.5 border border-[var(--st-line)] rounded hover:bg-[var(--st-hover)] text-sm"
                 download={downloadName}
               >
                 Download all (ZIP)
               </a>
             )}
             {(!hasImages || !invId) && (
-              <span className="text-slate-400 text-sm">None found</span>
+              <span className="text-[var(--st-muted)] text-sm">None found</span>
             )}
           </div>
         </div>
@@ -50,7 +50,7 @@ export function ImagesTab({ investigation, imagesItems, hasImages }) {
               return (
                 <div
                   key={idx}
-                  className="border border-[#37425B] rounded overflow-hidden bg-[#283247]"
+                  className="border border-[var(--st-line)] rounded overflow-hidden bg-[#283247]"
                 >
                   <a href={url} target="_blank" rel="noreferrer">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -68,7 +68,7 @@ export function ImagesTab({ investigation, imagesItems, hasImages }) {
                           href={url}
                           target="_blank"
                           rel="noreferrer"
-                          className="text-[#00D1FF] hover:underline"
+                          className="text-[var(--st-accent)] hover:underline"
                         >
                           {url}
                         </a>
@@ -78,7 +78,7 @@ export function ImagesTab({ investigation, imagesItems, hasImages }) {
                           href={sourceUrl}
                           target="_blank"
                           rel="noreferrer"
-                          className="px-2 py-0.5 rounded-full bg-[#00D1FF]/10 text-[#00D1FF] whitespace-nowrap"
+                          className="px-2 py-0.5 rounded-full bg-[var(--st-accent)]/10 text-[var(--st-accent)] whitespace-nowrap"
                           title={sourceUrl}
                         >
                           {host}
@@ -121,7 +121,7 @@ export function ImagesTab({ investigation, imagesItems, hasImages }) {
                           href={reverse.google}
                           target="_blank"
                           rel="noreferrer"
-                          className="text-[#00D1FF] hover:underline"
+                          className="text-[var(--st-accent)] hover:underline"
                         >
                           Google
                         </a>
@@ -131,7 +131,7 @@ export function ImagesTab({ investigation, imagesItems, hasImages }) {
                           href={reverse.bing}
                           target="_blank"
                           rel="noreferrer"
-                          className="text-[#00D1FF] hover:underline"
+                          className="text-[var(--st-accent)] hover:underline"
                         >
                           Bing
                         </a>
@@ -141,7 +141,7 @@ export function ImagesTab({ investigation, imagesItems, hasImages }) {
                           href={reverse.yandex}
                           target="_blank"
                           rel="noreferrer"
-                          className="text-[#00D1FF] hover:underline"
+                          className="text-[var(--st-accent)] hover:underline"
                         >
                           Yandex
                         </a>
