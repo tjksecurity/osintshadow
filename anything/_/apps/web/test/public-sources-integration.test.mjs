@@ -181,6 +181,65 @@ for (const kind of ['legacy', 'tick']) {
   });
 }
 
+test('executed tick report stage retains persisted source provenance and unavailable/error states without provider requests', async () => {
+  const timestamp = '2026-11-04T06:15:00.000Z';
+  const persisted = {
+    target_type: 'username', target_value: 'synthetic-person', collected_at: timestamp,
+    public_sources: [
+      { provider: 'github', status: 'candidates_found', evaluated_at: timestamp, request_started: true, truncated: false, validation: null,
+        message: 'Public-source candidates, not independently verified identity or ownership. Review each original source.',
+        records: [{ id: 'fixture-source-123', label: 'Persisted synthetic candidate', url: 'https://github.com/synthetic-person', context: 'Fixture Company' }] },
+      { provider: 'exa', status: 'not_configured', evaluated_at: timestamp, request_started: false, truncated: false, validation: null, records: [],
+        message: 'This source is not enabled or its required server API key is missing.' },
+      { provider: 'openalex', status: 'provider_error', evaluated_at: timestamp, request_started: true, truncated: false, validation: null, records: [],
+        message: 'The provider could not complete the lookup. No automatic retry.' },
+    ],
+  };
+  const original = structuredClone(persisted);
+  const flags = { ...normalizeProcessingFlags({}, true), publicSources: ['github', 'exa', 'openalex'] };
+  const reports = []; const checkpoints = []; let released = false; let providerRequests = 0; let persistedReads = 0; let terminalStatus;
+  const sql = async (parts, ...values) => {
+    const query = parts.join('?');
+    if (query.includes('FROM investigations')) {
+      assert.match(query, /user_id =/); assert.deepEqual(values.slice(0, 2), [7, 'synthetic-owner']);
+      return [{ id: 7, user_id: 'synthetic-owner', status: 'processing', target_type: 'username', target_value: 'synthetic-person', processing_flags: flags }];
+    }
+    if (query.includes("SET processing_locked_until = NOW() + INTERVAL '2 minutes'")) return [{ id: 7 }];
+    if (query.includes('FROM investigation_progress_events')) return ['osint', 'social_profiles', 'social_posts', 'ai', 'deconflict', 'geo'].map(step_key => ({ step_key, event_status: 'completed' }));
+    if (query.includes('FROM osint_raw')) {
+      persistedReads++; assert.match(query, /ORDER BY id ASC\s+LIMIT 1/); assert.deepEqual(values, [7]);
+      return [{ id: 101, data_json: persisted }];
+    }
+    if (query.includes('FROM ai_output')) return [{ full_json: { summary: 'Previously persisted synthetic analysis.', risk_score: 0, risk_level: 'Unknown' } }];
+    if (/INSERT INTO reports/.test(query)) { reports.push({ id: values[0], html: values[1] }); return []; }
+    if (/INSERT INTO investigation_progress_events/.test(query)) { checkpoints.push({ step: values[1], status: values[3] }); return []; }
+    if (/UPDATE investigations/.test(query) && /SET status/.test(query)) { terminalStatus = values[0]; return []; }
+    if (query.includes('SET processing_locked_until = NULL')) { released = true; return []; }
+    if (/INSERT INTO logs/.test(query)) return [];
+    throw new Error('Unexpected SQL during report-only tick: ' + query);
+  };
+  const route = await load(root + '[id]/tick/route.js', {
+    ...database, sql, readStoredProcessingFlags,
+    auth: async () => ({ user: { id: 'synthetic-owner' } }),
+    fetch: async () => { providerRequests++; throw new Error('Report stage must not request providers'); },
+  }, { modules: { '../../reports/generator.js': { generateReportHTML } } });
+  const response = await route.POST(new Request('https://example.invalid/api/investigations/7/tick', { method: 'POST' }), { params: { id: '7' } });
+  assert.equal(response.status, 200); const body = await response.json();
+  assert.equal(body.ranStep, 'report'); assert.equal(body.status, 'completed'); assert.equal(terminalStatus, 'completed');
+  assert.equal(providerRequests, 0); assert.equal(persistedReads, 1); assert.equal(released, true);
+  assert.equal(reports.length, 1); assert.equal(reports[0].id, 7);
+  const html = reports[0].html;
+  assert.ok(html.includes('Source ID: fixture-source-123'));
+  assert.ok(html.includes('href="https://github.com/synthetic-person"'));
+  assert.ok(html.includes('Persisted synthetic candidate'));
+  assert.equal((html.match(/Evaluated: 2026-11-04T06:15:00\.000Z/g) || []).length, 3);
+  assert.match(html, /not independently verified identity or ownership/);
+  for (const status of ['candidates_found', 'not_configured', 'provider_error']) assert.ok(html.includes(`Status: ${status}`));
+  assert.ok(html.includes('required server API key is missing')); assert.ok(html.includes('No automatic retry'));
+  assert.ok(checkpoints.some(event => event.step === 'report' && event.status === 'completed'));
+  assert.deepEqual(persisted, original);
+});
+
 test('public source flag normalization is additive, strict, deduplicated and disabled for trial', () => {
   assert.deepEqual(normalizeProcessingFlags({ public_sources: ['github', 'github', 'exa'] }).publicSources, ['github', 'exa']);
   for (const selection of [undefined, 'github', ['unknown'], [1], [...allIDs, 'github']]) assert.deepEqual(normalizeProcessingFlags({ public_sources: selection }).publicSources, []);
