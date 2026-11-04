@@ -1,6 +1,7 @@
 import { auth } from "@/auth";
 import sql from "@/app/api/utils/sql";
-import { logEvent, insertProgressEvent } from "../utils/database.js";
+import { logEvent } from "../utils/database.js";
+import { regenerateInvestigation } from "../utils/regenerate.js";
 
 export async function GET(request, { params }) {
   try {
@@ -70,7 +71,7 @@ export async function POST(request, { params }) {
 
     // Ensure the investigation exists and belongs to the user
     const rows = await sql`
-      SELECT id, user_id, target_type, target_value FROM investigations
+      SELECT id, user_id, status, processing_flags FROM investigations
       WHERE id = ${id} AND user_id = ${session.user.id}
     `;
     if (rows.length === 0) {
@@ -80,41 +81,19 @@ export async function POST(request, { params }) {
       );
     }
 
-    // Clean previous generated data to avoid duplicate rows on LEFT JOINs
-    await sql`DELETE FROM ai_output WHERE investigation_id = ${id}`;
-    await sql`DELETE FROM osint_raw WHERE investigation_id = ${id}`;
-    await sql`DELETE FROM geo_markers WHERE investigation_id = ${id}`;
-    await sql`DELETE FROM reports WHERE investigation_id = ${id}`;
+    // Recheck ownership, settings, state and lease under the row lock. All
+    // cleanup and requeue commit together, never an empty report on failure.
+    const regenerated = await regenerateInvestigation(sql, rows[0], session.user.id);
+    if (regenerated.code) {
+      return Response.json({
+        error: regenerated.code === 'PROCESSING_FLAGS_REQUIRED'
+          ? 'Saved collection settings must be restored before regeneration. Existing results were preserved.'
+          : 'This investigation is running or changed. Existing results were preserved; refresh its status.',
+        code: regenerated.code,
+      }, { status: 409 });
+    }
 
-    // clear live progress events so the progress panel matches the fresh run
-    await sql`DELETE FROM investigation_progress_events WHERE investigation_id = ${id}`;
-
-    // clean previously discovered social data for this investigation
-    await sql`
-      DELETE FROM social_posts
-      WHERE profile_id IN (
-        SELECT id FROM social_profiles WHERE investigation_id = ${id}
-      )
-    `;
-    await sql`DELETE FROM social_monitoring WHERE investigation_id = ${id}`;
-    await sql`DELETE FROM social_profiles WHERE investigation_id = ${id}`;
-
-    // Reset status + completion timestamp (processing will be started by the detail page)
-    await sql`
-      UPDATE investigations
-      SET status = 'queued', completed_at = NULL
-      WHERE id = ${id}
-    `;
-
-    // Immediately write a first progress event so the UI shows movement
-    await insertProgressEvent(sql, id, {
-      stepKey: "queued",
-      stepLabel: "Queued",
-      eventStatus: "info",
-      percent: 1,
-      message: "Regeneration queued",
-    });
-
+    try {
     await logEvent(
       sql,
       "investigation_regenerate_requested",
@@ -124,6 +103,9 @@ export async function POST(request, { params }) {
         user_id: session.user.id,
       },
     );
+    } catch (error) {
+      console.warn('Failed to log committed regeneration');
+    }
 
     // IMPORTANT: do NOT attempt to background-run processing here.
     // In production serverless environments, work scheduled after the response

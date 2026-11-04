@@ -50,6 +50,14 @@ async function safeProgress(investigationId, data) {
     await insertProgressEvent(sql, investigationId, data);
   } catch (e) {
     console.error("Failed to write progress event", e);
+    // Terminal stage events are checkpoints, not optional display telemetry.
+    // Without one, the next tick could run an already completed collector again.
+    if (STEP_ORDER.includes(data.stepKey) &&
+        (data.eventStatus === 'completed' || data.eventStatus === 'failed')) {
+      const error = new Error('Could not save the completed processing checkpoint. Existing results were preserved.');
+      error.code = 'CHECKPOINT_WRITE_FAILED';
+      throw error;
+    }
   }
 }
 
@@ -96,6 +104,7 @@ export async function POST(request, { params }) {
 
   // Normalize id early to avoid edge-case type issues
   const id = Number(idRaw);
+  let claimedToken = null;
 
   try {
     const session = await auth();
@@ -159,7 +168,7 @@ export async function POST(request, { params }) {
     const flags = readStoredProcessingFlags(inv.processing_flags);
     if (!flags) {
       return Response.json({
-        error: 'Investigation processing configuration must be reconciled before collection.',
+        error: 'Saved collection settings are missing or incomplete. Existing results are preserved; original settings must be restored before collection.',
         code: 'PROCESSING_FLAGS_REQUIRED', debugId,
       }, { status: 409, headers: cacheHeaders });
     }
@@ -194,6 +203,7 @@ export async function POST(request, { params }) {
         { status: 202, headers: cacheHeaders },
       );
     }
+    claimedToken = token;
 
     // Make sure we're marked as processing (safe/idempotent)
     if (inv.status === "queued") {
@@ -209,11 +219,10 @@ export async function POST(request, { params }) {
 
     // Determine next step from the existing progress events.
     const recent = await sql`
-      SELECT step_key, event_status
+      SELECT DISTINCT step_key, event_status
       FROM investigation_progress_events
       WHERE investigation_id = ${id}
-      ORDER BY id DESC
-      LIMIT 300
+        AND event_status IN ('completed', 'failed')
     `;
 
     const nextStep = nextStepFromEvents(recent);
@@ -229,33 +238,11 @@ export async function POST(request, { params }) {
         message: "Investigation completed",
       });
 
-      // Release lock
-      await sql`
-        UPDATE investigations
-        SET processing_locked_until = NULL,
-            processing_lock_token = NULL
-        WHERE id = ${id}
-      `;
-
       return Response.json(
         { ok: true, id: inv.id, status: "completed", debugId },
         { headers: cacheHeaders },
       );
     }
-
-    // Helper to ensure we always release the lock
-    const releaseLock = async () => {
-      try {
-        await sql`
-          UPDATE investigations
-          SET processing_locked_until = NULL,
-              processing_lock_token = NULL
-          WHERE id = ${id} AND processing_lock_token = ${token}
-        `;
-      } catch (e) {
-        console.warn("Failed to release tick lock", e);
-      }
-    };
 
     try {
       if (nextStep === "osint") {
@@ -566,6 +553,7 @@ export async function POST(request, { params }) {
               message: `Found ${totalProfilesStored} profile(s)`,
             });
           } catch (socialError) {
+            if (socialError?.code === 'CHECKPOINT_WRITE_FAILED') throw socialError;
             console.error(
               "Social profile search failed (continuing)",
               socialError,
@@ -649,6 +637,7 @@ export async function POST(request, { params }) {
               message: "Social posts saved",
             });
           } catch (postError) {
+            if (postError?.code === 'CHECKPOINT_WRITE_FAILED') throw postError;
             console.error(
               "Social post collection failed (continuing)",
               postError,
@@ -787,6 +776,7 @@ export async function POST(request, { params }) {
           });
         } catch (e) {
           console.error("Deconfliction step failed (continuing)", e);
+          if (e?.code === 'CHECKPOINT_WRITE_FAILED') throw e;
 
           await safeProgress(inv.id, {
             stepKey: "deconflict",
@@ -841,6 +831,7 @@ export async function POST(request, { params }) {
           });
         } catch (e) {
           console.error("Geo marker creation failed", e);
+          if (e?.code === 'CHECKPOINT_WRITE_FAILED') throw e;
 
           await safeProgress(inv.id, {
             stepKey: "geo",
@@ -918,13 +909,11 @@ export async function POST(request, { params }) {
         } catch (_) {}
       }
 
-      await releaseLock();
-
       return Response.json(
         {
           ok: true,
           id: inv.id,
-          status: "processing",
+          status: nextStep === "report" ? "completed" : "processing",
           ranStep: nextStep,
           debugId,
         },
@@ -955,8 +944,6 @@ export async function POST(request, { params }) {
         flags_json: safeJson(flags),
         at: new Date().toISOString(),
       });
-
-      await releaseLock();
 
       return Response.json(
         {
@@ -990,5 +977,19 @@ export async function POST(request, { params }) {
       },
       { status: 500, headers: cacheHeaders },
     );
+  } finally {
+    // Covers history reads, early completion and error-handling failures too.
+    // Never clear a newer worker's lease after ours expires.
+    if (claimedToken) {
+      try {
+        await sql`
+          UPDATE investigations
+          SET processing_locked_until = NULL, processing_lock_token = NULL
+          WHERE id = ${id} AND processing_lock_token = ${claimedToken}
+        `;
+      } catch (error) {
+        console.warn("Failed to release tick lock", error);
+      }
+    }
   }
 }

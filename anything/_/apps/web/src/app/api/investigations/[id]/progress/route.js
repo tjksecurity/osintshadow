@@ -68,12 +68,20 @@ export async function GET(request, { params }) {
     const investigation = invRows[0];
 
     const eventsStart = now();
-    const events = await sql`
+    const newestEvents = await sql`
       SELECT id, step_key, step_label, event_status, percent, message, created_at
       FROM investigation_progress_events
       WHERE investigation_id = ${id}
-      ORDER BY id ASC
+      ORDER BY id DESC
       LIMIT 200
+    `;
+    const events = [...newestEvents].reverse();
+    // Stage checkpoints must not disappear when a noisy collector fills the
+    // bounded display window. This query is at most one row per completed key.
+    const completed = await sql`
+      SELECT DISTINCT step_key
+      FROM investigation_progress_events
+      WHERE investigation_id = ${id} AND event_status = 'completed'
     `;
     eventsQueryMs = now() - eventsStart;
 
@@ -114,6 +122,7 @@ export async function GET(request, { params }) {
         percent,
         currentStep,
         events,
+        completedSteps: completed.map((event) => event.step_key),
         // NEW: Put these in the JSON body too, so you can debug even if headers are stripped.
         lastEventId: Number(lastEventId || 0),
         timing: {

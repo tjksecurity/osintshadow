@@ -33,8 +33,9 @@ export function useInvestigation(id) {
     mutationFn: async () => {
       const res = await fetch(`/api/investigations/${id}`, { method: "POST" });
       if (!res.ok) {
+        const payload = await res.json().catch(() => null);
         throw new Error(
-          `When posting /api/investigations/${id}, the response was [${res.status}] ${res.statusText}`,
+          payload?.error || `Regeneration failed (${res.status})`,
         );
       }
       return res.json();
@@ -54,5 +55,6 @@ export function useInvestigation(id) {
     refetch,
     regenerate: regenerateMutation.mutate,
     isRegenerating: regenerateMutation.isLoading,
+    regenerateError: regenerateMutation.error,
   };
 }

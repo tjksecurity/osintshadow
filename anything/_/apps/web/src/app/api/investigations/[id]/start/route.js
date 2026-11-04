@@ -1,6 +1,7 @@
 import { auth } from "@/auth";
 import sql from "@/app/api/utils/sql";
 import { insertProgressEvent, logEvent } from "../../utils/database.js";
+import { readStoredProcessingFlags } from "../../utils/processingFlags.js";
 
 export async function POST(request, { params }) {
   try {
@@ -20,11 +21,28 @@ export async function POST(request, { params }) {
       );
     }
 
-    // Atomically claim this investigation for processing.
+    // Do not label a legacy job as running when /tick must refuse its missing
+    // permissions. Never infer omitted collection capabilities from defaults.
+    const owned = await sql`
+      SELECT id, status, processing_flags FROM investigations
+      WHERE id = ${id} AND user_id = ${session.user.id} LIMIT 1
+    `;
+    if (!owned.length) {
+      return Response.json({ error: "Investigation not found", code: "NOT_FOUND" }, { status: 404 });
+    }
+    if (['queued', 'processing'].includes(owned[0].status) &&
+        !readStoredProcessingFlags(owned[0].processing_flags)) {
+      return Response.json({
+        error: "Saved collection settings are missing or incomplete. Processing has not started.",
+        code: "PROCESSING_FLAGS_REQUIRED",
+      }, { status: 409 });
+    }
+    // Compare the validated settings again at the mutation boundary.
     const claimed = await sql`
       UPDATE investigations
       SET status = 'processing'
       WHERE id = ${id} AND user_id = ${session.user.id} AND status = 'queued'
+        AND processing_flags::jsonb = ${JSON.stringify(readStoredProcessingFlags(owned[0].processing_flags))}::jsonb
       RETURNING id
     `;
 
@@ -44,6 +62,12 @@ export async function POST(request, { params }) {
         );
       }
 
+      if (rows[0].status === 'queued') {
+        return Response.json({
+          error: 'Investigation settings changed before processing could start. Refresh its status.',
+          code: 'PROCESSING_STATE_CHANGED',
+        }, { status: 409 });
+      }
       return Response.json({
         ok: true,
         message: `No start needed (status=${rows[0].status})`,

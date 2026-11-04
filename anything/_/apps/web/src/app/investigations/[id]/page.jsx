@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import useUser from "@/utils/useUser";
 import {
   ArrowLeft,
@@ -99,13 +99,6 @@ export default function InvestigationDetail(props) {
   const [debugTimingEnabled, setDebugTimingEnabled] = useState(false);
   const [lastServerTiming, setLastServerTiming] = useState([]);
 
-  // NEW: avoid repeatedly trying to start processing
-  const startRequestedRef = useRef(false);
-
-  // NEW: tick runner (step-based processing) state
-  const tickInFlightRef = useRef(false);
-  const tickTimerRef = useRef(null);
-
   const {
     investigation,
     isLoading,
@@ -113,43 +106,10 @@ export default function InvestigationDetail(props) {
     refetch,
     regenerate,
     isRegenerating,
+    regenerateError,
   } = useInvestigation(id);
 
   const investigationStatus = investigation?.status;
-
-  // NEW: if we land on a queued investigation (common in production), trigger processing.
-  useEffect(() => {
-    const run = async () => {
-      try {
-        const res = await fetch(`/api/investigations/${id}/start`, {
-          method: "POST",
-          headers: { Accept: "application/json" },
-        });
-        if (!res.ok) {
-          console.error(
-            `When posting /api/investigations/${id}/start, the response was [${res.status}] ${res.statusText}`,
-          );
-        }
-      } catch (e) {
-        console.error("Failed to start investigation processing", e);
-      }
-    };
-
-    if (!id) return;
-    if (!investigationStatus) return;
-
-    // Allow re-start after a regenerate: once the investigation leaves "queued",
-    // permit a future queued transition to trigger again.
-    if (investigationStatus !== "queued") {
-      startRequestedRef.current = false;
-      return;
-    }
-
-    if (startRequestedRef.current) return;
-
-    startRequestedRef.current = true;
-    run();
-  }, [id, investigationStatus]);
 
   // NEW: heartbeat updates once per second while we expect live polling
   useEffect(() => {
@@ -171,40 +131,30 @@ export default function InvestigationDetail(props) {
   useEffect(() => {
     const shouldTick =
       investigationStatus === "processing" || investigationStatus === "queued";
-
-    const stop = () => {
-      if (tickTimerRef.current) {
-        clearTimeout(tickTimerRef.current);
-        tickTimerRef.current = null;
-      }
-    };
+    if (!id || !shouldTick) return;
+    // Each effect owns its request and timer. A retired investigation must not
+    // rearm itself or block the next investigation while its fetch settles.
+    let stopped = false;
+    let timer = null;
+    let timeoutId = null;
+    let controller = null;
 
     const tickOnce = async () => {
-      if (!id) return;
-      if (!shouldTick) return;
-      if (tickInFlightRef.current) return;
-
-      tickInFlightRef.current = true;
-
-      const controller =
-        typeof AbortController !== "undefined" ? new AbortController() : null;
+      if (stopped) return;
+      controller = new AbortController();
+      let retry = true;
 
       // investigation steps (OSINT + AI) can legitimately take >25s on the published site.
       // If we abort too early, the UI looks "stuck" even though the server is still working.
-      const timeoutId = controller
-        ? setTimeout(() => {
-            try {
-              controller.abort();
-            } catch (_) {}
-          }, 90000)
-        : null;
+      timeoutId = setTimeout(() => controller.abort(), 90000);
 
       try {
         const res = await fetch(`/api/investigations/${id}/tick`, {
           method: "POST",
           headers: { Accept: "application/json" },
-          signal: controller ? controller.signal : undefined,
+          signal: controller.signal,
         });
+        if (stopped) return;
 
         // 202 means another tick is currently running. That's fine.
         if (res.status === 202) {
@@ -214,6 +164,10 @@ export default function InvestigationDetail(props) {
           try {
             payload = await res.json();
           } catch (_) {}
+          if (stopped) return;
+          // These require a corrected configuration/session, not another tick.
+          retry = ![400, 401, 403, 404, 409].includes(res.status) &&
+            payload?.code !== "TICK_FAILED";
 
           const msg =
             payload?.details ||
@@ -224,14 +178,14 @@ export default function InvestigationDetail(props) {
 
           setLastTickError(`${msg}${step}${dbg}`);
 
-          console.error(
-            `When posting /api/investigations/${id}/tick, the response was [${res.status}] ${res.statusText}`,
-            payload,
-          );
         } else {
+          const payload = await res.json();
+          if (stopped) return;
+          retry = payload?.status !== "completed" && payload?.status !== "failed";
           setLastTickError(null);
         }
       } catch (e) {
+        if (stopped) return;
         // Abort means the server took too long. We'll retry.
         const isAbort =
           e?.name === "AbortError" ||
@@ -240,35 +194,29 @@ export default function InvestigationDetail(props) {
           ? "Tick request timed out in the browser (server may still be running). Retrying…"
           : e?.message || "Tick request failed";
 
-        console.warn("Tick request failed", e);
         setLastTickError(msg);
       } finally {
         if (timeoutId) {
           clearTimeout(timeoutId);
         }
-        tickInFlightRef.current = false;
-
         // schedule next tick
-        if (shouldTick) {
-          tickTimerRef.current = setTimeout(() => {
+        if (!stopped && retry) {
+          timer = setTimeout(() => {
             tickOnce();
           }, 1500);
         }
       }
     };
 
-    if (!id) return;
-
-    if (!shouldTick) {
-      stop();
-      return;
-    }
-
-    // start ticking
+    // /tick validates the saved permissions, claims the lease and starts queued
+    // jobs itself. A concurrent /start request would only race that transition.
     tickOnce();
 
     return () => {
-      stop();
+      stopped = true;
+      clearTimeout(timer);
+      clearTimeout(timeoutId);
+      controller?.abort();
     };
   }, [id, investigationStatus]);
 
@@ -425,7 +373,7 @@ export default function InvestigationDetail(props) {
   ];
 
   const completedStepKeys = new Set(
-    progressEvents
+    progressData?.completedSteps || progressEvents
       .filter((e) => e?.event_status === "completed" && e?.step_key)
       .map((e) => e.step_key),
   );
@@ -545,7 +493,8 @@ export default function InvestigationDetail(props) {
                 ) : null}
                 {isPolling ? (
                   <div className="text-xs text-slate-400 mt-1">
-                    Polling every ~1s
+                    Keep this page open while processing. Leaving or suspending
+                    it pauses new steps; reopening it resumes saved progress.
                   </div>
                 ) : null}
 
@@ -656,6 +605,11 @@ export default function InvestigationDetail(props) {
             ) : null}
 
             {/* NEW: show tick errors plainly */}
+            {regenerateError ? (
+              <div className="mt-3 text-sm text-red-300 break-words">
+                {regenerateError.message}
+              </div>
+            ) : null}
             {lastTickError ? (
               <div className="mt-3 text-sm text-red-300 break-words">
                 Processing error: {lastTickError}
