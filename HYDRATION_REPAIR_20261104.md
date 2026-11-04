@@ -67,3 +67,18 @@ Final pre-push full suite including useId coverage: **305 total, 304 passed,
 Authenticated investigations/reports, database migrations/concurrency, provider
 activation and live paid billing remain separate acceptance gates. This fix
 does not claim to verify or activate them.
+
+## Bounded host interaction follow-up
+
+The first Preview published at `e89bced` became unreachable to browser control:
+the newly opened tab timed out while binding at `Emulation.setFocusEmulationEnabled`.
+That is not proof of an application exception or the cause of the timeout.
+Independent source review did reveal a missing bound: if the browser host
+reparents its widget back, the observer could repeatedly move it. A synthetic
+host-reparent regression failed (10 passed, 1 failed), proving this source risk.
+
+The handler now disconnects **before its first and only relocation**. It never
+fights the browser host or repeatedly relocates new/replaced nodes. If the host
+insists on invalid placement, hydration may still recover with an error; that
+limitation is preferable to a potentially unbounded observer loop. This must
+not be described as complete browser acceptance until a new live check passes.

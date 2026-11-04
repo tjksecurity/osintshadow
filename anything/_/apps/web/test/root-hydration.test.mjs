@@ -197,6 +197,21 @@ test('page exit disconnects the temporary observer', () => {
   assert.equal(events.size, 0);
 });
 
+test('never fights a host that reparents its own widget back outside body', () => {
+  const { document, element, observers, flush } = documentFixture();
+  const stop = prepareDocumentHydration(document);
+  const widget = document.documentElement.appendChild(element('DIV', commentsRootId));
+  flush();
+  assert.equal(widget.parentElement, document.body);
+  // A browser-owned UI may enforce its own placement. Never form a mutation
+  // observer ping-pong loop with that host, even before React has committed.
+  document.documentElement.appendChild(widget);
+  flush();
+  assert.equal(widget.parentElement, document.documentElement);
+  assert.equal(observers[0].active, false);
+  stop();
+});
+
 test('actual client entry prepares before hydration, ends on commit, and retains default router structure', async () => {
   const source = await readFile(new URL('../src/app/entry.client.tsx', import.meta.url), 'utf8');
   const steps = [];

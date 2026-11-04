@@ -3,7 +3,7 @@
  * comments widget beside BODY, where React treats it as unexpected HTML content.
  * Preserve that known widget (including its shadow root/listeners) at BODY's
  * tail, which React leaves alone. Never delete nodes or hide hydration errors.
- * Watch only until the initial hydration commits, including concurrent yields.
+ * Watch until the widget is handled once or initial hydration commits.
  * @param {Document | undefined} document
  */
 export function prepareDocumentHydration(document) {
@@ -16,7 +16,11 @@ export function prepareDocumentHydration(document) {
     if (!active) return;
     for (const node of Array.from(root.children)) {
       if (node.tagName === 'DIV' && node.id === 'codex-browser-sidebar-comments-root') {
+        // The host owns this node and may enforce another placement. Stop before
+        // moving it so competing observers cannot create an unbounded loop.
+        stop();
         body.appendChild(node);
+        return;
       }
     }
   };
