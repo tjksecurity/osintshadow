@@ -1,0 +1,34 @@
+/**
+ * React 18 hydrates this app's whole document. The in-app browser can insert its
+ * comments widget beside BODY, where React treats it as unexpected HTML content.
+ * Preserve that known widget (including its shadow root/listeners) at BODY's
+ * tail, which React leaves alone. Never delete nodes or hide hydration errors.
+ * Watch only until the initial hydration commits, including concurrent yields.
+ * @param {Document | undefined} document
+ */
+export function prepareDocumentHydration(document) {
+  const root = document?.documentElement;
+  const body = document?.body;
+  if (!root || !body) return () => {};
+
+  let active = true;
+  const preserveCommentsRoot = () => {
+    if (!active) return;
+    for (const node of Array.from(root.children)) {
+      if (node.tagName === 'DIV' && node.id === 'codex-browser-sidebar-comments-root') {
+        body.appendChild(node);
+      }
+    }
+  };
+  const view = document.defaultView;
+  const observer = view?.MutationObserver ? new view.MutationObserver(preserveCommentsRoot) : null;
+  const stop = () => {
+    active = false;
+    observer?.disconnect();
+    view?.removeEventListener('pagehide', stop);
+  };
+  observer?.observe(root, { childList: true });
+  view?.addEventListener('pagehide', stop, { once: true });
+  preserveCommentsRoot();
+  return stop;
+}
