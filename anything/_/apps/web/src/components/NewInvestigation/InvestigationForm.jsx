@@ -17,6 +17,8 @@ export function InvestigationForm({
   setIncludeDeepImageScan,
   includeDeepScan,
   setIncludeDeepScan,
+  includePeopleDataLabs = false,
+  setIncludePeopleDataLabs,
   includeCriminal,
   setIncludeCriminal,
   includeCourt,
@@ -126,6 +128,25 @@ export function InvestigationForm({
             enableRealTimeMonitoring={enableRealTimeMonitoring}
             setEnableRealTimeMonitoring={setEnableRealTimeMonitoring}
           />
+
+          <label className="flex items-start gap-3 p-3 rounded-md border border-[#37425B]">
+            <input
+              type="checkbox"
+              checked={includePeopleDataLabs && !isTrial && ['email', 'domain'].includes(targetType)}
+              disabled={isTrial || !['email', 'domain'].includes(targetType)}
+              onChange={(event) => setIncludePeopleDataLabs?.(event.target.checked)}
+              className="mt-1"
+            />
+            <span>
+              <span className="block font-medium text-sm">People Data Labs enrichment (optional)</span>
+              <span className="block text-xs text-slate-400">
+                Send this email or domain to People Data Labs for professional or company data.
+                Requires server configuration. Provider credits are separate from your
+                ShadowTrace credits, including unlimited accounts. Matches are not verified identity.
+                {isTrial ? ' Unavailable during the trial.' : !['email', 'domain'].includes(targetType) ? ' Select an email or domain target.' : ''}
+              </span>
+            </span>
+          </label>
 
           <div className="flex items-center justify-between pt-4">
             <div className="text-sm text-slate-400">

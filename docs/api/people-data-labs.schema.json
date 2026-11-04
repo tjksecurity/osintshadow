@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://shadowtrace.invalid/contracts/people-data-labs-v1",
+  "title": "ShadowTrace People Data Labs result v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["provider", "status", "kind", "checked_at", "likelihood", "record", "message"],
+  "allOf": [
+    {
+      "if": {"properties": {"status": {"const": "matched"}}},
+      "then": {"properties": {
+        "kind": {"enum": ["person", "company"]},
+        "likelihood": {"type": "integer", "minimum": 6, "maximum": 10},
+        "record": {"type": "object", "minProperties": 1}
+      }},
+      "else": {"properties": {"likelihood": {"type": "null"}, "record": {"type": "null"}}}
+    },
+    {
+      "if": {"properties": {"kind": {"const": "person"}}},
+      "then": {"properties": {"record": {"propertyNames": {"enum": ["id", "full_name", "linkedin_url", "job_title", "job_company_name", "job_company_website", "industry"]}}}}
+    },
+    {
+      "if": {"properties": {"kind": {"const": "company"}}},
+      "then": {"properties": {"record": {"propertyNames": {"enum": ["id", "name", "website", "linkedin_url", "industry", "size", "founded"]}}}}
+    }
+  ],
+  "properties": {
+    "provider": {"const": "People Data Labs"},
+    "status": {"enum": ["not_requested", "not_configured", "unsupported_target", "invalid_target", "matched", "no_match", "authentication_error", "rate_limited", "provider_error", "timeout", "invalid_response"]},
+    "kind": {"enum": ["person", "company", null]},
+    "checked_at": {"type": "string", "format": "date-time"},
+    "likelihood": {"type": ["integer", "null"], "minimum": 1, "maximum": 10},
+    "message": {"type": "string", "maxLength": 300},
+    "record": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {"type": "string", "minLength": 1, "maxLength": 300},
+        "full_name": {"type": "string", "minLength": 1, "maxLength": 300},
+        "linkedin_url": {"type": "string", "minLength": 1, "maxLength": 300},
+        "job_title": {"type": "string", "minLength": 1, "maxLength": 300},
+        "job_company_name": {"type": "string", "minLength": 1, "maxLength": 300},
+        "job_company_website": {"type": "string", "minLength": 1, "maxLength": 300},
+        "industry": {"type": "string", "minLength": 1, "maxLength": 300},
+        "name": {"type": "string", "minLength": 1, "maxLength": 300},
+        "website": {"type": "string", "minLength": 1, "maxLength": 300},
+        "size": {"type": "string", "minLength": 1, "maxLength": 300},
+        "founded": {"type": "integer", "minimum": 1, "maximum": 9999}
+      }
+    }
+  }
+}

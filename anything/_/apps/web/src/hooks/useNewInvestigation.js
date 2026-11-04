@@ -7,6 +7,7 @@ export function useNewInvestigation() {
   const [includeNSFW, setIncludeNSFW] = useState(true);
   const [includeDeepImageScan, setIncludeDeepImageScan] = useState(false);
   const [includeDeepScan, setIncludeDeepScan] = useState(false);
+  const [includePeopleDataLabs, setIncludePeopleDataLabs] = useState(false);
   const [includeCriminal, setIncludeCriminal] = useState(true);
   const [includeCourt, setIncludeCourt] = useState(true);
   const [includeProperty, setIncludeProperty] = useState(true);
@@ -53,6 +54,7 @@ export function useNewInvestigation() {
         include_nsfw: includeNSFW,
         include_deep_image_scan: includeDeepImageScan,
         include_deep_scan: includeDeepScan,
+        include_people_data_labs: includePeopleDataLabs === true && ['email', 'domain'].includes(targetType),
         include_criminal: includeCriminal,
         include_court: includeCourt,
         include_property: includeProperty,
@@ -68,7 +70,7 @@ export function useNewInvestigation() {
         include_post_collection: includePostCollection,
       };
 
-      console.log("✓ Request body prepared:", requestBody);
+      // Do not log target identifiers or provider-consent settings.
 
       // Make the request with detailed logging
       console.log("=== MAKING FETCH REQUEST ===");
@@ -290,6 +292,8 @@ export function useNewInvestigation() {
     setIncludeDeepImageScan,
     includeDeepScan,
     setIncludeDeepScan,
+    includePeopleDataLabs,
+    setIncludePeopleDataLabs,
     includeCriminal,
     setIncludeCriminal,
     includeCourt,

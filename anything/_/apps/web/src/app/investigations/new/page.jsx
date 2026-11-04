@@ -30,6 +30,8 @@ export default function NewInvestigation() {
     setIncludeDeepImageScan,
     includeDeepScan,
     setIncludeDeepScan,
+    includePeopleDataLabs,
+    setIncludePeopleDataLabs,
     includeCriminal,
     setIncludeCriminal,
     includeCourt,
@@ -131,6 +133,8 @@ export default function NewInvestigation() {
             setIncludeDeepImageScan={setIncludeDeepImageScan}
             includeDeepScan={includeDeepScan}
             setIncludeDeepScan={setIncludeDeepScan}
+            includePeopleDataLabs={includePeopleDataLabs}
+            setIncludePeopleDataLabs={setIncludePeopleDataLabs}
             includeCriminal={includeCriminal}
             setIncludeCriminal={setIncludeCriminal}
             includeCourt={includeCourt}

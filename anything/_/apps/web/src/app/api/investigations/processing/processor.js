@@ -78,6 +78,7 @@ export async function processInvestigation(
       includeDeepImageScan: !!options.includeDeepImageScan,
       // pass deep OSINT scan flag
       includeDeepScan: !!options.includeDeepScan,
+      includePeopleDataLabs: options.includePeopleDataLabs === true,
       // pass license plate lookup options
       includeLicensePlate:
         options.includeLicensePlate === undefined

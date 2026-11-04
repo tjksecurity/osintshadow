@@ -269,6 +269,7 @@ export async function POST(request, { params }) {
                 : !!flags.includeWebScraping,
             includeDeepImageScan: !!flags.includeDeepImageScan,
             includeDeepScan: !!flags.includeDeepScan,
+            includePeopleDataLabs: flags.includePeopleDataLabs === true,
             includeLicensePlate:
               flags.includeLicensePlate === undefined
                 ? true

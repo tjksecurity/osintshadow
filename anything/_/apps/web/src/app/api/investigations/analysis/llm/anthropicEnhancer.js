@@ -30,6 +30,8 @@ export async function enhanceWithAI(
     .replaceAll("/", "");
 
   try {
+    // Provider matches stay in their attributed section, not external AI claims.
+    const { people_data_labs: _pdl, ...analysisInput } = osintData || {};
     const prompt = [
       "You are an expert OSINT investigator. You have just completed a digital investigation on the provided target.",
       "Your goal is to write a detailed investigative report that sounds like it was written by a human specialist.",
@@ -51,7 +53,7 @@ export async function enhanceWithAI(
         { role: "system", content: "You are a seasoned OSINT investigator." },
         {
           role: "user",
-          content: `${prompt}\n\nOSINT DATA:\n${JSON.stringify(osintData).slice(0, 85000)}`,
+          content: `${prompt}\n\nOSINT DATA:\n${JSON.stringify(analysisInput).slice(0, 85000)}`,
         },
       ],
       json_schema: {

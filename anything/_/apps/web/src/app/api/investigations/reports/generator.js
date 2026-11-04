@@ -10,6 +10,15 @@ function sourceLink(url, label = url) {
 
 const rawData = (value) => text(JSON.stringify(value, null, 2));
 
+function peopleDataLabsSection(result) {
+  if (!result) return '';
+  return `<div class="section"><h2>People Data Labs</h2>
+    <p><strong>Status:</strong> ${text(result.status)}</p>
+    <p>${text(result.message)}</p><p>Evaluated: ${text(result.checked_at)}</p>
+    ${result.status === 'matched' && result.record ? `<p>Provider match likelihood: ${text(result.likelihood)}/10 (not independently verified identity or ownership)</p><pre>${rawData(result.record)}</pre>` : ''}
+  </div>`;
+}
+
 export function generateReportHTML(osintData, aiAnalysis) {
   const phoneCandidates = (osintData.phone_seeds || []).filter(
     (candidate) => candidate?.verification_status === "unverified_candidate",
@@ -74,6 +83,8 @@ export function generateReportHTML(osintData, aiAnalysis) {
             : ""
         }
       </div>
+
+      ${peopleDataLabsSection(osintData.people_data_labs)}
 
       <div class="section">
         <h2>Cross-Platform Identity Graph</h2>

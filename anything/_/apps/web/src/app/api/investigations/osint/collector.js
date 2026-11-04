@@ -3,6 +3,7 @@ import {
   createCrossRefs,
   createProgressReporter,
 } from "./collector/dataStructure.js";
+import { enrichPeopleDataLabs } from './peopleDataLabs.js';
 import {
   handleEmailTarget,
   handleUsernameTarget,
@@ -42,6 +43,13 @@ import {
 export async function collectOSINT(targetType, targetValue, options = {}) {
   const data = createOSINTEnvelope(targetType, targetValue, options);
   const report = createProgressReporter(options.onProgress);
+
+  // Isolated provider output: never seed discovery or assert identity from a match.
+  data.people_data_labs = await enrichPeopleDataLabs(targetType, targetValue, options);
+  if (options.includePeopleDataLabs === true) {
+    report({ phase: 'osint', step: 'people_data_labs', percent: 11,
+      message: `People Data Labs: ${data.people_data_labs.status}` });
+  }
 
   try {
     const crossRefs = createCrossRefs();
